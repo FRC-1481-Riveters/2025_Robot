@@ -1,8 +1,8 @@
 package frc.robot;
 
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -75,13 +75,20 @@ public final class Constants {
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 6;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 6;
 
-        public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
-                new PIDConstants(5, 0.0, 0.00), // Translation constants
-                new PIDConstants(10, 0.0, 0.0), // Rotation constants
-                kPhysicalMaxSpeedMetersPerSecond,
-                new Translation2d(kWheelBase / 2, kTrackWidth / 2).getNorm(), // Drive base radius (distance from center
-                                                                              // to furthest module)
-                new ReplanningConfig());
+        public static final PPHolonomicDriveController kDriveController = new PPHolonomicDriveController(
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+        );
+
+        public static RobotConfig kRobotConfig;
+        static {
+            try{
+            kRobotConfig = RobotConfig.fromGUISettings();
+            } catch (Exception e) {
+            // Handle exception as needed
+            e.printStackTrace();
+            }
+        }
 
         public static final double DRIVE_DIVIDER_NORMAL = 2.0;
         public static final double DRIVE_DIVIDER_TURBO = 1.0;

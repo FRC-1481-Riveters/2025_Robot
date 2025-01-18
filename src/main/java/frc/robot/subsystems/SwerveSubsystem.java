@@ -1,11 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware;
-import com.ctre.phoenix.sensors.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.PathPlannerLogging;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -22,6 +16,11 @@ import frc.robot.LocalADStarAK;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(
@@ -83,12 +82,13 @@ public class SwerveSubsystem extends SubsystemBase {
         }).start();
 
         // Configure AutoBuilder
-        AutoBuilder.configureHolonomic(
+        AutoBuilder.configure(
                 this::getPose,
                 this::resetOdometry,
                 () -> DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates()),
-                this::driveRobotRelative,
-                DriveConstants.pathFollowerConfig,
+                (speeds, feedForwards) -> driveRobotRelative(speeds),
+                DriveConstants.kDriveController,
+                DriveConstants.kRobotConfig,
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red
                     // alliance
@@ -117,7 +117,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void zeroHeading(double heading) {
         // gyro.setAccumZAngle(0); //.setFusedHeading(0);
-        yawOffset = gyro.getYaw() + heading;
+        yawOffset = gyro.getYaw().getValueAsDouble() + heading;
         System.out.println("zeroHeading: heading=" + heading + ", offset=" + yawOffset);
         frontLeft.resetEncoders();
         frontRight.resetEncoders();
@@ -132,7 +132,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // TODO: not sure if the Pigeon2 getYaw returning -368 to 368 is OK here (should
         // it be 0...360)?
         // return Math.IEEEremainder( gyro.getYaw() - yawOffset, 360 );
-        return gyro.getYaw() - yawOffset;
+        return gyro.getYaw().getValueAsDouble() - yawOffset;
     }
 
     public Rotation2d getRotation2d() {

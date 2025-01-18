@@ -37,11 +37,7 @@ public class ElevatorSubsystem extends SubsystemBase{
       m_motorConfig
         .inverted(true)
         .secondaryCurrentLimit(m_position, 0)
-        .idleMode(IdleMode.kBrake)
-        .softLimit
-        .reverseSoftLimit( (float) ElevatorConstants.ELEVATOR_MAX)
-        .reverseSoftLimitEnabled(true);
-        
+        .idleMode(IdleMode.kBrake);
       m_motorConfig.smartCurrentLimit(30, 30);
       m_encoder.setPosition(0);
 
