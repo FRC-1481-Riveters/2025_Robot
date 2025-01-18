@@ -1,0 +1,132 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.98,
+        "y": 6.63
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.8765648088949956,
+        "y": 6.96290147074405
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.845132261693095,
+        "y": 7.388366776733554
+      },
+      "prevControl": {
+        "x": 6.540440509452448,
+        "y": 7.300410029391488
+      },
+      "nextControl": {
+        "x": 9.149824013933742,
+        "y": 7.476323524075621
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.98,
+        "y": 5.629231829892232
+      },
+      "prevControl": {
+        "x": 2.962183678653073,
+        "y": 6.105664211328424
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 180.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake Begin",
+      "waypointRelativePos": 0.55,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeDeployCommand"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRollersIn"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Intake Stop",
+      "waypointRelativePos": 0.95,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRetractCommand"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Rollers Stop",
+      "waypointRelativePos": 1.45,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRollersStop"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -178.63607246805685,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": -120.37912601136834,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

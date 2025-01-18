@@ -1,0 +1,79 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7352951848760846,
+      "y": 4.471134656555028
+    },
+    "rotation": 121.75948008481284
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarMiddleReach"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarMiddleSpew"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpewCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Far2ndBottomReachFromSpew"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Far2ndBottomSpew"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAgainCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarBottomReachFromSpew"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarBottomShootReturn"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootCommand"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

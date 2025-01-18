@@ -1,0 +1,121 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7910011248593932,
+        "y": 4.479930331289235
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.0284843426829717,
+        "y": 3.840777967270221
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.4357923001560295,
+        "y": 4.104648209296419
+      },
+      "prevControl": {
+        "x": 2.083965310787765,
+        "y": 4.0606698356253865
+      },
+      "nextControl": {
+        "x": 2.6016451334678434,
+        "y": 4.125379813460396
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.7910011248593932,
+        "y": 4.479930331289235
+      },
+      "prevControl": {
+        "x": 1.043143800573316,
+        "y": 3.811459051489532
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 179.99999999967264,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Retract",
+      "waypointRelativePos": 1.35,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRetractCommand"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRollersStop"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Deploy",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeDeployCommand"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRollersIn"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 119.93151184050778,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 119.47588900324571,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

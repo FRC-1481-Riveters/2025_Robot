@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7910011248593932,
+      "y": 4.479930331289235
+    },
+    "rotation": 121.63603599862765
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarBottomFetch2ndNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAgainCommand"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

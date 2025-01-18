@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7586545815695819,
+      "y": 6.623047338926525
+    },
+    "rotation": -120.31121322668163
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidTop1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot3FootCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidTop2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot3FootCommand"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
