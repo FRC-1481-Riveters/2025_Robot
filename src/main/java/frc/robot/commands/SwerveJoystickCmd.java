@@ -2,27 +2,21 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 
-public class SwerveJoystickCmd extends CommandBase {
+public class SwerveJoystickCmd extends Command {
 
     private final SwerveSubsystem swerveSubsystem;
     private final Supplier<Double> xSpdFunction, ySpdFunction, turningSpdFunction;
     private final Supplier<Boolean> fieldOrientedFunction;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
-
-    private PIDController driftCorrectionPID = new PIDController(0.07, 0.00, 0.004);
-
-    private double pXY = 0;
-    private double desiredHeading;
 
     public SwerveJoystickCmd(SwerveSubsystem swerveSubsystem,
             Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction,
@@ -54,8 +48,9 @@ public class SwerveJoystickCmd extends CommandBase {
         ySpeed = Math.abs(ySpeed) > OIConstants.kDeadband ? ySpeed : 0.0;
         turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0.0;
 
-        if( xSpeed < 0 )
+        if( xSpeed > 0 )
         {
+            // the 2025 robot is always facing the driver, so controls are backwards
             xSpeed = -1 * xSpeed * xSpeed;
         }
         else
@@ -63,8 +58,9 @@ public class SwerveJoystickCmd extends CommandBase {
             xSpeed = xSpeed * xSpeed;
         }
       
-        if( ySpeed < 0 )
+        if( ySpeed > 0 )
         {
+            // the 2025 robot is always facing the driver, so controls are backwards
             ySpeed = -1 * ySpeed * ySpeed;
         }
         else
@@ -86,6 +82,14 @@ public class SwerveJoystickCmd extends CommandBase {
         ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
         turningSpeed = turningLimiter.calculate(turningSpeed)
                 * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
+
+        if (xSpeed < 1 && ySpeed < 1)
+        {
+            if (turningSpeed > 2 * Math.PI)
+            {
+                turningSpeed = 2 * Math.PI;
+            }
+        }
 
         // 4. Construct desired chassis speeds
         ChassisSpeeds chassisSpeeds;

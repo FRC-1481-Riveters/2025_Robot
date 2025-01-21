@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 2.435792300160462,
-        "y": 0.9968431365391288
+        "y": 0.9968431365391286
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 0.7622918102979067
       },
       "prevControl": {
-        "x": 4.854602852062848,
-        "y": 0.4104648209296428
+        "x": 4.854602852062849,
+        "y": 0.4104648209296421
       },
       "nextControl": {
-        "x": 8.710867239011582,
-        "y": 0.7705828959754385
+        "x": 8.871000508588967,
+        "y": 0.7855369756246884
       },
       "isLocked": false,
       "linkedName": null
@@ -37,7 +37,7 @@
       },
       "prevControl": {
         "x": 2.582386879059473,
-        "y": -0.49842156827170764
+        "y": -0.49842156827170747
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,29 +47,24 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": 179.99999999967264,
-      "rotateFast": false
+      "rotationDegrees": 179.99999999967264
     }
   ],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Retract",
-      "waypointRelativePos": 1.35,
+      "name": "Stow",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
-                "name": "IntakeRetractCommand"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "IntakeRollersStop"
+                "name": "Stow"
               }
             }
           ]
@@ -79,6 +74,7 @@
     {
       "name": "Deploy",
       "waypointRelativePos": 0.45,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
         "data": {
@@ -100,16 +96,23 @@
       }
     },
     {
-      "name": "Stow",
-      "waypointRelativePos": 0,
+      "name": "Retract",
+      "waypointRelativePos": 1.35,
+      "endWaypointRelativePos": null,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
-                "name": "Stow"
+                "name": "IntakeRetractCommand"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRollersStop"
               }
             }
           ]
@@ -121,18 +124,19 @@
     "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.93151184050778,
-    "rotateFast": false
+    "rotation": 119.93151184050777
   },
   "reversed": false,
   "folder": null,
-  "previewStartingState": {
-    "rotation": 119.47588900324571,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

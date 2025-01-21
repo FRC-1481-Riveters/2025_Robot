@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -20,12 +20,12 @@
         "y": 7.435813937609565
       },
       "prevControl": {
-        "x": 7.636945101898878,
-        "y": 7.4101560370234
+        "x": 7.631588493295595,
+        "y": 7.409591057591325
       },
       "nextControl": {
-        "x": 7.944867829413921,
-        "y": 7.442633677373625
+        "x": 8.128830328074404,
+        "y": 7.462036817627804
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 5.53
       },
       "prevControl": {
-        "x": 2.130314891151615,
-        "y": 5.507969430812442
+        "x": 2.128124868504248,
+        "y": 5.280011536335804
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,15 +47,16 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1,
-      "rotationDegrees": -179.55720125348412,
-      "rotateFast": false
+      "rotationDegrees": -179.55720125348412
     }
   ],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "Intake Begin",
       "waypointRelativePos": 0.4,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -79,6 +80,7 @@
     {
       "name": "Intake Stop",
       "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -96,6 +98,7 @@
     {
       "name": "Rollers Stop",
       "waypointRelativePos": 1.25,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -115,18 +118,19 @@
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 178.16880576710517,
-    "rotateFast": false
+    "rotation": 178.16880576710517
   },
   "reversed": false,
   "folder": null,
-  "previewStartingState": {
-    "rotation": -179.9768444612056,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

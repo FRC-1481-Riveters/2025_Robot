@@ -15,18 +15,18 @@ import com.ctre.phoenix.sensors.CANCoder;
 
 import org.littletonrobotics.junction.Logger;
 
-public class ShooterPivotSubsystem extends SubsystemBase 
+public class ClawSubsystem extends SubsystemBase 
 {
-    private SparkMax m_motor = new SparkMax(ShooterPivotConstants.SHOOTER_PIVOT_MOTOR, SparkLowLevel.MotorType.kBrushless );
+    private SparkMax m_motor = new SparkMax(ClawConstants.CLAW_MOTOR, SparkLowLevel.MotorType.kBrushless );
     private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
-    private CANCoder m_CANCoder = new CANCoder(ShooterPivotConstants.SHOOTER_PIVOT_CANCODER);
+    private CANCoder m_CANCoder = new CANCoder(ClawConstants.CLAW_CANCODER);
 
     private final TrapezoidProfile.Constraints m_constraints =
-        new TrapezoidProfile.Constraints(ShooterPivotConstants.SHOOTER_PIVOT_VELOCITY, ShooterPivotConstants.SHOOTER_PIVOT_ACCELERATION);
+        new TrapezoidProfile.Constraints(ClawConstants.CLAW_VELOCITY, ClawConstants.CLAW_ACCELERATION);
     private ProfiledPIDController pid = new ProfiledPIDController(
-                                        ShooterPivotConstants.SHOOTER_PIVOT_0_KP,
-                                        ShooterPivotConstants.SHOOTER_PIVOT_0_KI,
-                                        ShooterPivotConstants.SHOOTER_PIVOT_0_KD,
+                                        ClawConstants.CLAW_0_KP,
+                                        ClawConstants.CLAW_0_KI,
+                                        ClawConstants.CLAW_0_KD,
                                         m_constraints, 0.02
                                     );
     private double m_Setpoint;
@@ -38,7 +38,7 @@ public class ShooterPivotSubsystem extends SubsystemBase
     private boolean m_pid;
 
 
-    public ShooterPivotSubsystem() 
+    public ClawSubsystem() 
     {
         m_CANCoder.setPosition(m_CANCoder.getAbsolutePosition());
 
@@ -54,53 +54,53 @@ public class ShooterPivotSubsystem extends SubsystemBase
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
         
         // Create an initial log entry so they all show up in AdvantageScope without having to enable anything
-        Logger.recordOutput("ShooterPivot/Setpoint", 0.0 );
-        Logger.recordOutput("ShooterPivot/Position", 0.0);
-        Logger.recordOutput("ShooterPivot/Output", 0.0);
-        Logger.recordOutput("ShooterPivot/AtSetpoint", false );
+        Logger.recordOutput("Claw/Setpoint", 0.0 );
+        Logger.recordOutput("Claw/Position", 0.0);
+        Logger.recordOutput("Claw/Output", 0.0);
+        Logger.recordOutput("Claw/AtSetpoint", false );
     }
 
-    public void setShooterPivot( double angle )
+    public void setClaw( double angle )
     {
         double sensorSetpoint;
 
         m_Setpoint = angle;
         pid.setIZone(m_tolerance*3);
-        if( (angle >= (ShooterPivotConstants.SHOOTER_PIVOT_CLOSE - 0.5)) &&
-            (angle <= (ShooterPivotConstants.SHOOTER_PIVOT_CLOSE + 0.5)) )
+        if( (angle >= (ClawConstants.CLAW_CLOSE - 0.5)) &&
+            (angle <= (ClawConstants.CLAW_CLOSE + 0.5)) )
         {
-            pid.setP( ShooterPivotConstants.SHOOTER_PIVOT_CLOSE_KP );
-            pid.setI( ShooterPivotConstants.SHOOTER_PIVOT_CLOSE_KI );
-            pid.setD( ShooterPivotConstants.SHOOTER_PIVOT_CLOSE_KD );
+            pid.setP( ClawConstants.CLAW_CLOSE_KP );
+            pid.setI( ClawConstants.CLAW_CLOSE_KI );
+            pid.setD( ClawConstants.CLAW_CLOSE_KD );
             pid.setIZone(m_tolerance*4);
         }
-        else if( (angle >= (ShooterPivotConstants.SHOOTER_PIVOT_AMP - 0.5)) &&
-            (angle <= (ShooterPivotConstants.SHOOTER_PIVOT_AMP + 0.5)) )
+        else if( (angle >= (ClawConstants.CLAW_AMP - 0.5)) &&
+            (angle <= (ClawConstants.CLAW_AMP + 0.5)) )
         {
-            pid.setP( ShooterPivotConstants.SHOOTER_PIVOT_AMP_KP );
-            pid.setI( ShooterPivotConstants.SHOOTER_PIVOT_AMP_KI );
-            pid.setD( ShooterPivotConstants.SHOOTER_PIVOT_AMP_KD );
+            pid.setP( ClawConstants.CLAW_AMP_KP );
+            pid.setI( ClawConstants.CLAW_AMP_KI );
+            pid.setD( ClawConstants.CLAW_AMP_KD );
         }
         else
         {
-            pid.setP( ShooterPivotConstants.SHOOTER_PIVOT_0_KP );
-            pid.setI( ShooterPivotConstants.SHOOTER_PIVOT_0_KI );
-            pid.setD( ShooterPivotConstants.SHOOTER_PIVOT_0_KD );
+            pid.setP( ClawConstants.CLAW_0_KP );
+            pid.setI( ClawConstants.CLAW_0_KI );
+            pid.setD( ClawConstants.CLAW_0_KD );
         }
         pid.reset(m_position);
         m_pid = true;
-        Logger.recordOutput("ShooterPivot/Setpoint", m_Setpoint );
+        Logger.recordOutput("Claw/Setpoint", m_Setpoint );
 
-        System.out.println("setShooterPivot " + angle + ", current angle=" + m_position);
+        System.out.println("setClaw " + angle + ", current angle=" + m_position);
     }
 
-    public void setShooterPivotJog( double speed )
+    public void setClawJog( double speed )
     {
         m_pid = false;
         m_output = speed;
         m_Setpoint = 0;
-        Logger.recordOutput("ShooterPivot/Setpoint", m_Setpoint );
-        System.out.println("setShooterPivotJog " + m_output );
+        Logger.recordOutput("Claw/Setpoint", m_Setpoint );
+        System.out.println("setClawJog " + m_output );
     }
 
     public boolean atSetpoint()
@@ -126,22 +126,22 @@ public class ShooterPivotSubsystem extends SubsystemBase
           m_output = MathUtil.clamp( pidCalculate, -0.25, 0.25);
         }
 
-        if( (m_position > ShooterPivotConstants.SHOOTER_PIVOT_MAX) ||
-            (m_position < ShooterPivotConstants.SHOOTER_PIVOT_MIN) )
+        if( (m_position > ClawConstants.CLAW_MAX) ||
+            (m_position < ClawConstants.CLAW_MIN) )
         {
             m_output = 0;
         }
     
         m_motor.set( m_output );
-        Logger.recordOutput("ShooterPivot/Output", m_output);
-        Logger.recordOutput("ShooterPivot/Current",m_motor.getOutputCurrent());
+        Logger.recordOutput("Claw/Output", m_output);
+        Logger.recordOutput("Claw/Current",m_motor.getOutputCurrent());
 
-        Logger.recordOutput("ShooterPivot/Position", m_position);
+        Logger.recordOutput("Claw/Position", m_position);
         if( Math.abs( m_position - m_Setpoint ) > m_tolerance )
         {
             m_atSetpoint = false;
             m_atSetpointDebounceCounter = 0;
-            Logger.recordOutput("ShooterPivot/AtSetpoint", m_atSetpoint );
+            Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
         }
         else if( m_atSetpointDebounceCounter < 12 )
         {
@@ -149,7 +149,7 @@ public class ShooterPivotSubsystem extends SubsystemBase
             if( m_atSetpointDebounceCounter == 12 )
             {
                 m_atSetpoint = true;
-                Logger.recordOutput("ShooterPivot/AtSetpoint", m_atSetpoint );
+                Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
             }
         }
     }

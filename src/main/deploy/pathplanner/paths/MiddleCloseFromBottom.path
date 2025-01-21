@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -24,8 +24,8 @@
         "y": 5.249752596263769
       },
       "nextControl": {
-        "x": 2.597046336949817,
-        "y": 5.673210203563265
+        "x": 2.637976321231826,
+        "y": 5.702977464859272
       },
       "isLocked": false,
       "linkedName": null
@@ -36,7 +36,7 @@
         "y": 4.479930331289235
       },
       "prevControl": {
-        "x": 1.8200950687615667,
+        "x": 1.8200950687615665,
         "y": 3.708842846257122
       },
       "nextControl": null,
@@ -47,38 +47,16 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": -178.85423716182484,
-      "rotateFast": false
+      "rotationDegrees": -178.85423716182484
     }
   ],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
-    {
-      "name": "Retract",
-      "waypointRelativePos": 1.35,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "IntakeRetractCommand"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "IntakeRollersStop"
-              }
-            }
-          ]
-        }
-      }
-    },
     {
       "name": "Deploy",
       "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
         "data": {
@@ -98,24 +76,49 @@
           ]
         }
       }
+    },
+    {
+      "name": "Retract",
+      "waypointRelativePos": 1.35,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRetractCommand"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRollersStop"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.93151184050778,
-    "rotateFast": false
+    "rotation": 119.93151184050777
   },
   "reversed": false,
   "folder": null,
-  "previewStartingState": {
-    "rotation": 119.47588900324571,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

@@ -7,22 +7,17 @@ package frc.robot;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.ShoulderSubsystem;
-import frc.robot.subsystems.ExtendSubsystem;
-import frc.robot.subsystems.WristSubsystem;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,6 +30,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
  */
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
+    private Command m_testCommand;
 
     private RobotContainer m_robotContainer;
 
@@ -47,30 +43,36 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
+        
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our
         // autonomous chooser on the dashboard.
-        Logger.getInstance().recordMetadata("ProjectName", "Diplo"); // Set a metadata value
+        Logger.recordMetadata("ProjectName", "Mozart"); // Set a metadata value
 
         if (isReal()) {
-            Logger.getInstance().addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
-            Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            Logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
+            Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         } else {
             setUseTiming(false); // Run as fast as possible
             String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-            Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
-            Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+            Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
         }
-        
-        // Logger.getInstance().disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
-        Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+ 
+        Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
         
 
         System.out.println(" " + 1481);
         m_robotContainer = new RobotContainer();
-
+        
         //CameraServer.startAutomaticCapture();
+
+        // Limelight port forwarding (allows Limelight to be seen from outside)
+        // Make sure you only configure port forwarding once in your robot code.
+        // Do not place these function calls in any periodic functions
+       // for (int port = 5800; port <= 5807; port++) {
+            //PortForwarder.add(port, "limelight.local", port);
+  //}
     }
 
     /**
@@ -94,20 +96,16 @@ public class Robot extends LoggedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-        m_robotContainer.extendSubsystem.setShoulder(
-        m_robotContainer.shoulderSubsystem.getCosine());
+       
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
     public void disabledInit() {
         // Turn off position control when the robot is disabled.
-        m_robotContainer.driverJoystick.setRumble(RumbleType.kBothRumble,0);
-        m_robotContainer.operatorJoystick.setRumble(RumbleType.kBothRumble,0);
-        m_robotContainer.extendSubsystem.setExtend(0);
-        m_robotContainer.shoulderSubsystem.setShoulder(0);
-        m_robotContainer.wristSubsystem.setWrist(0);
-        m_robotContainer.extendSubsystem.zeroPosition();
+        m_robotContainer.driverJoystick.getHID().setRumble(RumbleType.kBothRumble,0);
+        m_robotContainer.operatorJoystick.getHID().setRumble(RumbleType.kBothRumble,0);
+       
     }
 
     @Override
@@ -133,11 +131,16 @@ public class Robot extends LoggedRobot {
      * {@link RobotContainer} class.
      */
     @Override
-    public void autonomousInit() {
+    public void autonomousInit() 
+    {
+        CommandScheduler.getInstance().cancelAll();
+        m_robotContainer.StopControls(true);
+
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
-        if (m_autonomousCommand != null) {
+        if (m_autonomousCommand != null) 
+        {
             m_autonomousCommand.schedule();
         }
     }
@@ -156,23 +159,39 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-        m_robotContainer.swerveSubsystem.zeroHeading(180.0);
-        m_robotContainer.setCreep(0);
+        m_robotContainer.StopControls(true);
+        CommandScheduler.getInstance().cancelAll();
     }
 
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
     }
+    
 
     @Override
     public void testInit() {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
+
+        m_testCommand = m_robotContainer.getTestCommand();
+        m_robotContainer.m_allTestsPassed = true;
+
+        // schedule the autonomous command (example)
+        if (m_testCommand != null) 
+        {
+            m_testCommand.schedule();
+        }
     }
 
     /** This function is called periodically during test mode. */
     @Override
     public void testPeriodic() {
+    }
+
+    @Override
+    public void testExit(){
+        CommandScheduler.getInstance().cancelAll();
+        m_robotContainer.StopControls(true);
     }
 }

@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -20,12 +20,12 @@
         "y": 7.007220871588259
       },
       "prevControl": {
-        "x": 2.4795590231442444,
-        "y": 6.9851903024007
+        "x": 2.4773690004968776,
+        "y": 6.757232407924063
       },
       "nextControl": {
-        "x": 2.479982324522474,
-        "y": 7.029251440775817
+        "x": 2.4821723471698407,
+        "y": 7.257209335252455
       },
       "isLocked": false,
       "linkedName": null
@@ -47,15 +47,16 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "Intake Begin",
       "waypointRelativePos": 0.05,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -77,25 +78,9 @@
       }
     },
     {
-      "name": "Intake Stop",
-      "waypointRelativePos": 0.9,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "IntakeRetractCommand"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Rollers Stop",
       "waypointRelativePos": 0.55,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -109,24 +94,43 @@
           ]
         }
       }
+    },
+    {
+      "name": "Intake Stop",
+      "waypointRelativePos": 0.9,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeRetractCommand"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -143.48003394845148,
-    "rotateFast": false
+    "rotation": -143.48003394845148
   },
   "reversed": false,
   "folder": null,
-  "previewStartingState": {
-    "rotation": -120.37912601136834,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

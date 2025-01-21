@@ -1,138 +1,61 @@
 package frc.robot;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
-import javax.lang.model.util.ElementScanner14;
-
-import org.w3c.dom.css.RGBColor;
-
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
-import com.pathplanner.lib.auto.PIDConstants;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import com.pathplanner.lib.server.PathPlannerServer;
-
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.XboxController.Button;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.ShoulderConstants;
+import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.commands.SwerveJoystickCmd;
-import frc.robot.subsystems.WristSubsystem;
-import frc.robot.subsystems.ShoulderSubsystem;
-import frc.robot.subsystems.ExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-
-
-import frc.robot.GamepadAxisButton;
-import frc.robot.commands.SwerveJoystickCmd;
-import frc.robot.commands.ShoulderJogUpCmd;
-import frc.robot.commands.ShoulderJogDownCmd;
-import frc.robot.commands.ShoulderPositionCmd;
-import frc.robot.commands.WristJogDownCmd;
-import frc.robot.commands.WristJogUpCmd;
-import frc.robot.commands.WristPositionCmd;
-import frc.robot.commands.BalanceWaitLevelCmd;
-import frc.robot.commands.ExtendJogInCmd;
-import frc.robot.commands.ExtendJogOutCmd;
-import frc.robot.commands.ExtendPositionCmd;
-import frc.robot.commands.IntakeJogCmd;
-import frc.robot.commands.WristWaitPositionCmd;
-import frc.robot.commands.ExtendWaitPositionCmd;
-import frc.robot.commands.ShoulderWaitPositionCmd;
+import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ClawSubsystem;
+import com.ctre.phoenix.led.*;
+import com.ctre.phoenix.led.CANdle.LEDStripType;
+import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 
 public class RobotContainer 
 {
     public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    public final ShoulderSubsystem shoulderSubsystem = new ShoulderSubsystem();
-    public final WristSubsystem wristSubsystem = new WristSubsystem();
-    public final ExtendSubsystem extendSubsystem = new ExtendSubsystem();
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem( this );
+    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem( elevatorSubsystem );
+    private final ClawSubsystem clawSubsystem = new ClawSubsystem();
+    
+
+    public final CommandXboxController driverJoystick = new CommandXboxController(OIConstants.kDriverControllerPort);
+    public final CommandXboxController operatorJoystick = new CommandXboxController(OIConstants.kOperatorControllerPort);
+
+    SendableChooser<Command> m_autoChooser;
 
 
-    public final XboxController driverJoystick = new XboxController(OIConstants.kDriverControllerPort);
-    public final XboxController operatorJoystick = new XboxController(OIConstants.kOperatorControllerPort);
-
-    private boolean isPracticeRobot;
-
-    private Field2d m_field;
-
-    double driveDivider = 1.5;
-
-    GamepadAxisButton m_driverDpadUp;
-    GamepadAxisButton m_operatorRightYAxisUp;
-    GamepadAxisButton m_operatorRightYAxisDown;
-    GamepadAxisButton m_operatorLeftYAxisUp;
-    GamepadAxisButton m_operatorLeftYAxisDown;
-    GamepadAxisButton m_operatorLeftTrigger;
-    GamepadAxisButton m_operatorRightTrigger;
-    GamepadAxisButton m_operatorDpadUp;
-    GamepadAxisButton m_operatorDpadDown;
-    GamepadAxisButton m_operatorDpadLeft;
-    GamepadAxisButton m_operatorDpadRight;
-    GamepadAxisButton m_driverLT, m_driverRT;
-
-    double m_dCreep=0;
-
-    // A chooser for autonomous commands
-    SendableChooser<Command> m_chooser = new SendableChooser<>();
+    double driveDivider = Constants.DriveConstants.DRIVE_DIVIDER_NORMAL;
 
     public AddressableLED m_led;
     public AddressableLEDBuffer m_ledBuffer;
+    public CANdle m_CANdle;
+    public boolean m_allTestsPassed;
 
     public RobotContainer() 
     {
-        DigitalInput input;
         m_led = new AddressableLED(0);
+        m_CANdle = new CANdle(Constants.OIConstants.CANDLE_ID);
 
         // Reuse buffer
         // Default to a length of 60, start empty output
         // Length is expensive to set, so only set it once, then just update data
-        m_ledBuffer = new AddressableLEDBuffer(60);
+        m_ledBuffer = new AddressableLEDBuffer(36);
         m_led.setLength(m_ledBuffer.getLength());
 
         for (var i = 0; i < m_ledBuffer.getLength(); i++) {
@@ -143,33 +66,80 @@ public class RobotContainer
         // Set the data
         m_led.setData(m_ledBuffer);
         m_led.start();
-        
-        input = new DigitalInput(9);
-        isPracticeRobot = !input.get();
-        input.close();
-
-        configureAutonomousCommands();
+        CANdleConfiguration configAll = new CANdleConfiguration();
+        configAll.statusLedOffWhenActive = true;
+        configAll.disableWhenLOS = false;
+        configAll.stripType = LEDStripType.RGB;
+        configAll.brightnessScalar = 0.1;
+        m_CANdle.configAllSettings(configAll, 100);
+        m_CANdle.animate( new RainbowAnimation(1.0, 1.0, 8), 0 );
     
         swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
                 swerveSubsystem,
                 () -> getDriverMoveFwdBack(),
                 () -> getDriverMoveLeftRight(),
                 () -> getDriverRotate(),
-                () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                () -> !driverJoystick.getHID().getRightBumper() ));
 
         configureButtonBindings();
 
-        // Create and push Field2d to SmartDashboard.
-        m_field = new Field2d();
-        SmartDashboard.putData(m_field);
-
-        // FIXME MUST NOT BE ENABLED WITH FMS!!!
-        // FIXME DISABLE THIS BEFORE COMPETITION!
-        //PathPlannerServer.startServer(5811); // 5811 = port number. adjust this according to your needs
+        // Register named pathplanner commands
+        NamedCommands.registerCommand("ShootCommand", AutonShooterCommand());
+        NamedCommands.registerCommand("ShootAgainCommand", AutonShootAgainCommand());
+        NamedCommands.registerCommand("Shoot3FootCommand", AutonShooter3FootCommand());
+        NamedCommands.registerCommand("SpewCommand", AutonSpewCommand());
+        NamedCommands.registerCommand("IntakeRetractCommand", IntakeRetractAutoCommand() );
+        NamedCommands.registerCommand("IntakeDeployCommand", IntakeDeployAutoCommand() );
+        NamedCommands.registerCommand("IntakeRollersIn", IntakeRollersInCommand() );
+        NamedCommands.registerCommand("IntakeRollersStop", IntakeRollersStopCommand() );
+        NamedCommands.registerCommand("Stow", AutonStowCommand());
+        // A chooser for autonomous commands
+        // Add a button to run the example auto to SmartDashboard
+        //SmartDashboard.putData("Example Auto", new PathPlannerAuto("Example Auto"));
+        m_autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be `Commands.none()`
+        SmartDashboard.putData( "Auto Mode", m_autoChooser ); 
     }
 
-    private void setBling( int red, int green, int blue )
+    public void setRosie()
     {
+        int i;
+        for( i=0; i<m_ledBuffer.getLength(); i += 3 )
+        {
+            m_ledBuffer.setRGB(i+0, 255, 0, 0);
+            m_ledBuffer.setRGB(i+1, 255, 0, 0);;
+            m_ledBuffer.setRGB(i+2, 255, 255, 255);
+        }
+        // Set the data
+        m_led.setData(m_ledBuffer);
+        m_led.start();
+
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+        m_CANdle.clearAnimation(0);
+        for( i=0; i<8; i++ )
+        {
+            if( i % 2 == 0 )
+                m_CANdle.setLEDs(255,0,0,0,i,1);
+            else
+                m_CANdle.setLEDs(255,255,255,255,i,1);
+        }
+    }
+
+    public void setBling( int red, int green, int blue )
+    {
+        // limelight ledMode: 1=off, 2=blink, 3=on
+        //if(red == 0 && blue == 0 && green == 255){
+          //  NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+        //}else if(red == 255 && green == 255 && blue == 0 ){
+          //  NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(2);
+        //}else if(red == 0 && green == 0 && blue == 0){
+          //  NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+        //}
+        //else if( red == 255 && green == 25 && blue == 0 ) {
+          //  NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(2);
+            //schedule brief double rumble 
+            //GamepieceRumbleCommand().schedule();
+        //}
+
         int i;
         for( i=0; i<m_ledBuffer.getLength(); i++ )
         {
@@ -178,874 +148,565 @@ public class RobotContainer
         // Set the data
         m_led.setData(m_ledBuffer);
         m_led.start();
+
+        m_CANdle.clearAnimation(0);
+        m_CANdle.setLEDs(red,green,blue,0,0,8);
     }
 
     private double getDriverMoveFwdBack()
     {
-        // Handle creeping forward if the driver is pressing D-pad up
         double pos;
-        if( m_dCreep != 0 )
-            // Use a fixed value to creep forward
-            pos = m_dCreep;
-        else
-            // Use the joystick axis
-            pos = driverJoystick.getRawAxis(OIConstants.kDriverYAxis) / driveDivider;
+        // Use the joystick axis
+        pos = driverJoystick.getRawAxis(OIConstants.kDriverYAxis) / driveDivider;
         return pos;
     }
 
     private double getDriverMoveLeftRight()
     {
         double pos;
-        if( m_dCreep != 0 )
-            pos = 0;
-        else
-            pos = driverJoystick.getRawAxis(OIConstants.kDriverXAxis) / driveDivider;
+        pos = driverJoystick.getRawAxis(OIConstants.kDriverXAxis) / driveDivider;
         return pos;
     }
 
     private double getDriverRotate()
     {
         double pos;
-        if( m_dCreep != 0 )
-            pos = 0;
-        else
-            pos = driverJoystick.getRawAxis(OIConstants.kDriverRotAxis) / driveDivider;
+        pos = -driverJoystick.getRawAxis(OIConstants.kDriverRotAxis) / driveDivider;
         return pos;
     }
 
-    private void DriveSlowDividerSet( double divider )
+    private void DriveDividerSet( double divider )
     {
         driveDivider = divider;
     }
     
-    public void setCreep( double value )
-    {
-        m_dCreep = value;
-
-        if( DriverStation.getAlliance() == DriverStation.Alliance.Blue ){
-            m_dCreep = m_dCreep * 1.10;
-            //juice blue side a little higher
-        }
-           
-        System.out.println("setCreep " + m_dCreep);
-    }
-
     private void configureButtonBindings() 
     {
-        new JoystickButton(driverJoystick, XboxController.Button.kA.value).whenPressed( () -> swerveSubsystem.zeroHeading(0.0) );
+        Trigger aButton = driverJoystick.start();
+        aButton
+            .onTrue( Commands.runOnce( () -> swerveSubsystem.zeroHeading(180.0) ) );
 
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value)
-           .whenPressed(() -> DriveSlowDividerSet(1.0))
-           .whenReleased(() -> DriveSlowDividerSet(1.5));
+        Trigger driverLeftTrigger = driverJoystick.leftTrigger( 0.7 );
+        driverLeftTrigger
+            .onFalse(Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_NORMAL )))
+            .onTrue( Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_TURBO )));
+
+        Trigger driverInTrigger = driverJoystick.leftBumper();
+        driverInTrigger
+        .onFalse(Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_NORMAL )))
+        .onTrue( Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_TURBO )));
+
+        Trigger driverOutTrigger = driverJoystick.leftBumper();
+        driverOutTrigger
+        .onFalse(Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_NORMAL )))
+        .onTrue( Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_TURBO )));
+
+        Trigger operatorL4Trigger = operatorJoystick.y();
+        operatorL4Trigger
+            .onTrue( IntakeDeployCommand() );
+
+        Trigger operatorL3Trigger = operatorJoystick.a();
+        operatorL3Trigger
+            .onTrue(IntakeRetractCommand());
+
+         Trigger operatorL2Trigger = operatorJoystick.y();
+        operatorL2Trigger
+            .onTrue( IntakeDeployCommand() );
+
+        Trigger operatorL1Trigger = operatorJoystick.a();
+        operatorL1Trigger
+            .onTrue(IntakeRetractCommand());
+
+        Trigger operatorAlgeaModeTrigger = operatorJoystick.leftBumper();
+        operatorAlgeaModeTrigger
+            .whileTrue( IntakeRollersInCommand())
+            .onFalse( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller( 0 ) ) );
+
+        Trigger operatorCoralModeTrigger = operatorJoystick.rightBumper();
+        operatorCoralModeTrigger
+            .onFalse(IntakeRollersStopCommand())
+            .onTrue( IntakeRollersOutCommand());
+
+
+/*
+        Trigger operatorLeftAxisLeft = operatorJoystick.axisLessThan(0, -0.15);
+        operatorLeftAxisLeft
+            // intake cam
+            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setCamJog( 0 ), intakeSubsystem))
+            .whileTrue( Commands.run( ()-> intakeSubsystem.setCamJog( operatorJoystick.getRawAxis(0) ), intakeSubsystem));
+
+        Trigger operatorLeftAxisRight = operatorJoystick.axisGreaterThan(0, 0.15);
+        operatorLeftAxisRight
+            // intake cam
+            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setCamJog( 0 ), intakeSubsystem))
+            .whileTrue( Commands.run( ()-> intakeSubsystem.setCamJog( operatorJoystick.getRawAxis(0) ), intakeSubsystem));
+*/
+
+        Trigger operatorRightJoystickAxisUp = operatorJoystick.axisGreaterThan(5, 0.7 );
+        operatorRightJoystickAxisUp
+            .onFalse(Commands.runOnce( ()-> clawSubsystem.setClawJog( 0 ), clawSubsystem))
+            .onTrue( Commands.runOnce( ()-> clawSubsystem.setClawJog( -1.0 ), clawSubsystem));
         
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value)
-           .whenPressed(() -> DriveSlowDividerSet(2.6))
-           .whenReleased(() -> DriveSlowDividerSet(1.5));
-
-        new JoystickButton(operatorJoystick, XboxController.Button.kRightBumper.value)
-           .whenPressed(() -> DriveSlowDividerSet(2.6))
-           .whenReleased(() -> DriveSlowDividerSet(1.5));
+        Trigger operatorRightJoystickAxisDown = operatorJoystick.axisLessThan(5, -0.7 );
+        operatorRightJoystickAxisDown
+            .onFalse(Commands.runOnce( ()-> clawSubsystem.setClawJog( 0 ), clawSubsystem))
+            .onTrue( Commands.runOnce( ()-> clawSubsystem.setClawJog( 1.0 ), clawSubsystem));
         
-        new JoystickButton(operatorJoystick, XboxController.Button.kY.value)
-            .whileTrue( ScoreHighProCmd()
-            .finallyDo( this::RumbleConfirm )
-            );
-        new JoystickButton(operatorJoystick, XboxController.Button.kB.value)
-            .whileTrue( ScoreMidProCmd() 
-            .finallyDo( this::RumbleConfirm )
-            );
-        new JoystickButton(operatorJoystick, XboxController.Button.kA.value)
-            .whileTrue( ScoreLowCmd() 
-            .finallyDo( this::RumbleConfirm )
-            );
-
-        new JoystickButton(operatorJoystick, XboxController.Button.kLeftBumper.value)
-            .whileTrue( new ConditionalCommand( ShelfLoadConeCmd(), ShelfLoadCubeCmd(), intakeSubsystem::getCone )
-            .finallyDo( this::RumbleConfirm )
-            );
-
-        new JoystickButton(operatorJoystick, XboxController.Button.kBack.value)
-            .whileTrue( 
-                new SequentialCommandGroup(
-                    new InstantCommand( ()-> shoulderSubsystem.latchStartingPosition() ),
-                    new ConditionalCommand( StowCmdLow(), StowCmdHigh(), shoulderSubsystem::startedBelowLevel )
+        Trigger operatorLeftJoystickAxisUp = operatorJoystick.axisGreaterThan(1, 0.7 );
+        operatorLeftJoystickAxisUp 
+            .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
+            .onTrue( Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.35 ), elevatorSubsystem));
+        
+        Trigger operatorLeftJoystickAxisDown = operatorJoystick.axisLessThan(1, -0.7 );
+        operatorLeftJoystickAxisDown
+            .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
+            .onTrue(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem)
+                .andThen( Commands.waitSeconds(150)
+                    .until( clawSubsystem::atSetpoint)
                 )
-            .finallyDo( this::RumbleConfirm )
-            );
+                .andThen(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( -0.20 ), elevatorSubsystem)));
 
-        m_driverDpadUp = new GamepadAxisButton(this::driverDpadUp);
-        m_driverDpadUp
-            .onTrue( new SequentialCommandGroup(
-                new InstantCommand( ()-> swerveSubsystem.setRampRate(0.25)),
-                new InstantCommand( ()-> setCreep(DriveConstants.CreepLoading) )
-                //new InstantCommand( () -> swerveSubsystem.zeroHeading(0.0) )
-            ) )
-            .onFalse( new SequentialCommandGroup(
-                new InstantCommand ( ()-> swerveSubsystem.setRampRate(0)),
-                new InstantCommand( ()-> setCreep(0) ) 
-            ));
-    
-
-        new JoystickButton(operatorJoystick, XboxController.Button.kStart.value).whenPressed(() -> extendSubsystem.zeroPosition());
-
-        m_operatorRightYAxisUp = new GamepadAxisButton(this::operatorRightYAxisUp);
-        m_operatorRightYAxisUp.whileTrue( new ShoulderJogUpCmd( shoulderSubsystem ) );
-        m_operatorRightYAxisDown = new GamepadAxisButton(this::operatorRightYAxisDown);
-        m_operatorRightYAxisDown.whileTrue( new ShoulderJogDownCmd( shoulderSubsystem ) );
-
-        m_operatorDpadUp = new GamepadAxisButton(this::operatorDpadUp);
-        m_operatorDpadUp.whileTrue( new WristJogUpCmd( wristSubsystem ) );
-        m_operatorDpadDown = new GamepadAxisButton(this::operatorDpadDown);
-        m_operatorDpadDown.whileTrue( new WristJogDownCmd( wristSubsystem ) );
-
-        m_operatorDpadLeft = new GamepadAxisButton(this::operatorDpadLeft);
-        m_operatorDpadLeft.onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand( ()-> intakeSubsystem.setCone(true) ),
-                new InstantCommand( ()->setBling( 255,120, 0 ) ),
-                new InstantCommand( ()-> operatorJoystick.setRumble(RumbleType.kLeftRumble, 1.0) ),
-                new WaitCommand(0.5),
-                new InstantCommand( ()-> operatorJoystick.setRumble(RumbleType.kLeftRumble, 0.0) )
+        //Algea Low
+        Trigger operatorDPadLeft = operatorJoystick.povLeft();
+        operatorDPadLeft
+         .onFalse(
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem)
+        )
+        .whileTrue(
+            Commands.runOnce( ()->System.out.println("Close Operator Sequence") )      
+            .andThen( 
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLOSE), elevatorSubsystem)
             )
-         );
-        m_operatorDpadRight = new GamepadAxisButton(this::operatorDpadRight);
-        m_operatorDpadRight.onTrue( 
-            new SequentialCommandGroup(
-                new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-                new InstantCommand( ()->setBling( 255,0, 255 ) ),
-                new InstantCommand( ()-> operatorJoystick.setRumble(RumbleType.kRightRumble, 1.0) ),
-                new WaitCommand(0.5),
-                new InstantCommand( ()-> operatorJoystick.setRumble(RumbleType.kRightRumble, 0.0) )
+            .andThen( 
+                Commands.waitSeconds(3)
+                    .until( elevatorSubsystem::isAboveIntake )
+            )
+            .andThen(  Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem) )
+            .andThen( 
+                Commands.waitSeconds(10)
+                    .until( elevatorSubsystem::isAtPosition)
+            )
+            .andThen(  
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_CLOSE), clawSubsystem)
             )
         );
+            
 
-        m_operatorLeftYAxisUp = new GamepadAxisButton(this::operatorLeftYAxisUp);
-        m_operatorLeftYAxisUp.whileTrue( new ExtendJogOutCmd( extendSubsystem ) );
-        m_operatorLeftYAxisDown = new GamepadAxisButton(this::operatorLeftYAxisDown);
-        m_operatorLeftYAxisDown.whileTrue( new ExtendJogInCmd( extendSubsystem ) );
-
-        m_operatorLeftTrigger = new GamepadAxisButton(this::operatorLeftTrigger);
-        m_operatorLeftTrigger
-            .whileTrue( new ConditionalCommand( FloorLoadConeCmd(), FloorLoadCubeCmd(), intakeSubsystem::getCone )
-            .finallyDo( this::RumbleConfirm )
-        );
-
-        m_driverLT = new GamepadAxisButton(this::DriverLTrigger);
-        m_driverLT.whileTrue( new IntakeJogCmd( intakeSubsystem, true ) );
-        m_driverRT = new GamepadAxisButton(this::DriverRTtrigger);
-        m_driverRT.whileTrue( new IntakeJogCmd( intakeSubsystem, false ) );
-    }
-
-    public boolean driverDpadUp()
-    {
-        return ( driverJoystick.getPOV() == 0 );
-    }
-
-    public boolean operatorRightYAxisUp()
-    {
-        return ( operatorJoystick.getRawAxis( XboxController.Axis.kRightY.value ) < -0.3 );
-    }
-
-    public boolean operatorRightYAxisDown()
-    {
-        return ( operatorJoystick.getRawAxis( XboxController.Axis.kRightY.value ) > 0.3 );
-    }
-
-    public boolean DriverLTrigger()
-    {
-        return ( driverJoystick.getRawAxis( XboxController.Axis.kLeftTrigger.value ) > 0.3 );
-    }
-
-    public boolean DriverRTtrigger()
-    {
-        return ( driverJoystick.getRawAxis( XboxController.Axis.kRightTrigger.value ) > 0.3 );
-    }
-
-    
-    public boolean operatorLeftYAxisUp()
-    {
-        return ( operatorJoystick.getRawAxis( XboxController.Axis.kLeftY.value ) < -0.3 );
-    }
-
-    public boolean operatorLeftYAxisDown()
-    {
-        return ( operatorJoystick.getRawAxis( XboxController.Axis.kLeftY.value ) > 0.3 );
-    }
-
-    public boolean operatorLeftTrigger()
-    {
-        return ( operatorJoystick.getRawAxis( XboxController.Axis.kLeftTrigger.value ) > 0.3 );
-    }
-
-    public boolean operatorRightTrigger()
-    {
-        return ( operatorJoystick.getRawAxis( XboxController.Axis.kRightTrigger.value ) > 0.3 );
-    }
-
-    public boolean operatorDpadUp()
-    {
-        return ( operatorJoystick.getPOV() == 0 );
-    }
-
-    public boolean operatorDpadDown()
-    {
-        return ( operatorJoystick.getPOV() == 180 );
-    }
-
-    public boolean operatorDpadLeft()
-    {
-        return ( operatorJoystick.getPOV() == 270 );
-    }
-
-    public boolean operatorDpadRight()
-    {
-        return ( operatorJoystick.getPOV() == 90 );
-    }
-
-
-    public Command StowCmdLow()
-    {
-        // STOW when the arm starts below level
-        return new SequentialCommandGroup(
-            // Move SHOULDER up to clear the bumper
-            new InstantCommand( ()->System.out.println("StowCmdLow") ),
-            new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL, true),
-            new ParallelCommandGroup(
-                // Move WRIST all the way in
-                new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_STOWED, true),
-                new SequentialCommandGroup(
-                    // Once WRIST is almost all the way in
-                    new WristWaitPositionCmd( wristSubsystem, true, WristConstants.WRIST_POSITION_STOWED - 300 ),
-                    // Pull EXTEND all the way in
-                    new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true),
-                    // Pull SHOULDER all the way down
-                    new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_STOWED, true),
-                    new InstantCommand( ()-> wristSubsystem.setPosition(WristConstants.WRIST_POSITION_STOWED) ),
-                    new WaitCommand(0.5)
-                )
-            ),
-            new InstantCommand(() -> shoulderSubsystem.setShoulder(0)),
-            new InstantCommand(() -> extendSubsystem.setExtend(0)),
-            new InstantCommand(() -> intakeSubsystem.setIntake(0)),
-            new InstantCommand(() -> wristSubsystem.setWrist(0))
-        );
-    }
-
-    public Command StowCmdHigh()
-    {
-        // STOW when the arm is above level
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("StowCmdHigh") ),
-            new ParallelCommandGroup(
-                // Move EXTEND all the way in
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, false),
-                new SequentialCommandGroup(
-                    // Wait for EXTEND to be past the shelf
-                    new ExtendWaitPositionCmd(extendSubsystem, false, ExtendConstants.EXTEND_POSITION_HIGH_PRO - 3000),
-                    // Once EXTEND is in past the shelf, move WRIST all the way in
-                    new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_STOWED, true)
-                )
-            ),
-            // Move SHOULDER to STOWED
-            new SequentialCommandGroup(
-                new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_STOWED, true),
-                new WaitCommand(0.5)
-            ),
-            new InstantCommand(() -> shoulderSubsystem.setShoulder(0)),
-            new InstantCommand(() -> extendSubsystem.setExtend(0)),
-            new InstantCommand(() -> intakeSubsystem.setIntake(0)),
-            new InstantCommand(() -> wristSubsystem.setWrist(0))
-        );
-    }
-
-    public Command ScoreHighCmd(){
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("ScoreHighCmd") ),
-            new ParallelCommandGroup(
-                // Pull game piece in a little IF IT IS A CONE
-                new ConditionalCommand(
-                    new IntakeJogCmd( intakeSubsystem, true ).withTimeout(0.1),
-                    new WaitCommand(0),
-                    intakeSubsystem::getCone ),
-                // Pull EXTEND all the way in
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true)
-            ),
-            new ParallelCommandGroup(
-                // Move SHOULDER to high position
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_HIGH, true),
-                new SequentialCommandGroup(
-                    // Wait for SHOULDER to be above bumper
-                    new ShoulderWaitPositionCmd( shoulderSubsystem, false, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL ),
-                    // Move WRIST to HIGH position
-                    new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_HIGH, false)
-                )
-            ),
-            // Wait until wrist is past straight
-            new WristWaitPositionCmd(wristSubsystem, false, WristConstants.WRIST_POSITION_STRAIGHT),
-            // Move EXTEND to HIGH position
-            new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_HIGH, true)
-        );
-    }
-
-    public Command ScoreHighProCmd(){
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("ScoreHighProCmd") ),
-            new ParallelCommandGroup(
-                // Pull game piece in a little IF IT IS A CONE
-                new ConditionalCommand(
-                    new IntakeJogCmd( intakeSubsystem, true ).withTimeout(0.1),
-                    new WaitCommand(0),
-                    intakeSubsystem::getCone ),
-                // Pull EXTEND all the way in
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true)
-            ),
-            new ParallelCommandGroup(
-                // Move SHOULDER to high position
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_HIGH_PRO, true),
-                new SequentialCommandGroup(
-                    // Wait for SHOULDER to be above bumper
-                    new ShoulderWaitPositionCmd( shoulderSubsystem, false, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL ),
-                    // Move WRIST to HIGH position
-                    new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_HIGH_PRO, false)
-                )
-            ),
-            // Wait until wrist is past straight
-            new WristWaitPositionCmd(wristSubsystem, false, WristConstants.WRIST_POSITION_STRAIGHT),
-            // Move EXTEND to HIGH position
-            new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_HIGH_PRO, true)
-        );
-    }
-
-    public Command ScoreMidCmd(){
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("ScoreMidCmd") ),
-            new ParallelCommandGroup(
-                // Pull game piece in a little IF IT IS A CONE
-                new ConditionalCommand(
-                    new IntakeJogCmd( intakeSubsystem, true ).withTimeout(0.1),
-                    new WaitCommand(0),
-                    intakeSubsystem::getCone ),
-                // Pull EXTEND all the way in
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true)
-            ),
-            new ParallelCommandGroup(
-                // Move SHOULDER to mid position
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_MID, true),
-                new SequentialCommandGroup(
-                    // Wait for SHOULDER to be above bumper
-                    new ShoulderWaitPositionCmd( shoulderSubsystem, false, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL ),
-                    // Move WRIST to MID position
-                    new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_MID, false)
-                )
-            ),
-            // Wait until wrist is past straight
-            new WristWaitPositionCmd(wristSubsystem, false, WristConstants.WRIST_POSITION_STRAIGHT),
-            // Move EXTEND to MID position
-            new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_MID, true)
-        );
-    }
-
-    public Command ScoreMidProCmd(){
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("ScoreMidProCmd") ),
-            new ParallelCommandGroup(
-                // Pull game piece in a little IF IT IS A CONE
-                new ConditionalCommand(
-                    new IntakeJogCmd( intakeSubsystem, true ).withTimeout(0.1),
-                    new WaitCommand(0),
-                    intakeSubsystem::getCone ),
-                // Pull EXTEND all the way in
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true)
-            ),
-            new ParallelCommandGroup(
-                // Move SHOULDER to mid position
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_MID_PRO, true),
-                new SequentialCommandGroup(
-                    // Wait for SHOULDER to be above bumper
-                    new ShoulderWaitPositionCmd( shoulderSubsystem, false, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL ),
-                    // Move WRIST to MID position
-                    new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_MID_PRO, false)
-                )
-            ),
-            // Wait until wrist is past straight
-            new WristWaitPositionCmd(wristSubsystem, false, WristConstants.WRIST_POSITION_STRAIGHT),
-            // Move EXTEND to MID position
-            new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_MID, true)
-        );
-    }
-
-    public Command ScoreLowCmd(){
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("ScoreLowCmd") ),
-            new ParallelCommandGroup(
-                // Pull game piece in a little IF IT IS A CONE
-                new ConditionalCommand(
-                    new IntakeJogCmd( intakeSubsystem, true ).withTimeout(0.1),
-                    new WaitCommand(0),
-                    intakeSubsystem::getCone ),
-                // Pull EXTEND all the way in
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true)
-            ),
-            new ParallelCommandGroup(
-                // Move SHOULDER to LEVEL position
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_LEVEL, true),
-                new SequentialCommandGroup(
-                    // Wait for SHOULDER to be above bumper
-                    new ShoulderWaitPositionCmd( shoulderSubsystem, false, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL ),
-                    // Move WRIST to LOW position
-                    new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_LOW, true)
-                )
-            ),
-            new ParallelCommandGroup(
-                // Move SHOULDER to LOW
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_LOW, true),
-                // Move EXTEND to SCORE LOW
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_SCORE_LOW, true)
+        //Algea High
+        Trigger operatorDPadUp = operatorJoystick.povUp();
+        operatorDPadUp
+         .onFalse(
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem)
+        )      
+        .whileTrue(
+            Commands.runOnce( ()->System.out.println("3Foot Operator Sequence") ) 
+            .andThen( 
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_3FOOT), elevatorSubsystem)
+            )
+            .andThen( 
+                Commands.waitSeconds(3)
+                    .until( elevatorSubsystem::isAboveIntake )
+            )
+            .andThen(  Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem) )
+            .andThen( 
+                Commands.waitSeconds(10)
+                    .until( elevatorSubsystem::isAtPosition)
+            )
+            .andThen(  
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_3FOOT), clawSubsystem)
             )
         );
-    }
-
-    public Command ShelfLoadConeCmd(){
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("ShelfLoadConeCmd") ),
-            // Move EXTEND all the way in
-            new ExtendPositionCmd(extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true),
-            // Start moving SHOULDER to SHELF
-            new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_SHELF_CONE, false),
-            new SequentialCommandGroup(
-                // Wait for SHOULDER to be above bumper
-                new ShoulderWaitPositionCmd( shoulderSubsystem, false, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL ),
-                // Move WRIST to SHELF
-                new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_SHELF_CONE, true),
-                // Wait for SHOULDER to be correct
-                new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_SHELF_CONE, true),
-                // Move EXTEND to SHELF
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_SHELF, true)
-            )   
-        );
-    }
-
-    public Command ShelfLoadCubeCmd(){
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("ShelfLoadCubeCmd") ),
-            // Move EXTEND all the way in
-            new ExtendPositionCmd(extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true),
-            // Move SHOULDER to SHELF
-            new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_SHELF_CUBE, false),
-            new SequentialCommandGroup(
-                // Wait for SHOULDER to be above bumper
-                new ShoulderWaitPositionCmd( shoulderSubsystem, false, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL ),
-                // Move WRIST to SHELF
-                new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_SHELF_CUBE, true),
-                // Wait for SHOULDER to be correct
-                new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_SHELF_CUBE, true),
-                // Move EXTEND to SHELF
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_SHELF, true)
+        
+        //Algea Out
+        Trigger operatorDPadDown = operatorJoystick.povDown();
+        operatorDPadDown
+         .onFalse(
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem)
+        )      
+        .whileTrue(
+            Commands.runOnce( ()->System.out.println("Podium Operator Sequence") ) 
+            .andThen( 
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_PODIUM), elevatorSubsystem)
+            )
+            .andThen( 
+                Commands.waitSeconds(3)
+                    .until( elevatorSubsystem::isAboveIntake )
+            )
+            .andThen(  Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem) )
+            .andThen( 
+                Commands.waitSeconds(10)
+                    .until( elevatorSubsystem::isAtPosition)
+            )
+            .andThen(  
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_PODIUM), clawSubsystem)
             )
         );
-    }
-
-    public Command FloorLoadConeFromHighCmd()
-    {
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("FloorLoadConeFromHighCmd") ),
-            // Move WRIST to CONE PICKUP
-            new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_CONE_PICKUP, true),
-            new ParallelCommandGroup (
-                new InstantCommand( ()->wristSubsystem.setWrist(0) ),         
-                // Move SHOULDER to CONE PICKUP
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_CONE_PICKUP, true)
+        
+        //Stow
+        Trigger operatorBack = operatorJoystick.back();
+        operatorBack
+         .onFalse(
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem)
+            .andThen( Commands.runOnce( ()-> clawSubsystem.setClawJog(0), clawSubsystem) )
+            .alongWith (
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0)),
+                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0))
+                )
+            )      
+        .whileTrue(
+            Commands.runOnce( ()->System.out.println("Stow Sequence") ) 
+            .andThen( 
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem)
             )
-        );
-    }
-
-    public Command FloorLoadConeCmd()
-    {
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("FloorLoadConeCmd") ),
-            // Move EXTEND all the way in
-            new ExtendPositionCmd(extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true),
-            // Move SHOULDER to above bumper
-            new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL, true),
-            // Move WRIST to CONE PICKUP
-            new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_CONE_PICKUP, true),
-            new ParallelCommandGroup (
-                // Move EXTEND to CONE PICKUP
-                new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_CONE_PICKUP, true),
-                new InstantCommand( ()->wristSubsystem.setWrist(0) ),         
-                // Move SHOULDER to CONE PICKUP
-                new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_CONE_PICKUP, true)
+            .andThen( Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint)
             )
-        );
-    }
-
-    public Command FloorLoadCubeCmd()
-    {
-        return new SequentialCommandGroup(
-            new InstantCommand( ()->System.out.println("FloorLoadCubeCmd") ),
-            // Move EXTEND all the way in
-            new ExtendPositionCmd(extendSubsystem, ExtendConstants.EXTEND_MOTOR_MIN, true),
-            // Move SHOULDER to above bumper
-            new ShoulderPositionCmd(shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_BETWEEN_STOWED_AND_LEVEL, true),
-            // Move WRIST to CUBE PICKUP
-            new WristPositionCmd(wristSubsystem, WristConstants.WRIST_POSITION_CUBE_PICKUP, true),
-            // Move EXTEND to CUBE PICKUP
-            new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_CUBE_PICKUP, true),
-            new InstantCommand( ()->wristSubsystem.setWrist(0) ),         
-            // Move SHOULDER to CUBE PICKUP
-            new ShoulderPositionCmd (shoulderSubsystem, ShoulderConstants.SHOULDER_POSITION_CUBE_PICKUP, true)
-        );
-    }
-
-    public Command RumbleCmd( double rumbleAmount )
-    {
-        return new ParallelCommandGroup(
-            new InstantCommand(() -> operatorJoystick.setRumble(RumbleType.kLeftRumble, rumbleAmount) ),
-            new InstantCommand(() -> driverJoystick.setRumble(RumbleType.kLeftRumble, rumbleAmount) )
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_PAST_BUMP ), elevatorSubsystem)
+            .andThen( Commands.waitSeconds(3)
+                .until( elevatorSubsystem::isAtPosition)
+            )
+            .andThen( 
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_CLEAR_INTAKE), clawSubsystem)
+            )
+            .andThen( Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint)
+            )
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem)
+            )
+            .andThen( Commands.waitSeconds(10) 
+                .until( elevatorSubsystem::isAtPosition ))
+            )
+            .andThen(
+                Commands.runOnce( ()->setBling(0, 255, 0) ),
+                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) ),
+                Commands.waitSeconds(0.5 ),
+                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                Commands.runOnce( ()->StopControls(true) )
+            )
         );
     }
     
-    public void RumbleConfirm( boolean interrupted )
+    public Command AutonShooterCommand() 
     {
-        if( interrupted == false )
-        {
-            // Make a solid rumble to tell the
-            // operator+driver that the motion completed
-            CommandScheduler.getInstance().schedule(
-                new SequentialCommandGroup(
-                    RumbleCmd( 1.0 ),
-                    new WaitCommand(0.5),
-                    RumbleCmd( 0.0 )
-                )
-            );
-        }
-        else
-        {
-            // Make a half-hearted 3 rumble bursts to tell the
-            // operator+driver the motion didn't complete
-            CommandScheduler.getInstance().schedule(
-                new SequentialCommandGroup(
-                    RumbleCmd( 0.5 ),
-                    new WaitCommand(0.1),
-                    RumbleCmd( 0.0 ),
-                    new WaitCommand(0.1),
-                    RumbleCmd( 0.5 ),
-                    new WaitCommand(0.1),
-                    RumbleCmd( 0.0 ),
-                    new WaitCommand(0.1),
-                    RumbleCmd( 0.5 ),
-                    new WaitCommand(0.1),
-                    RumbleCmd( 0.0 )
-                )
-            );
-        }
+        return Commands.runOnce( ()->System.out.println("AutonShooterCommand") )
+            .andThen(Commands.runOnce(()-> swerveSubsystem.saveOdometry()))
+            /*.andThen( 
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_PIVOT_CLEAR), elevatorSubsystem)
+            )
+            .andThen( 
+                Commands.waitSeconds(10)
+                    .until( elevatorSubsystem::isAtPosition)
+            ) */
+            .andThen( 
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLOSE), elevatorSubsystem)
+            )
+            .andThen( 
+                Commands.waitSeconds(3)
+                    .until( elevatorSubsystem::isAboveIntake )
+            )
+            .andThen(  Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem) )
+            .andThen( 
+                Commands.waitSeconds(10)
+                    .until( elevatorSubsystem::isAtPosition)
+            )
+            .andThen(   
+                Commands.runOnce(()-> Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem)),
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_CLOSE), clawSubsystem)
+            )
+            .andThen( Commands.waitSeconds(3.0)
+                .until( this::isAtAllPositions ))
+            .andThen( IntakeRollersOutCommand())
+            .andThen( Commands.waitSeconds(0.60))
+            .andThen( IntakeRollersStopCommand())
+            /* .andThen( 
+                Commands.runOnce( ()-> shooterSubsystem.setShooterSpeed(ShooterConstants.SHOOTER_SPEED_3FOOT), shooterSubsystem),
+                Commands.runOnce( ()-> shooterPivotSubsystem.setClaw(ClawConstants.CLAW_3FOOT), shooterPivotSubsystem),
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_3FOOT), elevatorSubsystem)
+            ) */
+        ;
     }
 
-
-    void configureAutonomousCommands()
+    public Command AutonShootAgainCommand() 
     {
-        // Add commands to the autonomous command chooser
-        m_chooser.setDefaultOption("Auto Nothing", new WaitCommand(15.0) );
-        m_chooser.addOption("Balance", AutoBalanceCmd() );
-        m_chooser.addOption("Balance + Mobility", AutoBalanceMobilityCmd());
-        m_chooser.addOption("Inner", AutoInnerCmd());
-        m_chooser.addOption("Outer", AutoOuterCmd());
-        m_chooser.addOption("Mobility", AutoMobilityCmd());
-
-        // Put the chooser on the dashboard
-        SmartDashboard.putData(m_chooser);
+        return Commands.runOnce( ()->System.out.println("AutonShootAgainCommand") )
+            .andThen(Commands.runOnce(()-> swerveSubsystem.resetOdometry(swerveSubsystem.getSavedOdometry())))
+            .andThen( Commands.waitSeconds(3.0)
+                .until( this::isAtAllPositions ))
+            .andThen( IntakeRollersOutCommand())
+            .andThen( Commands.waitSeconds(0.60))
+            .andThen( IntakeRollersStopCommand())
+        ;
     }
 
+    public Command AutonSpewCommand()
+    {
+        return Commands.runOnce( ()->System.out.println("AutonShooterCommand") )
+            .andThen(Commands.runOnce(()-> swerveSubsystem.saveOdometry()))
+            .andThen( 
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLOSE), elevatorSubsystem)
+            )
+            .andThen( 
+                Commands.waitSeconds(3)
+                    .until( elevatorSubsystem::isAboveIntake )
+            )
+            .andThen(  Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem) )
+            .andThen( 
+                Commands.waitSeconds(10)
+                    .until( elevatorSubsystem::isAtPosition)
+            )
+            .andThen(   
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem),
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_CLOSE), clawSubsystem)
+            )
+            .andThen( Commands.waitSeconds(3.0)
+                .until( this::isAtAllPositions ))
+            .andThen( IntakeRollersOutCommand())
+            .andThen( Commands.waitSeconds(0.60))
+            .andThen( IntakeRollersStopCommand());
+    }
+
+    public Command AutonShooter3FootCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("AutonShooter3FootCommand") )
+            .andThen( 
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem),
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_3FOOT), clawSubsystem),
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_3FOOT), elevatorSubsystem)
+            )
+            .andThen( Commands.waitSeconds(3.0)
+                .until( this::isAtAllPositions ))
+            .andThen(IntakeRollersOutCommand())
+            .andThen(Commands.waitSeconds(0.60))
+            .andThen(IntakeRollersStopCommand())
+        ;
+    }
+
+    public Command AutonStowCommand()
+    {
+        return Commands.runOnce( ()->System.out.println("Auton Stow Sequence") ) 
+            .andThen(Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem))
+            .andThen( 
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem)
+            )
+            .andThen( Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint)
+            )
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_PAST_BUMP ), elevatorSubsystem)
+            .andThen( Commands.waitSeconds(3)
+                .until( elevatorSubsystem::isAtPosition)
+            )
+            .andThen( 
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_CLEAR_INTAKE), clawSubsystem)
+            )
+            .andThen( Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint)
+            )
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem)
+            )
+            .andThen( Commands.waitSeconds(10) 
+                .until( elevatorSubsystem::isAtPosition ))
+            .andThen(Commands.runOnce( ()->StopControls(true) ))
+            );
+    }
+
+    public Command IntakeRetractCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("IntakeRetractCommand") );
+          //  .andThen(Commands.waitSeconds(3))
+               // .until(intakeSubsystem::atSetpoint)
+                //.finallyDo( intakeSubsystem::intakeAngleDisable);
+    }
+
+    public Command IntakeDeployCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("IntakeDeployCommand") )
+            .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(0), clawSubsystem));
+    }
+
+    public Command IntakeRetractAutoCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("IntakeRetractAutoCommand") )
+            .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(0), clawSubsystem));
+    }
+
+    public Command IntakeDeployAutoCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("IntakeDeployAutoCommand") )
+            .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(0), clawSubsystem));
+    }
+
+    public Command IntakeRollersInCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("IntakeRollersInCommand") )
+            .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller( -0.7 ) ) )
+            .andThen( Commands.waitSeconds(20)
+                .until(intakeSubsystem::isIntakeBeamBreakLoaded))
+            .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller( 0 )));
+    }
+
+    public Command IntakeRollersStopCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("IntakeRollersStopCommand") )
+            .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller( 0 )));
+    }
+
+    public Command IntakeRollersOutCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("IntakeRollersOutCommand") )
+            .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller(1 )));
+    }
+
+    public Command GamepieceRumbleCommand()
+    {
+        return 
+            Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0.25) )
+            .andThen(
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0.25) ),
+                Commands.waitSeconds(0.2 ),
+                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                Commands.waitSeconds(0.2 ),
+                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0.25) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0.25) ),
+                Commands.waitSeconds(0.2 ),
+                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) )
+            );
+    }
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
     public Command getAutonomousCommand() 
     {
-        // return the selected Auton
-        // called by Robot.java / autonomousInit()
-        return m_chooser.getSelected();
+        return m_autoChooser.getSelected();
     }
 
-    private Command AutoBalanceCmd()
+    public void StopControls( boolean stopped)
     {
-        // Load the PathPlanner path file and generate it with a max
-        // velocity and acceleration for every path in the group
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Balance", 
-            new PathConstraints(0.55, 2));
-
-        // This is just an example event map. It would be better to have a constant, global event map
-        // in your code that will be used by all path following commands.
-        HashMap<String, Command> eventMap = new HashMap<>();
-        //eventMap.put("marker1", new PrintCommand("Passed marker 1"));
-        //eventMap.put("intakeDown", new IntakeDown());
-
-        // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            swerveSubsystem::getPose, // Pose2d supplier
-            swerveSubsystem::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
-            DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-            new PIDConstants(AutoConstants.kPXController, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-            new PIDConstants(AutoConstants.kPThetaController, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-            swerveSubsystem::setModuleStates, // Module states consumer used to output to the drive subsystem
-            eventMap,
-            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-            swerveSubsystem // The drive subsystem. Used to properly set the requirements of path following commands
-        );
-
-        Command autoBuilderCommand = autoBuilder.fullAuto(pathGroup);
-
-        return new SequentialCommandGroup(
-            new InstantCommand( () -> swerveSubsystem.zeroHeading(0.0) ),
-            new InstantCommand( () -> swerveSubsystem.initialPitch() ),
-            new InstantCommand( ()-> intakeSubsystem.setCone(true) ),
-            ScoreHighCmd(),
-            new WaitCommand(0.5),
-            new IntakeJogCmd( intakeSubsystem, false ).withTimeout(0.5),
-            new ParallelCommandGroup(
-                StowCmdHigh(),
-                autoBuilderCommand
-            ),
-            new InstantCommand( ()->setCreep(DriveConstants.CreepBalance * 0.9) ),
-            new BalanceWaitLevelCmd(swerveSubsystem, 4.0)
-                .deadlineWith(
-                    new SwerveJoystickCmd(
-                        swerveSubsystem,
-                        () -> getDriverMoveFwdBack(), () -> getDriverMoveLeftRight(), () -> getDriverRotate(), () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)
-                    )
-                ),
-            new InstantCommand( ()->setCreep(-DriveConstants.CreepBalance * 0.6) ),
-            new WaitCommand(0.15)
-            .deadlineWith(
-                new SwerveJoystickCmd(
-                    swerveSubsystem,
-                    () -> getDriverMoveFwdBack(), () -> getDriverMoveLeftRight(), () -> getDriverRotate(), () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)
-                )
-            ),
-            new InstantCommand( ()->setCreep(0) )
-        );
+        System.out.println("StopControls");
+        clawSubsystem.setClawJog(0);
+        elevatorSubsystem.setElevatorJog(0);
+        intakeSubsystem.setIntakeRoller( 0.0 );
+        intakeSubsystem.setCamJog(0);
     }
 
-    private Command AutoBalanceMobilityCmd()
+    public boolean isAtAllPositions()
     {
-        // Load the PathPlanner path file and generate it with a max
-        // velocity and acceleration for every path in the group
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Balance + Mobility", 
-            new PathConstraints(0.9, 2.0));
-
-        // This is just an example event map. It would be better to have a constant, global event map
-        // in your code that will be used by all path following commands.
-        HashMap<String, Command> eventMap = new HashMap<>();
-        eventMap.put("Stow", StowCmdHigh());
-        //eventMap.put("intakeDown", new IntakeDown());
-
-        // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            swerveSubsystem::getPose, // Pose2d supplier
-            swerveSubsystem::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
-            DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-            new PIDConstants(AutoConstants.kPXController, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-            new PIDConstants(AutoConstants.kPThetaController, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-            swerveSubsystem::setModuleStates, // Module states consumer used to output to the drive subsystem
-            eventMap,
-            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-            swerveSubsystem // The drive subsystem. Used to properly set the requirements of path following commands
-        );
-
-        Command autoBuilderCommand = autoBuilder.fullAuto(pathGroup);
-
-        return new SequentialCommandGroup(
-            new InstantCommand( () -> swerveSubsystem.zeroHeading(0.0) ),
-            new InstantCommand( () -> swerveSubsystem.initialPitch() ),
-            new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-            ScoreHighProCmd().withTimeout(3.5),
-            new IntakeJogCmd( intakeSubsystem, false ).withTimeout(0.3),
-            autoBuilderCommand,
-            // After pathplanner mobility finishes halfway up the ramp, creep forward
-            new InstantCommand( ()->setCreep(DriveConstants.CreepBalanceMobility) ),
-            // Wait for the platform to start tilting
-            new BalanceWaitLevelCmd(swerveSubsystem, 9.0)
-                .deadlineWith(
-                    new SwerveJoystickCmd( swerveSubsystem, () -> getDriverMoveFwdBack(), () -> getDriverMoveLeftRight(), () -> getDriverRotate(), () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx) )
-                ),
-            // Once platform starts tilting, stop driving forward
-            new InstantCommand( ()->setCreep(0) ),
-            new WaitCommand(0.1)
-                .deadlineWith(
-                    new SwerveJoystickCmd( swerveSubsystem, () -> getDriverMoveFwdBack(), () -> getDriverMoveLeftRight(), () -> getDriverRotate(), () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx) )
-                ),
-            // Once platform starts tilting, wait a little for it to settle
-            new WaitCommand(1.0),
-            // Now drive backwards slowly until the platform is balanced
-            new InstantCommand( ()->setCreep(DriveConstants.CreepBalanceMobilityBackup) ),
-            // Wait for the platform to be balanced
-            new BalanceWaitLevelCmd(swerveSubsystem, 1.0)
-                .deadlineWith(
-                    new SwerveJoystickCmd( swerveSubsystem, () -> getDriverMoveFwdBack(), () -> getDriverMoveLeftRight(), () -> getDriverRotate(), () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx) )
-                ),
-            // Balanced - stop creeping
-            new InstantCommand( ()->setCreep(0) ),
-            new WaitCommand(0.15)
-            .deadlineWith(
-                new SwerveJoystickCmd( swerveSubsystem, () -> getDriverMoveFwdBack(), () -> getDriverMoveLeftRight(), () -> getDriverRotate(), () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx) )
-            )
-    );
+        if( elevatorSubsystem.isAtPosition() && 
+            clawSubsystem.atSetpoint() )
+            return true;
+        else
+            return false;
     }
 
-    private Command AutoInnerCmd()
-    {
-        // Load the PathPlanner path file and generate it with a max
-        // velocity and acceleration for every path in the group
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Inner", 
-            new PathConstraints(3.5, 1.3));
-
-        // This is just an example event map. It would be better to have a constant, global event map
-        // in your code that will be used by all path following commands.
-        HashMap<String, Command> eventMap = new HashMap<>();
-        eventMap.put("FloorLoad",
-            new SequentialCommandGroup(
-                new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-                FloorLoadCubeCmd()
-            )
-        );
-
-        eventMap.put("LoadLow", 
-            new SequentialCommandGroup(
-                new IntakeJogCmd( intakeSubsystem, true ).withTimeout(2.0),
-                StowCmdLow()
-            )
-        );
-
-//        eventMap.put("ScoreHigh2",
-//            new SequentialCommandGroup(
-//                new IntakeJogCmd( intakeSubsystem, false ).withTimeout(1.5),
-//                StowCmdHigh()
-//            )
-//        );
-
-        // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            swerveSubsystem::getPose, // Pose2d supplier
-            swerveSubsystem::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
-            DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-            new PIDConstants(AutoConstants.kPXController, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-            new PIDConstants(AutoConstants.kPThetaController, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-            swerveSubsystem::setModuleStates, // Module states consumer used to output to the drive subsystem
-            eventMap,
-            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-            swerveSubsystem // The drive subsystem. Used to properly set the requirements of path following commands
-        );
-
-        Command autoBuilderCommand = autoBuilder.fullAuto(pathGroup);
-
-        return new SequentialCommandGroup(
-            new InstantCommand( () -> swerveSubsystem.zeroHeading(0.0) ),
-            new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-            ScoreHighProCmd().withTimeout(3.5),
-            new WaitCommand(0.5),
-            new IntakeJogCmd( intakeSubsystem, false ).withTimeout(0.5),
-            new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-            // Move EXTEND to CUBE PICKUP
-            new ExtendPositionCmd (extendSubsystem, ExtendConstants.EXTEND_POSITION_CUBE_PICKUP, true),
-            autoBuilderCommand,
-            ScoreMidProCmd(),
-            new IntakeJogCmd( intakeSubsystem, false ).withTimeout(3.0)
-        );
+    public void testElevatorBeamBreak(boolean intendedState){
+        String status;
+        if(intendedState == true){
+            status = "Active";}
+        else{
+            status = "not Active";}
+        if (elevatorSubsystem.m_proxSwitchBottomState == intendedState){
+            System.out.println("PASS: Elevator Prox Switch is " + status);
+        }
+        else{
+            System.out.println("FAIL: Elevator Prox Switch is " + status);
+            m_allTestsPassed = false;
+        }
     }
 
-    private Command AutoOuterCmd()
-    {
-        // Load the PathPlanner path file and generate it with a max
-        // velocity and acceleration for every path in the group
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Outer", 
-            new PathConstraints(3.5, 1.3));
-
-        // This is just an example event map. It would be better to have a constant, global event map
-        // in your code that will be used by all path following commands.
-        HashMap<String, Command> eventMap = new HashMap<>();
-
-        eventMap.put("FloorLoadSetup", 
-            new SequentialCommandGroup(
-                new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-                FloorLoadCubeCmd()
-            )
-        );
-
-        eventMap.put("LoadLow", 
-            new SequentialCommandGroup(
-                new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-                new IntakeJogCmd( intakeSubsystem, true ).withTimeout(2.0)
-            )
-        );
-
-        /*eventMap.put("ScoreHigh2",
-            new SequentialCommandGroup(
-                ScoreMidProCmd(),
-                new IntakeJogCmd( intakeSubsystem, false ).withTimeout(3.0),
-                StowCmdHigh()
-            )
-        );*/
-
-        // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            swerveSubsystem::getPose, // Pose2d supplier
-            swerveSubsystem::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
-            DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-            new PIDConstants(AutoConstants.kPXController, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-            new PIDConstants(AutoConstants.kPThetaController, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-            swerveSubsystem::setModuleStates, // Module states consumer used to output to the drive subsystem
-            eventMap,
-            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-            swerveSubsystem // The drive subsystem. Used to properly set the requirements of path following commands
-        );
-
-        Command autoBuilderCommand = autoBuilder.fullAuto(pathGroup);
-
-        return new SequentialCommandGroup(
-            new InstantCommand( () -> swerveSubsystem.zeroHeading(0.0) ),
-            new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-            ScoreHighProCmd().withTimeout(3.5),
-            new WaitCommand(0.5),
-            new IntakeJogCmd( intakeSubsystem, false ).withTimeout(0.5),
-            autoBuilderCommand,
-            ScoreMidProCmd(),
-            new IntakeJogCmd( intakeSubsystem, false ).withTimeout(1.5),
-            StowCmdHigh()
-        );
+    public void testElevatorEncoder(boolean intendedZero){
+        String zero;
+        if(intendedZero == true){
+            zero = "at zero";}
+        else{
+            zero = "not at zero";}
+        if(intendedZero == true){
+            if (elevatorSubsystem.getPosition() == 0){
+                System.out.println("PASS: Elevator Encoder is " + zero);
+            }
+            else{
+                System.out.println("FAIL: Elevator Encoder is " + zero);
+                m_allTestsPassed = false;
+            }
+        }
+        else{
+            if (elevatorSubsystem.getPosition() == 0){
+                System.out.println("FAIL: Elevator Encoder is " + zero);
+            }
+            else{
+                System.out.println("PASS: Elevator Encoder is " + zero);
+                m_allTestsPassed = false;
+            }
+        }
     }
 
-    private Command AutoMobilityCmd(){
-        // Load the PathPlanner path file and generate it with a max
-        // velocity and acceleration for every path in the group
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Mobility", 
-            new PathConstraints(0.55, 2.0));
+    public void testClawEncoder(boolean intendedStartSpot){
+        if(intendedStartSpot == true){
+            if (clawSubsystem.getPosition() < ClawConstants.CLAW_TRAVEL + 0.5 && 
+                clawSubsystem.getPosition() > ClawConstants.CLAW_TRAVEL - 0.5 ){
+                System.out.println("PASS: Shooter Pivot Encoder is at start spot");
+            }
+            else{
+                System.out.println("FAIL: Shooter Pivot Encoder is not at start spot");
+                m_allTestsPassed = false;
+            }
+        }
+        else{
+            if (clawSubsystem.getPosition() > ClawConstants.CLAW_TRAVEL + 0.5){
+                System.out.println("PASS: Shooter Pivot Encoder has moved from start spot");
+            }
+            else{
+                System.out.println("FAIL: Shooter Pivot Encoder has not moved from start spot");
+                m_allTestsPassed = false;
+            }
+        }
+    }
+        
+    public void testIntakeRollers(){
+        if(intakeSubsystem.getRollerSpeed() > 0){
+            System.out.println("PASS: Intake Wheels rotated");}
+        else{
+            System.out.println("FAIL: Intake Wheels did not rotate");
+            m_allTestsPassed = false;
+        }
+    }
 
-        // This is just an example event map. It would be better to have a constant, global event map
-        // in your code that will be used by all path following commands.
-        HashMap<String, Command> eventMap = new HashMap<>();
-        //eventMap.put("marker1", new PrintCommand("Passed marker 1"));
-        //eventMap.put("intakeDown", new IntakeDown());
+    public void testResult(){
+        if(m_allTestsPassed == true ){
+            System.out.println("PASS: Passed all tests");}
+        else{
+            System.out.println("FAIL: Some tests failed");
+        }
+    }
 
-        // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            swerveSubsystem::getPose, // Pose2d supplier
-            swerveSubsystem::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
-            DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-            new PIDConstants(AutoConstants.kPXController, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-            new PIDConstants(AutoConstants.kPThetaController, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-            swerveSubsystem::setModuleStates, // Module states consumer used to output to the drive subsystem
-            eventMap,
-            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-            swerveSubsystem // The drive subsystem. Used to properly set the requirements of path following commands
-        );
 
-        Command autoBuilderCommand = autoBuilder.fullAuto(pathGroup);
-
-        return new SequentialCommandGroup(
-            new InstantCommand( () -> swerveSubsystem.zeroHeading(0.0) ),
-            new InstantCommand( () -> swerveSubsystem.initialPitch() ),
-            new InstantCommand( ()-> intakeSubsystem.setCone(false) ),
-            ScoreHighProCmd().withTimeout(3.5),
-            new IntakeJogCmd( intakeSubsystem, false ).withTimeout(0.3),
-            StowCmdHigh(),
-            new WaitCommand(7.0),
-            autoBuilderCommand
+    public Command getTestCommand(){
+        return Commands.runOnce( ()-> testElevatorBeamBreak(true))
+        .andThen(
+            Commands.runOnce( ()-> testElevatorEncoder(true)),
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog(0.25), elevatorSubsystem),
+            Commands.waitSeconds(0.25),
+            Commands.runOnce( ()-> testElevatorEncoder(false)),
+            Commands.runOnce( ()-> testElevatorBeamBreak(false)),
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog(-0.25), elevatorSubsystem),
+            Commands.waitSeconds(0.3),
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog(0), elevatorSubsystem),
+            Commands.runOnce( ()-> testClawEncoder(true)),
+            Commands.runOnce( ()-> clawSubsystem.setClawJog(0.25), clawSubsystem),
+            Commands.waitSeconds(0.25),
+            Commands.runOnce( ()-> testClawEncoder(false)),
+            Commands.runOnce( ()-> clawSubsystem.setClawJog(-0.25), clawSubsystem),
+            Commands.waitSeconds(0.25),
+            Commands.runOnce( ()-> clawSubsystem.setClawJog(0), clawSubsystem),
+            Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller(0.1)),
+            Commands.waitSeconds(0.25),
+            Commands.runOnce( ()-> testIntakeRollers()),
+            Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller(0.0)),
+            Commands.runOnce( ()-> testResult())
         );
     }
- }
+}

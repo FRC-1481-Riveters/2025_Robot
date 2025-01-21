@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 3.7844624260749735,
-        "y": 0.5130810261578282
+        "y": 0.5130810261578285
       },
       "isLocked": false,
       "linkedName": null
@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 6.2282403798592885,
-        "y": 1.136910444603075
+        "y": 1.1369104446030747
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,10 +30,30 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
+    {
+      "name": "Stow",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Stow"
+              }
+            }
+          ]
+        }
+      }
+    },
     {
       "name": "Deploy",
       "waypointRelativePos": 0.5,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -51,6 +71,7 @@
     {
       "name": "RollersStart",
       "waypointRelativePos": 0.75,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -64,41 +85,25 @@
           ]
         }
       }
-    },
-    {
-      "name": "Stow",
-      "waypointRelativePos": 0.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Stow"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -126.52885536698521,
-    "rotateFast": false
+    "rotation": -126.52885536698521
   },
   "reversed": false,
   "folder": null,
-  "previewStartingState": {
-    "rotation": 119.98163936884934,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }
