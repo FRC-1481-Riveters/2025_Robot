@@ -6,7 +6,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.ShooterPivotConstants;
+import frc.robot.Constants.ClawConstants;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 import com.revrobotics.*;
