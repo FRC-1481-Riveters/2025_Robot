@@ -9,25 +9,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
-//import com.ctre.phoenix6.hardware.TalonFX;
 public class SwerveModule {
 
     private final TalonFX driveMotor;
@@ -35,13 +27,13 @@ public class SwerveModule {
 
     private final PIDController turningPidController;
 
-    private final CANcoder absoluteEncoder;
+    private final CANCoder absoluteEncoder;
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffsetDegrees;
 
-    public static final double drive_kA = 0.12872;
-    public static final double drive_kV = 2.3014;
-    public static final double drive_kS = 0.55493;
+    public static final double drive_kA = -0.12872;
+    public static final double drive_kV = -2.3014;
+    public static final double drive_kS = -0.55493;
     private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( drive_kS, drive_kV, drive_kA );
 
 
@@ -50,53 +42,39 @@ public class SwerveModule {
 
         SupplyCurrentLimitConfiguration currentConfig;
 
-        InvertedValue driveMotorInverted = driveMotorReversed ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
-        InvertedValue turningMotorInverted = turningMotorReversed ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive; //check direction for turn (is true the same as clockwise / counter-clockwise)
-
         this.absoluteEncoderOffsetDegrees = absoluteEncoderOffsetDegrees;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
-        absoluteEncoder = new CANcoder(absoluteEncoderId, "CANivore");
-                
+        absoluteEncoder = new CANCoder(absoluteEncoderId, "CANivore");
+
         driveMotor = new TalonFX(driveMotorId, "CANivore");
         turningMotor = new TalonFX(turningMotorId, "CANivore");
+
+        driveMotor.setInverted(driveMotorReversed);
+        turningMotor.setInverted(turningMotorReversed);
+
+        //TODO: maybe copy the PID + motion magic stuff from the old Falcon500SteerControllerFactoryBuilder.java?
 
         currentConfig = new SupplyCurrentLimitConfiguration();
         currentConfig.currentLimit = 30;
         currentConfig.enable = true;
 
-        MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
-        CurrentLimitsConfigs driveMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-        driveMotorOutputConfigs
-            .withNeutralMode(NeutralModeValue.Brake)
-            .withInverted(driveMotorInverted);
-        driveMotorCurrentLimitsConfigs
-            .withSupplyCurrentLimit(15)
-            .withSupplyCurrentLimitEnable(true);
-        currentConfig.currentLimit = 12.5;
-        // driveMotor.configVoltageCompSaturation(12.5);
-        // driveMotor.enableVoltageCompensation(true);
-        driveMotor.getConfigurator().apply(new TalonFXConfiguration());
-        driveMotor.getConfigurator().apply(driveMotorCurrentLimitsConfigs);
-        driveMotor.getConfigurator().apply(driveMotorOutputConfigs);
+        driveMotor.configFactoryDefault();
+        driveMotor.setNeutralMode( NeutralMode.Brake );
+        driveMotor.configVoltageCompSaturation(12.5);
+        driveMotor.enableVoltageCompensation(true);
+        driveMotor.configSupplyCurrentLimit( currentConfig );
 
-        
-        MotorOutputConfigs turningMotorOutputConfigs = new MotorOutputConfigs();
-        CurrentLimitsConfigs turningMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-        turningMotorOutputConfigs
-            .withNeutralMode(NeutralModeValue.Brake)
-            .withInverted(turningMotorInverted);
-        turningMotorCurrentLimitsConfigs
-            .withSupplyCurrentLimit(15)
-            .withSupplyCurrentLimitEnable(true);
+        turningMotor.configFactoryDefault();
+        turningMotor.setNeutralMode( NeutralMode.Brake );
         currentConfig.currentLimit = 15;
-        // turningMotor.configVoltageCompSaturation(12.5);
-        // turningMotor.enableVoltageCompensation(true);
-        turningMotor.getConfigurator().apply(new TalonFXConfiguration());
-        turningMotor.getConfigurator().apply(turningMotorCurrentLimitsConfigs);
-        turningMotor.getConfigurator().apply(turningMotorOutputConfigs);
-        
-        // absoluteEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition );   Ensure that these exist as defaults w/ phoenix 6
-        // absoluteEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+        turningMotor.configVoltageCompSaturation(12.5);
+        turningMotor.enableVoltageCompensation(true);
+        turningMotor.configSupplyCurrentLimit( currentConfig );
+    
+        absoluteEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition );
+        absoluteEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+
+        turningMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Signed_PlusMinus180);
 
         turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
@@ -106,9 +84,10 @@ public class SwerveModule {
 
     public double getDrivePosition() {
         double position;
-        position = driveMotor.getPosition().getValueAsDouble();  // Double check positions
-        position = position * (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
-        position = position * ModuleConstants.kWheelDiameterMeters * Math.PI;
+        position = driveMotor.getSelectedSensorPosition();  // 0..2048 counts per revolution
+        position = (position / 2048) * (14.0 / 50.0) * (28.0 / 16.0) * (15.0 / 60.0);
+        position = -position * ModuleConstants.kWheelDiameterMeters * Math.PI;
+        SmartDashboard.putNumber("driving Position[" + absoluteEncoder.getDeviceID() + "]",position);
 
         return( position );
     }
@@ -121,19 +100,22 @@ public class SwerveModule {
 
     public double getTurningPosition() {
         double position;
-        position = turningMotor.getPosition().getValueAsDouble(); // Double check position accuracy
+        position = turningMotor.getSelectedSensorPosition();
 
         // convert the encodercount to radians
-        position = position * (2*Math.PI) / (Constants.ModuleConstants.SWERVE_STEERING_RATIO);
+        position = position * (2*Math.PI / (2048*12.8));
+        //driving geer ratio; (14.0 / 50.0) * (28.0 / 16.0) * (15.0 / 60.0),
+        //steering geer ratio; (15.0 / 32.0) * (10.0 / 60.0), 
+
 
         return( position );
     }
 
     public double getDriveVelocity() {
         double velocity;
-        velocity = driveMotor.getVelocity().getValueAsDouble();
+        velocity = -driveMotor.getSelectedSensorVelocity();
 
-        velocity = (velocity *10) * (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+        velocity = (velocity / 204.8) * (14.0 / 50.0) * (28.0 / 16.0) * (15.0 / 60.0);
         velocity = velocity * ModuleConstants.kWheelDiameterMeters * Math.PI;
 
         return( velocity );
@@ -141,7 +123,7 @@ public class SwerveModule {
 
     public double getTurningVelocity() {
         double velocity;
-        velocity = turningMotor.getVelocity().getValueAsDouble();
+        velocity = turningMotor.getSelectedSensorPosition();
 
         // convert degrees/100 milliseconds to radians per second
         velocity = (velocity * 10) * (Math.PI / 180);
@@ -149,17 +131,8 @@ public class SwerveModule {
         return( velocity );
     }
 
-    public double getDriveCurrent()
-    {
-        return driveMotor.getStatorCurrent().getValueAsDouble();
-    }
-    public double getTurningCurrent()
-    {
-        return driveMotor.getStatorCurrent().getValueAsDouble();
-    }
-
     public double getAbsoluteEncoderDegrees() {
-        double position = absoluteEncoder.getAbsolutePosition().getValueAsDouble();
+        double position = absoluteEncoder.getAbsolutePosition();
         SmartDashboard.putNumber("absoluteEncoder" + absoluteEncoder.getDeviceID() + "]", position);
         position = position - absoluteEncoderOffsetDegrees;
         return position * (absoluteEncoderReversed ? -1.0 : 1.0);
@@ -167,45 +140,38 @@ public class SwerveModule {
 
     public void resetEncoders() {
         double absPosition;
-        System.out.println("resetEncoders");
         // Clear the drive motor encoder position
-        driveMotor.setPosition( 0 );
-
-        absPosition = getAbsoluteEncoderDegrees() * 1.0;  // negative because turning motors are upside down in mk4i
-        absPosition = (absPosition/180.0) * (2048.0*Constants.ModuleConstants.SWERVE_STEERING_RATIO/2.0);
-        System.out.println("Absolute Position = " + absPosition);
-        turningMotor.setPosition( absPosition );
+        driveMotor.setSelectedSensorPosition( 0 );
+        absPosition = getAbsoluteEncoderDegrees();
+        absPosition = absPosition * ((2048*12.8)/360);
+        turningMotor.setSelectedSensorPosition( absPosition );
     }
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurningPosition()));
     }
 
-    public void setDesiredState(SwerveModuleState state) 
-    {
-        double driveOutput;
-        double motorOutput;
-
+    public void setDesiredState(SwerveModuleState state) {
         if (Math.abs(state.speedMetersPerSecond) < 0.001) {
             stop();
             return;
         }
         state = SwerveModuleState.optimize(state, getState().angle);
+        //double speed = m_feedForward.calculate( state.speedMetersPerSecond );
         double speed = state.speedMetersPerSecond;
-        double turningPosition = getTurningPosition();
-        driveOutput = speed / DriveConstants.kPhysicalMaxSpeedMetersPerSecond;
-        driveMotor.set( driveOutput );
-//        motorOutput = MathUtil.clamp( m_feedForward.calculate( speed ), -12, 12 );
-//        driveMotor.set(ControlMode.PercentOutput,  motorOutput / 12.0 );
-        turningMotor.set( turningPidController.calculate( turningPosition, state.angle.getRadians() ) );
+        driveMotor.set( ControlMode.PercentOutput, speed / DriveConstants.kPhysicalMaxSpeedMetersPerSecond );
+        turningMotor.set( ControlMode.PercentOutput, 
+                          turningPidController.calculate( getTurningPosition(), state.angle.getRadians() ) );
+        SmartDashboard.putNumber("Turning Position[" + absoluteEncoder.getDeviceID() + "]", turningMotor.getSelectedSensorPosition() );
+        SmartDashboard.putString("Swerve[" + absoluteEncoder.getDeviceID() + "] state", state.toString());
     }
 
     public void stop() {
-        driveMotor.set( 0 );
-        turningMotor.set( 0 );
+        driveMotor.set( ControlMode.PercentOutput, 0 );
+        turningMotor.set( ControlMode.PercentOutput, 0 );
     }
 
     public void setRampRate(double rampSeconds){
-        driveMotor.getConfigurator().apply(new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(rampSeconds)); //Ensure that control type is correct (Voltage, Torqe, DutyCycle)
+        driveMotor.configOpenloopRamp(rampSeconds);
     }
 }
