@@ -104,12 +104,16 @@ public final class Constants {
         public static final int TALON_TIMEOUT_MS = 5000;
 
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
-        public static final double INTAKE_ROLLER_SPEED_AMP = 300;
-        public static final double INTAKE_ROLLER_SPEED_SPEAKER = 1500;
+        public static final double INTAKE_ROLLER_SPEED_CORAL = 300;
+        public static final double INTAKE_ROLLER_SPEED_ALGAE = 1500;
 
         public static final double INTAKE_CAM_ANGLE_TOLERANCE = 10;
-        public static final double INTAKE_CAM_SPEAKER = 10.0;
-        public static final double INTAKE_CAM_3FOOT = 190.0;
+        public static final double INTAKE_CAM_L1 = 10.0;
+        public static final double INTAKE_CAM_L2 = 190.0;
+        public static final double INTAKE_CAM_L3 = 190.0;
+        public static final double INTAKE_CAM_L4 = 190.0;
+        public static final double INTAKE_CAM_BARGE = 190.0;
+        public static final double INTAKE_CAM_PROCESSOR = 190.0;
         public static final double INTAKE_CAM_MOTOR_ACCELERATION = 4000;
         public static final double INTAKE_CAM_MOTOR_CRUISE = 2000;
         public static final double INTAKE_CAM_MOTOR_KP = 7;
@@ -123,15 +127,6 @@ public final class Constants {
         public static final double INTAKE_FLOOR_PICKUP = 189;
         public static final double INTAKE_SOURCE = 45.0;
         public static final double INTAKE_HALF = 115;
-        public static final double INTAKE_ANGLE_TOLERANCE = 7;
-        public static final double INTAKE_ANGLE_MOTOR_ACCELERATION = 3500;
-        public static final double INTAKE_ANGLE_MOTOR_CRUISE = 8000;
-        public static final double INTAKE_ANGLE_MOTOR_KP = 0.5;
-        public static final double INTAKE_ANGLE_MOTOR_KI = 0;
-        public static final double INTAKE_ANGLE_MOTOR_KD = 0.06;
-        public static final double INTAKE_ANGLE_MOTOR_KF = 0;
-        public static final double INTAKE_ANGLE_MOTOR_MAX = 191;
-        public static final double INTAKE_ANGLE_MOTOR_MIN = 0;
 
     }
 
@@ -140,14 +135,15 @@ public final class Constants {
         public static final int CLAW_CANCODER = 37;
 
         public static final double CLAW_MIN = 10;
-        public static final double CLAW_AMP = 23.0;
         public static final double CLAW_TRAVEL = 58.0;
-        public static final double CLAW_CLEAR_INTAKE = 61.0;
         public static final double CLAW_CLOSE = 127.0; // 126.5
         public static final double CLAW_CLIMB = 85.0;
-        public static final double CLAW_3FOOT = 114.0; // 3 deg diff
-        public static final double CLAW_PODIUM = 106.5; // 3 deg diff?
-        public static final double CLAW_AMP_LOAD = 88.2;
+        public static final double CLAW_L1 = 114.0; // 3 deg diff
+        public static final double CLAW_L2 = 106.5; // 3 deg diff?
+        public static final double CLAW_L3 = 88.2;
+        public static final double CLAW_L4 = 88.2;
+        public static final double CLAW_BARGE = 88.2;
+        public static final double CLAW_PROCESSOR = 88.2;
         public static final double CLAW_MAX = 140; // max travel
 
         public static final double CLAW_ACCELERATION = 500;
@@ -158,9 +154,7 @@ public final class Constants {
         public static final double CLAW_CLOSE_KP = 0.015; // 0.004;
         public static final double CLAW_CLOSE_KI = 0.03;// 0.0300;
         public static final double CLAW_CLOSE_KD = 0.00040;
-        public static final double CLAW_AMP_KP = 0.0028; // 0.005;
-        public static final double CLAW_AMP_KI = 0.0450;
-        public static final double CLAW_AMP_KD = 0.00034;
+        //NEED TO CHANGE THE NAMES/CONSTANTS BELOW
         // public static final double CLAW_0_KP = 0.003;
         // public static final double CLAW_0_KI = 0.004;
         // public static final double CLAW_0_KD = 0.0003;
@@ -177,17 +171,20 @@ public final class Constants {
         public static final double ELEVATOR_ABOVE_BUMP = -0.2;
         public static final double ELEVATOR_PAST_BUMP = -2.7;
         public static final double ELEVATOR_WING = -7.9;
-        public static final double ELEVATOR_3FOOT = -16.0;
-        public static final double ELEVATOR_CLOSE = -16.0;
-        public static final double ELEVATOR_PODIUM = -14.0;
-        public static final double ELEVATOR_AMP_START = -5.66;
+        public static final double ELEVATOR_L1 = -16.0;
+        public static final double ELEVATOR_L2 = -16.0;
+        public static final double ELEVATOR_L3 = -14.0;
+        public static final double ELEVATOR_L4 = -5.66;
         public static final double ELEVATOR_PIVOT_CLEAR = -11.3;
-        public static final double ELEVATOR_AMP = -19.5;
+        public static final double ELEVATOR_BARGE = -19.5;
+        public static final double ELEVATOR_ALGAE_LOW = -19.5;
+        public static final double ELEVATOR_ALGAE_HIGH = -19.5;
+        public static final double ELEVATOR_PROCESSOR = -19.5;
         public static final double ELEVATOR_CLIMB_START = -13.0;
         public static final double ELEVATOR_CLIMB_TAUT = -8.1;
         public static final double ELEVATOR_CLIMB_FULL = -3.2;
         public static final double ELEVATOR_MAX = -20.0;
-        public static final double ELEVATOR_TRAP = 0;
+        //public static final double ELEVATOR_TRAP = 0;
     }
 
     public static final class ClimbConstants {
