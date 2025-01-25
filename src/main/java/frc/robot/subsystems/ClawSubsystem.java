@@ -74,13 +74,6 @@ public class ClawSubsystem extends SubsystemBase
             pid.setD( ClawConstants.CLAW_CLOSE_KD );
             pid.setIZone(m_tolerance*4);
         }
-        else if( (angle >= (ClawConstants.CLAW_AMP - 0.5)) &&
-            (angle <= (ClawConstants.CLAW_AMP + 0.5)) )
-        {
-            pid.setP( ClawConstants.CLAW_AMP_KP );
-            pid.setI( ClawConstants.CLAW_AMP_KI );
-            pid.setD( ClawConstants.CLAW_AMP_KD );
-        }
         else
         {
             pid.setP( ClawConstants.CLAW_0_KP );

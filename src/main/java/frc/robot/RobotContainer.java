@@ -275,7 +275,7 @@ public class RobotContainer
         .whileTrue(
             Commands.runOnce( ()->System.out.println("Close Operator Sequence") )      
             .andThen( 
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLOSE), elevatorSubsystem)
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_BARGE), elevatorSubsystem)
             )
             .andThen( 
                 Commands.waitSeconds(3)
@@ -301,7 +301,7 @@ public class RobotContainer
         .whileTrue(
             Commands.runOnce( ()->System.out.println("3Foot Operator Sequence") ) 
             .andThen( 
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_3FOOT), elevatorSubsystem)
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L1), elevatorSubsystem)
             )
             .andThen( 
                 Commands.waitSeconds(3)
@@ -313,7 +313,7 @@ public class RobotContainer
                     .until( elevatorSubsystem::isAtPosition)
             )
             .andThen(  
-                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_3FOOT), clawSubsystem)
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_L1), clawSubsystem)
             )
         );
         
@@ -326,7 +326,7 @@ public class RobotContainer
         .whileTrue(
             Commands.runOnce( ()->System.out.println("Podium Operator Sequence") ) 
             .andThen( 
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_PODIUM), elevatorSubsystem)
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_BARGE), elevatorSubsystem)
             )
             .andThen( 
                 Commands.waitSeconds(3)
@@ -338,7 +338,7 @@ public class RobotContainer
                     .until( elevatorSubsystem::isAtPosition)
             )
             .andThen(  
-                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_PODIUM), clawSubsystem)
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_L1), clawSubsystem)
             )
         );
         
@@ -366,7 +366,7 @@ public class RobotContainer
                 .until( elevatorSubsystem::isAtPosition)
             )
             .andThen( 
-                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_CLEAR_INTAKE), clawSubsystem)
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_L1), clawSubsystem)
             )
             .andThen( Commands.waitSeconds(3)
                 .until( clawSubsystem::atSetpoint)
@@ -400,7 +400,7 @@ public class RobotContainer
                     .until( elevatorSubsystem::isAtPosition)
             ) */
             .andThen( 
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLOSE), elevatorSubsystem)
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L1), elevatorSubsystem)
             )
             .andThen( 
                 Commands.waitSeconds(3)
@@ -445,7 +445,7 @@ public class RobotContainer
         return Commands.runOnce( ()->System.out.println("AutonShooterCommand") )
             .andThen(Commands.runOnce(()-> swerveSubsystem.saveOdometry()))
             .andThen( 
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLOSE), elevatorSubsystem)
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L1), elevatorSubsystem)
             )
             .andThen( 
                 Commands.waitSeconds(3)
@@ -472,8 +472,8 @@ public class RobotContainer
         return Commands.runOnce( ()->System.out.println("AutonShooter3FootCommand") )
             .andThen( 
                 Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(0), elevatorSubsystem),
-                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_3FOOT), clawSubsystem),
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_3FOOT), elevatorSubsystem)
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_BARGE), clawSubsystem),
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_BARGE), elevatorSubsystem)
             )
             .andThen( Commands.waitSeconds(3.0)
                 .until( this::isAtAllPositions ))
@@ -498,7 +498,7 @@ public class RobotContainer
                 .until( elevatorSubsystem::isAtPosition)
             )
             .andThen( 
-                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_CLEAR_INTAKE), clawSubsystem)
+                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_BARGE), clawSubsystem)
             )
             .andThen( Commands.waitSeconds(3)
                 .until( clawSubsystem::atSetpoint)
