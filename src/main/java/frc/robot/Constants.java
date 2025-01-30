@@ -95,13 +95,8 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int INTAKE_CAM_MOTOR = 56;
-        public static final int INTAKE_CAM_CANCODER = 57;
-        public static final int INTAKE_ROLLER_MOTOR = 58;
-        public static final int INTAKE_ANGLE_MOTOR = 59;
-        public static final int INTAKE_ANGLE_MOTOR_FOLLOWER = 62;
-        public static final int INTAKE_ANGLE_CANCODER = 61;
-        public static final int TALON_TIMEOUT_MS = 5000;
+        public static final int INTAKE_MOTOR = 36;
+        public static final int INTAKE_CANCODER = 37;
 
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
         public static final double INTAKE_ROLLER_SPEED_CORAL = 300;
@@ -116,10 +111,10 @@ public final class Constants {
         public static final double INTAKE_CAM_PROCESSOR = 190.0;
         public static final double INTAKE_CAM_MOTOR_ACCELERATION = 4000;
         public static final double INTAKE_CAM_MOTOR_CRUISE = 2000;
-        public static final double INTAKE_CAM_MOTOR_KP = 7;
-        public static final double INTAKE_CAM_MOTOR_KI = 0;
-        public static final double INTAKE_CAM_MOTOR_KD = 0.06;
-        public static final double INTAKE_CAM_MOTOR_KF = 0;
+        public static final double INTAKE_MOTOR_KP = 7;
+        public static final double INTAKE_MOTOR_KI = 0;
+        public static final double INTAKE_MOTOR_KD = 0.06;
+        public static final double INTAKE_MOTOR_KF = 0;
         public static final double INTAKE_CAM_MOTOR_MAX = 200;
         public static final double INTAKE_CAM_MOTOR_MIN = 5;
 

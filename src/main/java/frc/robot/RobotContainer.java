@@ -219,13 +219,21 @@ public class RobotContainer
 
         Trigger operatorAlgeaModeTrigger = operatorJoystick.leftBumper();
         operatorAlgeaModeTrigger
-            .whileTrue( IntakeRollersInCommand())
-            .onFalse( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller( 0 ) ) );
+            .onTrue(Commands.runOnce(()-> intakeSubsystem.setCone(false))
+                .andThen(Commands.runOnce( ()->setBling(0, 200, 200)))
+                .andThen (Commands.runOnce(()-> operatorJoystick.setRumble(RumbleType.kRightRumble, 1.0)))
+                .andThen(Commands.waitSeconds(0.5))
+                .andThen(Commands.runOnce ( ()-> operatorJoystick.setRumble(RumbleType.kRightRumble, 0.0)))
+            );
 
         Trigger operatorCoralModeTrigger = operatorJoystick.rightBumper();
         operatorCoralModeTrigger
-            .onFalse(IntakeRollersStopCommand())
-            .onTrue( IntakeRollersOutCommand());
+        .onTrue(Commands.runOnce(()-> intakeSubsystem.setCone(true))
+        .andThen(Commands.runOnce( ()->setBling(255,255, 255)))
+        .andThen (Commands.runOnce(()-> operatorJoystick.setRumble(RumbleType.kRightRumble, 1.0)))
+        .andThen(Commands.waitSeconds(0.5))
+        .andThen(Commands.runOnce ( ()-> operatorJoystick.setRumble(RumbleType.kRightRumble, 0.0)))
+    );
 
 
 /*
@@ -260,11 +268,7 @@ public class RobotContainer
         Trigger operatorLeftJoystickAxisDown = operatorJoystick.axisLessThan(1, -0.7 );
         operatorLeftJoystickAxisDown
             .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
-            .onTrue(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_TRAVEL), clawSubsystem)
-                .andThen( Commands.waitSeconds(150)
-                    .until( clawSubsystem::atSetpoint)
-                )
-                .andThen(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( -0.20 ), elevatorSubsystem)));
+            .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( -0.20 ), elevatorSubsystem));
 
         //Algea Low
         Trigger operatorDPadLeft = operatorJoystick.povLeft();
