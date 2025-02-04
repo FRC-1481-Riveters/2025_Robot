@@ -26,22 +26,18 @@ import org.littletonrobotics.junction.Logger;
 
 public class ClawSubsystem extends SubsystemBase 
 {
-    private final TalonFX m_clawMotor =  new TalonFX(ClawConstants.CLAW_MOTOR, "CANivore");
+    private final TalonFX m_clawMotor =  new TalonFX(ClawConstants.CLAW_MOTOR, "rio");
 
-    private final CANcoder m_CANCoder = new CANcoder(ClawConstants.CLAW_CANCODER, "CANivore");
-    private final boolean m_CANCoderReversed;
-    private final double m_CANCoderOffsetDegrees;
+    //private final boolean m_CANCoderReversed;
+    //private final double m_CANCoderOffsetDegrees;
     
-    private final PIDController clawPidController;
+    private final PIDController clawPidController = new PIDController(ClawConstants.CLAW_0_KP, ClawConstants.CLAW_0_KI, ClawConstants.CLAW_0_KD);
 
     public static final double claw_kA = 0.12872;
     public static final double claw_kV = 2.3014;
     public static final double claw_kS = 0.55493;
-    private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( claw_kS, claw_kV, claw_kA );
-    InvertedValue clawMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
+    private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( claw_kS, claw_kV, claw_kA ); InvertedValue clawMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
     
-    clawPidController = new PIDController(ClawConstants.CLAW_0_KP, ClawConstants.CLAW_0_KI, ClawConstants.CLAW_0_KD);
-    clawPidController.enableContinuousInput(-Math.PI, Math.PI);
    
     private double m_Setpoint;
     private double m_output;
@@ -54,27 +50,32 @@ public class ClawSubsystem extends SubsystemBase
 
     public ClawSubsystem() 
     {
+        InvertedValue clawMotorInverted =
+
+        InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
+    
+        clawPidController.enableContinuousInput(-Math.PI, Math.PI);
+       
         MotorOutputConfigs clawMotorOutputConfigs = new MotorOutputConfigs();
         CurrentLimitsConfigs clawMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
     
     SupplyCurrentLimitConfiguration currentConfig = new SupplyCurrentLimitConfiguration();
-    currentConfig.currentLimit = 30;
+    currentConfig.currentLimit = 2;
     currentConfig.enable = true;
 
     clawMotorOutputConfigs
         .withNeutralMode(NeutralModeValue.Brake)
         .withInverted(clawMotorInverted);
     clawMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(15)
+        .withSupplyCurrentLimit(20)
         .withSupplyCurrentLimitEnable(true);
-    currentConfig.currentLimit = 12.5;
     // clawMotor.configVoltageCompSaturation(12.5);
     // clawMotor.enableVoltageCompensation(true);
     m_clawMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_clawMotor.getConfigurator().apply(clawMotorCurrentLimitsConfigs);
     m_clawMotor.getConfigurator().apply(clawMotorOutputConfigs);
 
-        m_CANCoder.setPosition(m_CANCoderOffsetDegrees);
+       // m_CANCoder.setPosition(m_CANCoderOffsetDegrees);
 
         m_tolerance = 2.5;
         clawPidController.setIZone(m_tolerance*3);
@@ -92,22 +93,11 @@ public class ClawSubsystem extends SubsystemBase
 
         m_Setpoint = angle;
         clawPidController.setIZone(m_tolerance*3);
-        if( (angle >= (ClawConstants.CLAW_CLOSE - 0.5)) &&
-            (angle <= (ClawConstants.CLAW_CLOSE + 0.5)) )
-        {
-            clawPidController.setP( ClawConstants.CLAW_CLOSE_KP );
-            clawPidController.setI( ClawConstants.CLAW_CLOSE_KI );
-            clawPidController.setD( ClawConstants.CLAW_CLOSE_KD );
-            clawPidController.setIZone(m_tolerance*4);
-        }
-        else
-        {
             clawPidController.setP( ClawConstants.CLAW_0_KP );
             clawPidController.setI( ClawConstants.CLAW_0_KI );
             clawPidController.setD( ClawConstants.CLAW_0_KD );
-        }
-        clawPidController.reset(m_position);
-        m_clawPidController = true;
+        //clawPidController.reset(m_position);
+        m_pid = true;
         Logger.recordOutput("Claw/Setpoint", m_Setpoint );
 
         System.out.println("setClaw " + angle + ", current angle=" + m_position);
@@ -117,6 +107,7 @@ public class ClawSubsystem extends SubsystemBase
     {
         m_pid = false;
         m_output = speed;
+        m_clawMotor.set(speed);
         m_Setpoint = 0;
         Logger.recordOutput("Claw/Setpoint", m_Setpoint );
         System.out.println("setClawJog " + m_output );

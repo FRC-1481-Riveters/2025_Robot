@@ -39,13 +39,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-   private final TalonFX m_intakeMotor =  new TalonFX(IntakeConstants.INTAKE_MOTOR, "CANivore");
+    private final TalonFX m_intakeMotor =  new TalonFX(IntakeConstants.INTAKE_MOTOR, "rio");
 
-    private final CANcoder m_CANCoder = new CANcoder(IntakeConstants.INTAKE_CANCODER, "CANivore");
-    private final boolean m_CANCoderReversed;
-    private final double m_CANCoderOffsetDegrees;
+    //private final boolean m_CANCoderReversed;
+    //private final double m_CANCoderOffsetDegrees;
     
-    private final PIDController intakePidController;
+    private final PIDController intakePidController = new PIDController(IntakeConstants.INTAKE_MOTOR_KP, IntakeConstants.INTAKE_MOTOR_KI, IntakeConstants.INTAKE_MOTOR_KD);
 
     public static final double intake_kA = 0.12872;
     public static final double intake_kV = 2.3014;
@@ -53,8 +52,6 @@ public class IntakeSubsystem extends SubsystemBase {
     private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( intake_kS, intake_kV, intake_kA );
     InvertedValue intakeMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
     
-    intakePidController = new PIDController(IntakeConstants.INTAKE_MOTOR_KP, IntakeConstants.INTAKE_MOTOR_KI, IntakeConstants.INTAKE_MOTOR_KD);
-    intakePidController.enableContinuousInput(-Math.PI, Math.PI);
    
     private DigitalInput m_BeamBreakShooter = new DigitalInput(0);
     private DigitalInput m_BeamBreakLoaded = new DigitalInput(1);
@@ -69,14 +66,14 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem( RobotContainer robotContainer ) 
     {
+        intakePidController.enableContinuousInput(-Math.PI, Math.PI);
          m_robotContainer = robotContainer;
 
-         
         MotorOutputConfigs intakeMotorOutputConfigs = new MotorOutputConfigs();
         CurrentLimitsConfigs intakeMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
     
     SupplyCurrentLimitConfiguration currentConfig = new SupplyCurrentLimitConfiguration();
-    currentConfig.currentLimit = 30;
+    currentConfig.currentLimit = 5;
     currentConfig.enable = true;
 
     intakeMotorOutputConfigs
@@ -85,7 +82,7 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeMotorCurrentLimitsConfigs
         .withSupplyCurrentLimit(15)
         .withSupplyCurrentLimitEnable(true);
-    currentConfig.currentLimit = 12.5;
+    currentConfig.currentLimit = 10;
     // intakeMotor.configVoltageCompSaturation(12.5);
     // intakeMotor.enableVoltageCompensation(true);
     m_intakeMotor.getConfigurator().apply(new TalonFXConfiguration());
@@ -118,7 +115,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setIntakeRollerSpeed( double rpm )
     {
-        intakePidController.setReference(rpm, ControlType.kVelocity);
+       // intakePidController..setReference(rpm, ControlType.kVelocity);
+        m_intakeMotor.set(rpm);
         m_rollerRpmSetpoint = rpm;
         if( rpm > 10 )
             intakePidControllerEnabled = true;
@@ -138,7 +136,7 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() 
     {
-        m_rollerRpm = m_rollerEncoder.getVelocity();
+        m_rollerRpm = m_intakeMotor.getVelocity().getValueAsDouble();
         Logger.recordOutput("Intake/BeamBreakShooter", !m_BeamBreakShooter.get() );
     }
 

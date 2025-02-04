@@ -95,8 +95,7 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int INTAKE_MOTOR = 36;
-        public static final int INTAKE_CANCODER = 37;
+        public static final int INTAKE_MOTOR = 38;
 
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
         public static final double INTAKE_ROLLER_SPEED_CORAL = 300;
@@ -127,19 +126,18 @@ public final class Constants {
 
     public static final class ClawConstants {
         public static final int CLAW_MOTOR = 36;
-        public static final int CLAW_CANCODER = 37;
 
-        public static final double CLAW_MIN = 10;
+        public static final double CLAW_MIN = 0;
         public static final double CLAW_TRAVEL = 58.0;
-        public static final double CLAW_CLOSE = 127.0; // 126.5
         public static final double CLAW_CLIMB = 85.0;
         public static final double CLAW_L1 = 114.0; // 3 deg diff
         public static final double CLAW_L2 = 106.5; // 3 deg diff?
         public static final double CLAW_L3 = 88.2;
         public static final double CLAW_L4 = 88.2;
         public static final double CLAW_BARGE = 88.2;
+        public static final double CLAW_REEF = 88.2;
         public static final double CLAW_PROCESSOR = 88.2;
-        public static final double CLAW_MAX = 140; // max travel
+        public static final double CLAW_MAX = 40; // max travel
 
         public static final double CLAW_ACCELERATION = 500;
         public static final double CLAW_VELOCITY = 250;
@@ -160,6 +158,7 @@ public final class Constants {
         public static final double ELEVATOR_VELOCITY = 40;
         public static final double ELEVATOR_ACCELERATION = 120;
         public static final int ELEVATOR_MOTOR = 42;
+        public static final int ELEVATOR_MOTOR_FOLLOWER = 43;
         public static final double ELEVATOR_POSITION_TOLERANCE = 0.3;
         // fill out position values later
         public static final double ELEVATOR_START = 0;
@@ -178,8 +177,11 @@ public final class Constants {
         public static final double ELEVATOR_CLIMB_START = -13.0;
         public static final double ELEVATOR_CLIMB_TAUT = -8.1;
         public static final double ELEVATOR_CLIMB_FULL = -3.2;
+        public static final double ELEVATOR_MOTOR_KP = 0.30;
+        public static final double ELEVATOR_MOTOR_KI = 0.090;
+        public static final double ELEVATOR_MOTOR_KD = 0.005;
+        public static final double ELEVATOR_MOTOR_KF = 0;
         public static final double ELEVATOR_MAX = -20.0;
-        //public static final double ELEVATOR_TRAP = 0;
     }
 
     public static final class ClimbConstants {
@@ -187,9 +189,9 @@ public final class Constants {
         public static final int CLIMB_MOTOR_FOLLOWER = 25;
         public static final double CLIMB_POSITION_MAX = 15.0;
         public static final double CLIMB_ENCODER_FULLY_CLIMBED = -150;
-        public static final int CLIMB_MIN = 0;
+        public static final int CLIMB_MIN = 0; 
 
-    }
+    }  
 
     public static final class OIConstants {
         public static final int kDriverControllerPort = 0;

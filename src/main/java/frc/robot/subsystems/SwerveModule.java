@@ -50,8 +50,8 @@ public class SwerveModule {
 
         SupplyCurrentLimitConfiguration currentConfig;
 
-        InvertedValue driveMotorInverted = driveMotorReversed ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
-        InvertedValue turningMotorInverted = turningMotorReversed ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive; //check direction for turn (is true the same as clockwise / counter-clockwise)
+        InvertedValue driveMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
+        InvertedValue turningMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for turn (is true the same as clockwise / counter-clockwise)
 
         this.absoluteEncoderOffsetDegrees = absoluteEncoderOffsetDegrees;
         this.absoluteEncoderReversed = absoluteEncoderReversed;

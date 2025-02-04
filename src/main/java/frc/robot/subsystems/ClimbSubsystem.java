@@ -19,7 +19,7 @@ import javax.lang.model.util.ElementScanner14;
 import org.littletonrobotics.junction.Logger;
 
 public class ClimbSubsystem extends SubsystemBase {
-
+/* 
     private SparkMax m_motor = new SparkMax(ClimbConstants.CLIMB_MOTOR, SparkLowLevel.MotorType.kBrushless );
     private SparkMax m_motorFollower = new SparkMax(ClimbConstants.CLIMB_MOTOR_FOLLOWER, SparkLowLevel.MotorType.kBrushless );
     private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
@@ -106,5 +106,5 @@ public class ClimbSubsystem extends SubsystemBase {
         }
 
         Logger.recordOutput("Climb/Output", m_setpoint );
-    }
+    }*/
 }
