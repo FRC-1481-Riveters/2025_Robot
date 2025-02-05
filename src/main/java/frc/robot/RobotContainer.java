@@ -267,8 +267,8 @@ public class RobotContainer
         Trigger operatorDPadLeft = operatorJoystick.povLeft();
         operatorDPadLeft
         .onTrue( 
-            Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE))
-            .andThen( Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))));
+            //Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE))
+            /*.andThen(*/ Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_WING))); //))));
             
         //Algea High
         Trigger operatorDPadUp = operatorJoystick.povUp();
@@ -424,7 +424,7 @@ public class RobotContainer
             .andThen( Commands.waitSeconds(3)
                 .until( clawSubsystem::atSetpoint)
             )
-            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_PAST_BUMP ), elevatorSubsystem)
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_BARGE ), elevatorSubsystem)
             .andThen( Commands.waitSeconds(3)
                 .until( elevatorSubsystem::isAtPosition)
             )

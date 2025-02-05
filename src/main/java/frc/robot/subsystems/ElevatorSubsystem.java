@@ -69,7 +69,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     elevatorMotorCurrentLimitsConfigs
         .withSupplyCurrentLimit(15)
         .withSupplyCurrentLimitEnable(true);
-    currentConfig.currentLimit = 10; //30
+    currentConfig.currentLimit = 2; //30
     // elevatorMotor.enableVoltageCompensation(true);
     m_elevatorMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
@@ -147,7 +147,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public boolean isAboveIntake()
     {
       boolean retval;
-      if( m_position < ElevatorConstants.ELEVATOR_ABOVE_BUMP )
+      if( m_position < ElevatorConstants.ELEVATOR_BARGE )
         retval = true;
       else
         retval = false;
