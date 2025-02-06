@@ -7,38 +7,38 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants;
 import frc.robot.Constants.ClawConstants;
 import edu.wpi.first.wpilibj.DigitalInput;
 
+import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.*;
-import com.revrobotics.spark.*;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SoftLimitConfig;
 
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase{
     private final TalonFX m_elevatorMotor =  new TalonFX(ElevatorConstants.ELEVATOR_MOTOR, "rio");
+    private final TalonFX m_elevatorMotorFollower =  new TalonFX(ElevatorConstants.ELEVATOR_MOTOR_FOLLOWER, "rio");
     //private final boolean m_CANCoderReversed;
     //private final double m_CANCoderOffsetDegrees;
     
     private final PIDController elevatorPidController = new PIDController(ElevatorConstants.ELEVATOR_MOTOR_KP, ElevatorConstants.ELEVATOR_MOTOR_KI, ElevatorConstants.ELEVATOR_MOTOR_KD);
+    private final PIDController elevatorFollowerPidController = new PIDController(ElevatorConstants.ELEVATOR_MOTOR_KP, ElevatorConstants.ELEVATOR_MOTOR_KI, ElevatorConstants.ELEVATOR_MOTOR_KD);
 
     public static final double elevator_kA = 0.12872;
     public static final double elevator_kV = 2.3014;
     public static final double elevator_kS = 0.55493;
     private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( elevator_kS, elevator_kV, elevator_kA );
-    InvertedValue elevatorMotorInverted = InvertedValue.Clockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
-    
+    InvertedValue elevatorMotorInverted = InvertedValue.Clockwise_Positive; 
+     InvertedValue elevatorFollowerMotorInverted = InvertedValue.Clockwise_Positive;
 
     /*private SparkMax m_motor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR, SparkLowLevel.MotorType.kBrushless );
     private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
@@ -57,6 +57,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public ElevatorSubsystem(){
 
       elevatorPidController.enableContinuousInput(-Math.PI, Math.PI);
+      elevatorFollowerPidController.enableContinuousInput(-Math.PI, Math.PI);
 
       MotorOutputConfigs elevatorMotorOutputConfigs = new MotorOutputConfigs();
       CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
@@ -76,6 +77,24 @@ public class ElevatorSubsystem extends SubsystemBase{
     m_elevatorMotor.getConfigurator().apply(elevatorMotorOutputConfigs);
     m_elevatorMotor.setPosition(0);
 
+    MotorOutputConfigs elevatorMotorFollowerOutputConfigs = new MotorOutputConfigs();
+    CurrentLimitsConfigs elevatorMotorFollowerCurrentLimitsConfigs = new CurrentLimitsConfigs();
+      
+      SupplyCurrentLimitConfiguration currentFollowerConfig = new SupplyCurrentLimitConfiguration();
+      currentFollowerConfig.enable = true;
+
+    elevatorMotorFollowerOutputConfigs
+        .withNeutralMode(NeutralModeValue.Brake);
+    elevatorMotorFollowerCurrentLimitsConfigs
+        .withSupplyCurrentLimit(15)
+        .withSupplyCurrentLimitEnable(true);
+    currentFollowerConfig.currentLimit = 2; //30
+    // elevatorMotor.enableVoltageCompensation(true);
+    m_elevatorMotorFollower.getConfigurator().apply(new TalonFXConfiguration());
+    m_elevatorMotorFollower.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
+    m_elevatorMotorFollower.getConfigurator().apply(elevatorMotorOutputConfigs);
+    m_elevatorMotorFollower.setPosition(0);
+
       // Create an initial log entry so they all show up in AdvantageScope without having to enable anything
       Logger.recordOutput("Elevator/Position", 0.0 );
       Logger.recordOutput("Elevator/Setpoint", 0.0);
@@ -83,7 +102,7 @@ public class ElevatorSubsystem extends SubsystemBase{
       Logger.recordOutput("Elevator/BeamBreak", false );
       Logger.recordOutput("Elevator/AtPosition", false );
 
-      elevatorPidController.setIZone(1.0);
+      elevatorFollowerPidController.setIZone(1.0);
     }
 
     @Override
@@ -102,6 +121,7 @@ public class ElevatorSubsystem extends SubsystemBase{
       {
         m_position = 0;
         m_elevatorMotor.setPosition(m_position);
+        m_elevatorMotorFollower.setPosition(m_position);
       }
 
       m_atPosition = false;
@@ -127,6 +147,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     {
       m_pid = false;
       m_elevatorMotor.set(speed);
+      m_elevatorMotorFollower.set(speed);
       Logger.recordOutput("Elevator/Output", speed);
       System.out.println("setElevatorJog " + speed );
     }
@@ -136,7 +157,8 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         m_setpoint = position;    
         m_pid = true;
-        //elevatorPidController.reset(m_position);
+        elevatorPidController.setSetpoint(position);
+        elevatorFollowerPidController.setSetpoint(position);
         Logger.recordOutput("Elevator/Setpoint", m_setpoint);
     }
 
@@ -162,6 +184,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void elevatorDisable()
     {
         m_elevatorMotor.set(0.0);
+        m_elevatorMotorFollower.set(0.0);
         m_pid = false;
         System.out.println("elevatorDisable current position=" + getPosition());
         Logger.recordOutput("Elevator/Output", 0.0);
@@ -171,5 +194,6 @@ public class ElevatorSubsystem extends SubsystemBase{
     {
         m_position = 0;
         m_elevatorMotor.setPosition(m_position);
+        m_elevatorMotorFollower.setPosition(m_position);
     }
 }

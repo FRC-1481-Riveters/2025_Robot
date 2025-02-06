@@ -256,12 +256,12 @@ public class RobotContainer
         Trigger operatorLeftJoystickAxisUp = operatorJoystick.axisGreaterThan(1, 0.7 );
         operatorLeftJoystickAxisUp 
             .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
-            .onTrue( Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.35 ), elevatorSubsystem));
+            .onTrue( Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( -0.15 ), elevatorSubsystem));
         
         Trigger operatorLeftJoystickAxisDown = operatorJoystick.axisLessThan(1, -0.7 );
         operatorLeftJoystickAxisDown
             .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
-            .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( -0.20 ), elevatorSubsystem));
+            .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.10 ), elevatorSubsystem));
 
         //Algea Low
         Trigger operatorDPadLeft = operatorJoystick.povLeft();
