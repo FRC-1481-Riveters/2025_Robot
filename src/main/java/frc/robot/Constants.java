@@ -162,7 +162,7 @@ public final class Constants {
         public static final double ELEVATOR_POSITION_TOLERANCE = 0.3;
         // fill out position values later
         public static final double ELEVATOR_START = 0;
-        public static final double ELEVATOR_WING =  -4;
+        public static final double ELEVATOR_WING =  4;
         public static final double ELEVATOR_L1 = -16.0;
         public static final double ELEVATOR_L2 = -16.0;
         public static final double ELEVATOR_L3 = -14.0;
