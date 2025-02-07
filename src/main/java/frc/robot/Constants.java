@@ -96,6 +96,7 @@ public final class Constants {
 
     public static final class IntakeConstants {
         public static final int INTAKE_MOTOR = 38;
+        public static final int CANRANGE = 8;
 
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
         public static final double INTAKE_ROLLER_SPEED_CORAL = 300;

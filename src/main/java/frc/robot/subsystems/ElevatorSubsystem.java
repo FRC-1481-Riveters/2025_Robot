@@ -46,7 +46,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     private final TrapezoidProfile.Constraints m_constraints =
         new TrapezoidProfile.Constraints(ElevatorConstants.ELEVATOR_VELOCITY, ElevatorConstants.ELEVATOR_ACCELERATION);
     private ProfiledPIDController pidElevator = new ProfiledPIDController(0.30, 0.090, 0.005, m_constraints, 0.02);*/
-    private DigitalInput m_proxSwitchBottom = new DigitalInput(3);
+    private DigitalInput m_proxSwitchBottom = new DigitalInput(0);
     public boolean m_proxSwitchBottomState;
 
     private boolean m_pid;
@@ -116,14 +116,6 @@ public class ElevatorSubsystem extends SubsystemBase{
       m_proxSwitchBottomState = !m_proxSwitchBottom.get();
       Logger.recordOutput("Elevator/ProxSwitchBottom", m_proxSwitchBottomState );
 
-      // If the elevator is all the way down, zero the encoder
-      if( m_proxSwitchBottomState == true )
-      {
-        m_position = 0;
-        m_elevatorMotor.setPosition(m_position);
-        m_elevatorMotorFollower.setPosition(m_position);
-      }
-
       m_atPosition = false;
 
       if( m_pid == true )
@@ -157,8 +149,8 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         m_setpoint = position;    
         m_pid = true;
-        elevatorPidController.setSetpoint(position);
-        elevatorFollowerPidController.setSetpoint(position);
+        m_elevatorMotor.setPosition(position);
+        m_elevatorMotorFollower.setPosition(position);
         Logger.recordOutput("Elevator/Setpoint", m_setpoint);
     }
 

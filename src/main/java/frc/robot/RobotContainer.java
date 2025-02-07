@@ -199,7 +199,18 @@ public class RobotContainer
         Trigger driverRightBumper = driverJoystick.rightBumper();
         driverRightBumper
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
-            .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( -Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE )));
+            .whileTrue( 
+                Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( -Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE ))
+            .andThen( Commands.waitSeconds(6)
+                    .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
+            .andThen( Commands.waitSeconds(.0025))
+                .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
+            );
+
+        Trigger startButton = operatorJoystick.start();
+        startButton
+            .onTrue( Commands.runOnce( () -> elevatorSubsystem.zeroEncoder() ) );
+
 
         Trigger operatorL4Trigger = operatorJoystick.y();
         operatorL4Trigger
@@ -472,8 +483,8 @@ public class RobotContainer
     {
         return Commands.runOnce( ()->System.out.println("IntakeRollersInCommand") )
             .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller( -0.7 ) ) )
-            .andThen( Commands.waitSeconds(20)
-                .until(intakeSubsystem::isIntakeBeamBreakLoaded))
+            .andThen( Commands.waitSeconds(20))
+                //.until(intakeSubsystem::isIntakeBeamBreakLoaded))
             .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRoller( 0 )));
     }
 

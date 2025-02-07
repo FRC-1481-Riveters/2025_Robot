@@ -15,18 +15,10 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.spark.*;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.ctre.phoenix.motion.MotionProfileStatus;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.revrobotics.*;
+import com.ctre.phoenix6.hardware.CANrange;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -40,6 +32,7 @@ import org.littletonrobotics.junction.Logger;
 public class IntakeSubsystem extends SubsystemBase {
 
     private final TalonFX m_intakeMotor =  new TalonFX(IntakeConstants.INTAKE_MOTOR, "rio");
+    private final CANrange m_CANrange = new CANrange(IntakeConstants.CANRANGE);
 
     //private final boolean m_CANCoderReversed;
     //private final double m_CANCoderOffsetDegrees;
@@ -52,9 +45,6 @@ public class IntakeSubsystem extends SubsystemBase {
     private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( intake_kS, intake_kV, intake_kA );
     InvertedValue intakeMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
     
-   
-    private DigitalInput m_BeamBreakShooter = new DigitalInput(0);
-    private DigitalInput m_BeamBreakLoaded = new DigitalInput(1);
     private boolean m_BeamBreakLoadedPrevious;
     private RobotContainer m_robotContainer;
 
@@ -137,15 +127,16 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic() 
     {
         m_rollerRpm = m_intakeMotor.getVelocity().getValueAsDouble();
-        Logger.recordOutput("Intake/BeamBreakShooter", !m_BeamBreakShooter.get() );
+        Logger.recordOutput("CANrange", m_CANrange.getDistance().getValueAsDouble());
+        //Logger.recordOutput("Intake/BeamBreakShooter", !m_BeamBreakShooter.get() );
     }
 
     public boolean isIntakeBeamBreakLoaded()
     {
-        if( m_BeamBreakLoaded.get() )
-            return false;
-        else
+        if( m_CANrange.getDistance().getValueAsDouble() < 0.1 ) 
             return true;
+        else
+            return false;
     }
 
     public void setCone( boolean bHasCone )
@@ -155,11 +146,11 @@ public class IntakeSubsystem extends SubsystemBase {
         System.out.println("setCone "  + bHasCone);
     }
 
-    public boolean isIntakeBeamBreakShooter()
+    /*public boolean isIntakeBeamBreakShooter()
     {
         if( m_BeamBreakLoaded.get() )
             return false;
         else
             return true;
-    }
+    }*/
 }
