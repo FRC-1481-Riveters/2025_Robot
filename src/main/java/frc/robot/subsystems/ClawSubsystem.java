@@ -31,7 +31,7 @@ public class ClawSubsystem extends SubsystemBase
     //private final boolean m_CANCoderReversed;
     //private final double m_CANCoderOffsetDegrees;
     
-    private final PIDController clawPidController = new PIDController(ClawConstants.CLAW_0_KP, ClawConstants.CLAW_0_KI, ClawConstants.CLAW_0_KD);
+    private final PIDController clawPidController = new PIDController(ClawConstants.CLAW_KP, ClawConstants.CLAW_KI, ClawConstants.CLAW_KD);
 
     public static final double claw_kA = 0.12872;
     public static final double claw_kV = 2.3014;
@@ -50,24 +50,20 @@ public class ClawSubsystem extends SubsystemBase
 
     public ClawSubsystem() 
     {
-        InvertedValue clawMotorInverted =
-
-        InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
-    
-        clawPidController.enableContinuousInput(-Math.PI, Math.PI);
+        InvertedValue clawMotorInverted =InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
        
         MotorOutputConfigs clawMotorOutputConfigs = new MotorOutputConfigs();
         CurrentLimitsConfigs clawMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
     
     SupplyCurrentLimitConfiguration currentConfig = new SupplyCurrentLimitConfiguration();
-    currentConfig.currentLimit = 2;
+    currentConfig.currentLimit = 1;
     currentConfig.enable = true;
 
     clawMotorOutputConfigs
         .withNeutralMode(NeutralModeValue.Brake)
         .withInverted(clawMotorInverted);
     clawMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(20)
+        .withSupplyCurrentLimit(3)
         .withSupplyCurrentLimitEnable(true);
     // clawMotor.configVoltageCompSaturation(12.5);
     // clawMotor.enableVoltageCompensation(true);
@@ -92,10 +88,6 @@ public class ClawSubsystem extends SubsystemBase
         double sensorSetpoint;
 
         m_Setpoint = angle;
-        clawPidController.setIZone(m_tolerance*3);
-            clawPidController.setP( ClawConstants.CLAW_0_KP );
-            clawPidController.setI( ClawConstants.CLAW_0_KI );
-            clawPidController.setD( ClawConstants.CLAW_0_KD );
         //clawPidController.reset(m_position);
         m_pid = true;
         Logger.recordOutput("Claw/Setpoint", m_Setpoint );

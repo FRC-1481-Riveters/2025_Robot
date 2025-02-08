@@ -218,7 +218,7 @@ public class RobotContainer
             Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4))
             .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_L4))));
 
-        Trigger operatorL3Trigger = operatorJoystick.a();
+        Trigger operatorL3Trigger = operatorJoystick.b();
         operatorL3Trigger
         .onTrue( 
             Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L3))
@@ -228,13 +228,18 @@ public class RobotContainer
         operatorL2Trigger
         .onTrue( 
             Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L3))
-            .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_L3))));
+            .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_L2))));
+
+        /*Trigger operatorL1Trigger = operatorJoystick.a();
+        operatorL1Trigger
+        .onTrue( 
+            Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L1))
+            .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_L1))));*/
 
         Trigger operatorL1Trigger = operatorJoystick.a();
         operatorL1Trigger
         .onTrue( 
-            Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L3))
-            .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_L3))));
+            Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_L1)));
 
         Trigger operatorAlgeaModeTrigger = operatorJoystick.leftBumper();
         operatorAlgeaModeTrigger
@@ -550,7 +555,7 @@ public class RobotContainer
             status = "Active";}
         else{
             status = "not Active";}
-        if (elevatorSubsystem.m_proxSwitchBottomState == intendedState){
+        if (elevatorSubsystem.m_proxSwitchBottomStateNew == intendedState){
             System.out.println("PASS: Elevator Prox Switch is " + status);
         }
         else{

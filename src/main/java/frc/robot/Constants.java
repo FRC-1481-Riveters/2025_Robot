@@ -128,26 +128,24 @@ public final class Constants {
     public static final class ClawConstants {
         public static final int CLAW_MOTOR = 36;
 
-        public static final double CLAW_MIN = 0;
+        public static final double CLAW_MIN = -3.8;
         public static final double CLAW_TRAVEL = 58.0;
         public static final double CLAW_CLIMB = 85.0;
-        public static final double CLAW_L1 = 114.0; // 3 deg diff
+        public static final double CLAW_L1 = 10; // 3 deg diff
         public static final double CLAW_L2 = 106.5; // 3 deg diff?
         public static final double CLAW_L3 = 88.2;
         public static final double CLAW_L4 = 88.2;
         public static final double CLAW_BARGE = 88.2;
         public static final double CLAW_REEF = 88.2;
         public static final double CLAW_PROCESSOR = 88.2;
-        public static final double CLAW_MAX = 40; // max travel
+        public static final double CLAW_MAX = 19.9;
+        public static final double CLAW_ELEVATOR_CLEAR = 0; // max travel
 
         public static final double CLAW_ACCELERATION = 500;
         public static final double CLAW_VELOCITY = 250;
-        public static final double CLAW_0_KP = 0.0095; // 0.004
-        public static final double CLAW_0_KI = 0.024;
-        public static final double CLAW_0_KD = 0.00034;
-        public static final double CLAW_CLOSE_KP = 0.015; // 0.004;
-        public static final double CLAW_CLOSE_KI = 0.03;// 0.0300;
-        public static final double CLAW_CLOSE_KD = 0.00040;
+        public static final double CLAW_KP = 0.2; // 0.004
+        public static final double CLAW_KI = 0.024;
+        public static final double CLAW_KD = 0.000;
         //NEED TO CHANGE THE NAMES/CONSTANTS BELOW
         // public static final double CLAW_0_KP = 0.003;
         // public static final double CLAW_0_KI = 0.004;
@@ -176,10 +174,14 @@ public final class Constants {
         public static final double ELEVATOR_CLIMB_START = -13.0;
         public static final double ELEVATOR_CLIMB_TAUT = -8.1;
         public static final double ELEVATOR_CLIMB_FULL = -3.2;
-        public static final double ELEVATOR_MOTOR_KP = 0.3;
-        public static final double ELEVATOR_MOTOR_KI = 0.090;
-        public static final double ELEVATOR_MOTOR_KD = 0.005;
-        public static final double ELEVATOR_MOTOR_KF = 0;
+        public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.015;
+        public static final double ELEVATOR_MOTOR_ABOVE_KI = 0.090;
+        public static final double ELEVATOR_MOTOR_ABOVE_KD = 0.000;
+        public static final double ELEVATOR_MOTOR_ABOVE_KF = 0;
+        public static final double ELEVATOR_MOTOR_BELOW_KP = 0.15;
+        public static final double ELEVATOR_MOTOR_BELOW_KI = 0.090;
+        public static final double ELEVATOR_MOTOR_BELOW_KD = 0.000;
+        public static final double ELEVATOR_MOTOR_BELOW_KF = 0;
         public static final double ELEVATOR_MAX = -20.0;
     }
 
