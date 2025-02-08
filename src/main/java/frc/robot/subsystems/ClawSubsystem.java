@@ -107,7 +107,7 @@ public class ClawSubsystem extends SubsystemBase
     {
         m_pid = false;
         m_output = speed;
-        m_clawMotor.set(speed);
+        clawPidController.setSetpoint(speed);
         m_Setpoint = 0;
         Logger.recordOutput("Claw/Setpoint", m_Setpoint );
         System.out.println("setClawJog " + m_output );

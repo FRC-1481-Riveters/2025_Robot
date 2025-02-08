@@ -36,9 +36,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public static final double elevator_kA = 0.12872;
     public static final double elevator_kV = 2.3014;
     public static final double elevator_kS = 0.55493;
-    private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( elevator_kS, elevator_kV, elevator_kA );
     InvertedValue elevatorMotorInverted = InvertedValue.Clockwise_Positive; 
-     InvertedValue elevatorFollowerMotorInverted = InvertedValue.Clockwise_Positive;
+    InvertedValue elevatorFollowerMotorInverted = InvertedValue.Clockwise_Positive;
 
     /*private SparkMax m_motor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR, SparkLowLevel.MotorType.kBrushless );
     private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
@@ -68,9 +67,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     elevatorMotorOutputConfigs
         .withNeutralMode(NeutralModeValue.Brake);
     elevatorMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(15)
         .withSupplyCurrentLimitEnable(true);
-    currentConfig.currentLimit = 2; //30
+    currentConfig.currentLimit = .5; //30
     // elevatorMotor.enableVoltageCompensation(true);
     m_elevatorMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
@@ -149,8 +147,8 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         m_setpoint = position;    
         m_pid = true;
-        m_elevatorMotor.setPosition(position);
-        m_elevatorMotorFollower.setPosition(position);
+        elevatorPidController.setSetpoint(position);
+        elevatorFollowerPidController.setSetpoint(position);
         Logger.recordOutput("Elevator/Setpoint", m_setpoint);
     }
 

@@ -160,10 +160,10 @@ public final class Constants {
         public static final double ELEVATOR_ACCELERATION = 120;
         public static final int ELEVATOR_MOTOR = 42;
         public static final int ELEVATOR_MOTOR_FOLLOWER = 43;
-        public static final double ELEVATOR_POSITION_TOLERANCE = 0.3;
+        public static final double ELEVATOR_POSITION_TOLERANCE = .5;
         // fill out position values later
         public static final double ELEVATOR_START = 0;
-        public static final double ELEVATOR_WING =  4;
+        public static final double ELEVATOR_WING =  4.4;
         public static final double ELEVATOR_L1 = -16.0;
         public static final double ELEVATOR_L2 = -16.0;
         public static final double ELEVATOR_L3 = -14.0;
@@ -176,7 +176,7 @@ public final class Constants {
         public static final double ELEVATOR_CLIMB_START = -13.0;
         public static final double ELEVATOR_CLIMB_TAUT = -8.1;
         public static final double ELEVATOR_CLIMB_FULL = -3.2;
-        public static final double ELEVATOR_MOTOR_KP = 0.30;
+        public static final double ELEVATOR_MOTOR_KP = 0.3;
         public static final double ELEVATOR_MOTOR_KI = 0.090;
         public static final double ELEVATOR_MOTOR_KD = 0.005;
         public static final double ELEVATOR_MOTOR_KF = 0;
