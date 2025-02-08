@@ -44,8 +44,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public static final double intake_kS = 0.55493;
     private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward( intake_kS, intake_kV, intake_kA );
     InvertedValue intakeMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
-    
-    private boolean m_BeamBreakLoadedPrevious;
+
     private RobotContainer m_robotContainer;
 
     private boolean intakePidControllerEnabled;
@@ -91,8 +90,6 @@ public class IntakeSubsystem extends SubsystemBase {
         Logger.recordOutput("Intake/CamSetpoint", 0.0 );
         Logger.recordOutput("Intake/CamPosition", 0.0 );
         Logger.recordOutput("Intake/Output", 0.0 );
-        Logger.recordOutput("Intake/BeamBreakShooter", false );
-        Logger.recordOutput("Intake/BeamBreakLoaded", false );
     }
 
     public void setIntakeRoller( double minus_one_to_one )
@@ -128,12 +125,13 @@ public class IntakeSubsystem extends SubsystemBase {
     {
         m_rollerRpm = m_intakeMotor.getVelocity().getValueAsDouble();
         Logger.recordOutput("CANrange", m_CANrange.getDistance().getValueAsDouble());
+        Logger.recordOutput("Intake/BeamBreakLoaded", isIntakeBeamBreakLoaded() );
         //Logger.recordOutput("Intake/BeamBreakShooter", !m_BeamBreakShooter.get() );
     }
 
     public boolean isIntakeBeamBreakLoaded()
     {
-        if( m_CANrange.getDistance().getValueAsDouble() < 0.1 ) 
+        if( m_CANrange.getDistance().getValueAsDouble() < 0.05 && m_CANrange.getDistance().getValueAsDouble() > 0.02 ) 
             return true;
         else
             return false;
@@ -145,12 +143,4 @@ public class IntakeSubsystem extends SubsystemBase {
         Logger.recordOutput("HasCone", bHasCone );
         System.out.println("setCone "  + bHasCone);
     }
-
-    /*public boolean isIntakeBeamBreakShooter()
-    {
-        if( m_BeamBreakLoaded.get() )
-            return false;
-        else
-            return true;
-    }*/
 }
