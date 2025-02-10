@@ -100,7 +100,7 @@ public final class Constants {
 
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
         public static final double INTAKE_ROLLER_SPEED_CORAL = 300;
-        public static final double INTAKE_ROLLER_SPEED_ALGAE = 500;
+        public static final double INTAKE_ROLLER_SPEED_ALGAE = 300;
 
         public static final double INTAKE_CAM_ANGLE_TOLERANCE = 10;
         public static final double INTAKE_CAM_L1 = 10.0;
@@ -128,8 +128,8 @@ public final class Constants {
     public static final class ClawConstants {
         public static final int CLAW_MOTOR = 36;
 
-        public static final double CLAW_MIN = -0.8;
-        public static final double CLAW_START = -0.6;
+        public static final double CLAW_MIN = -0.9;
+        public static final double CLAW_START = -0.7;
         public static final double CLAW_CLIMB = 85.0;
         public static final double CLAW_REEF = 4.4;
         public static final double CLAW_BARGE = 88.2;

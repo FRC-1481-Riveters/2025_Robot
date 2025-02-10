@@ -191,6 +191,12 @@ public class RobotContainer
             .onFalse(Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_NORMAL )))
             .onTrue( Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_TURBO )));
 
+        Trigger driverRightTrigger = driverJoystick.rightTrigger(0.7);
+        driverRightTrigger
+        .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
+        .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( -Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE )));
+
+
         Trigger driverLeftBumper = driverJoystick.leftBumper();
         driverLeftBumper
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
@@ -203,12 +209,9 @@ public class RobotContainer
                 Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( -Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE ))
             .andThen( Commands.waitSeconds(6)
                     .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
-            .andThen( Commands.waitSeconds(.005))
-                .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
+            .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
             );
-
             
-
         Trigger startButton = operatorJoystick.start();
         startButton
             .onTrue( Commands.runOnce( () -> elevatorSubsystem.zeroEncoder() ) );
@@ -247,8 +250,12 @@ public class RobotContainer
             Trigger operatorL1Trigger = operatorJoystick.x();
             operatorL1Trigger
             .onTrue( 
-                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)));
-
+                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
+                .andThen(Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint))
+                .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L1)))
+                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF))
+            ));
 
         Trigger operatorRightJoystickAxisUp = operatorJoystick.axisGreaterThan(5, 0.7 );
         operatorRightJoystickAxisUp
