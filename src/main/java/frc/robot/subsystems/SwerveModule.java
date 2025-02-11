@@ -70,33 +70,30 @@ public class SwerveModule {
             .withNeutralMode(NeutralModeValue.Brake)
             .withInverted(driveMotorInverted);
         driveMotorCurrentLimitsConfigs
-            .withSupplyCurrentLimit(15)
+            .withSupplyCurrentLimit(12.5)
             .withSupplyCurrentLimitEnable(true);
-        currentConfig.currentLimit = 12.5;
         // driveMotor.configVoltageCompSaturation(12.5);
         // driveMotor.enableVoltageCompensation(true);
         driveMotor.getConfigurator().apply(new TalonFXConfiguration());
         driveMotor.getConfigurator().apply(driveMotorCurrentLimitsConfigs);
         driveMotor.getConfigurator().apply(driveMotorOutputConfigs);
 
-        
         MotorOutputConfigs turningMotorOutputConfigs = new MotorOutputConfigs();
         CurrentLimitsConfigs turningMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
         turningMotorOutputConfigs
             .withNeutralMode(NeutralModeValue.Brake)
             .withInverted(turningMotorInverted);
         turningMotorCurrentLimitsConfigs
-            .withSupplyCurrentLimit(15)
+            .withSupplyCurrentLimit(12.5)
             .withSupplyCurrentLimitEnable(true);
-        currentConfig.currentLimit = 15;
         // turningMotor.configVoltageCompSaturation(12.5);
         // turningMotor.enableVoltageCompensation(true);
         turningMotor.getConfigurator().apply(new TalonFXConfiguration());
         turningMotor.getConfigurator().apply(turningMotorCurrentLimitsConfigs);
         turningMotor.getConfigurator().apply(turningMotorOutputConfigs);
         
-        // absoluteEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition );   Ensure that these exist as defaults w/ phoenix 6
-        // absoluteEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+        //absoluteEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition );   //Ensure that these exist as defaults w/ phoenix 6
+        //absoluteEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
 
         turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
@@ -121,7 +118,7 @@ public class SwerveModule {
 
     public double getTurningPosition() {
         double position;
-        position = turningMotor.getPosition().getValueAsDouble(); // Double check position accuracy
+        position = turningMotor.getPosition().getValueAsDouble(); //absoluteEncoder.getAbsolutePosition().getValueAsDouble(); // Double check position accuracy
 
         // convert the encodercount to radians
         position = position * (2*Math.PI) / (Constants.ModuleConstants.SWERVE_STEERING_RATIO);

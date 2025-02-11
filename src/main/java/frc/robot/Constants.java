@@ -42,13 +42,13 @@ public final class Constants {
         public static final int gyroPort = 60;
 
         public static final boolean kFrontLeftTurningEncoderReversed = true;
-        public static final boolean kFrontRightTurningEncoderReversed = true;
+        public static final boolean kFrontRightTurningEncoderReversed = false;
         public static final boolean kBackLeftTurningEncoderReversed = true;
-        public static final boolean kBackRightTurningEncoderReversed = true;
+        public static final boolean kBackRightTurningEncoderReversed = false;
 
-        public static final boolean kFrontLeftDriveEncoderReversed = true;
+        public static final boolean kFrontLeftDriveEncoderReversed = false;
         public static final boolean kFrontRightDriveEncoderReversed = false;
-        public static final boolean kBackLeftDriveEncoderReversed = true;
+        public static final boolean kBackLeftDriveEncoderReversed = false;
         public static final boolean kBackRightDriveEncoderReversed = false;
 
         // CANCoder IDs
@@ -62,10 +62,10 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffset = -0.214844; 
-        public static final double kFrontRightDriveAbsoluteEncoderOffset = -0.246826; 
-        public static final double kBackLeftDriveAbsoluteEncoderOffset = -0.157471; 
-        public static final double kBackRightDriveAbsoluteEncoderOffset = -0.031006; 
+        public static final double kFrontLeftDriveAbsoluteEncoderOffset = 0.0; 
+        public static final double kFrontRightDriveAbsoluteEncoderOffset = 0.0; 
+        public static final double kBackLeftDriveAbsoluteEncoderOffset = 0.0; 
+        public static final double kBackRightDriveAbsoluteEncoderOffset = 0.0; 
 
         public static final double kPhysicalMaxSpeedMetersPerSecond = 5.0292; // MK4i 16.5 FPS => 5.0292 m/s
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
