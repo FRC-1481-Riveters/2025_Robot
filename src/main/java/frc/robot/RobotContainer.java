@@ -184,7 +184,7 @@ public class RobotContainer
     {
         Trigger aButton = driverJoystick.start();
         aButton
-            .onTrue( Commands.runOnce( () -> swerveSubsystem.zeroHeading(180.0) ) );
+            .onTrue( Commands.runOnce( () -> swerveSubsystem.zeroHeading(0.0) ) );
 
         Trigger driverLeftTrigger = driverJoystick.leftTrigger( 0.7 );
         driverLeftTrigger
@@ -247,6 +247,16 @@ public class RobotContainer
                 .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF))
             ));
 
+        Trigger operatorDPadleft = operatorJoystick.povLeft();
+            operatorDPadleft
+            .onTrue( 
+                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
+                .andThen(Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint))
+                .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW)))
+                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE_LOW))
+            ));
+
             Trigger operatorL1Trigger = operatorJoystick.x();
             operatorL1Trigger
             .onTrue( 
@@ -276,6 +286,12 @@ public class RobotContainer
         operatorLeftJoystickAxisDown
             .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
             .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.15 ), elevatorSubsystem));
+
+        Trigger operatordpadleft = operatorJoystick.axisLessThan(1, -0.7 );
+            operatorLeftJoystickAxisDown
+                .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
+                .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.15 ), elevatorSubsystem));
+    
 
         //Algea Low
         Trigger operatorDPadLeft = operatorJoystick.povLeft();

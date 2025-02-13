@@ -13,16 +13,20 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
+import java.util.prefs.AbstractPreferences;
+
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -50,9 +54,22 @@ public class SwerveModule {
 
         SupplyCurrentLimitConfiguration currentConfig;
 
-        InvertedValue driveMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
-        InvertedValue turningMotorInverted = InvertedValue.CounterClockwise_Positive; //check direction for turn (is true the same as clockwise / counter-clockwise)
+        InvertedValue driveMotorInverted;
+        InvertedValue turningMotorInverted;
 
+        //check direction for drive (is true the same as clockwise / counter-clockwise)
+        if( driveMotorReversed )
+            driveMotorInverted = InvertedValue.CounterClockwise_Positive;
+        else
+            driveMotorInverted = InvertedValue.Clockwise_Positive;
+            
+        
+        //check direction for turn (is true the same as clockwise / counter-clockwise)
+        if( turningMotorReversed )
+            turningMotorInverted = InvertedValue.CounterClockwise_Positive; 
+        else
+            turningMotorInverted = InvertedValue.Clockwise_Positive;
+        
         this.absoluteEncoderOffsetDegrees = absoluteEncoderOffsetDegrees;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         absoluteEncoder = new CANcoder(absoluteEncoderId, "CANivore");
@@ -91,14 +108,13 @@ public class SwerveModule {
         turningMotor.getConfigurator().apply(new TalonFXConfiguration());
         turningMotor.getConfigurator().apply(turningMotorCurrentLimitsConfigs);
         turningMotor.getConfigurator().apply(turningMotorOutputConfigs);
+
         
         //absoluteEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition );   //Ensure that these exist as defaults w/ phoenix 6
         //absoluteEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
 
         turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
-
-        resetEncoders();
     }
 
     public double getDrivePosition() {
@@ -130,7 +146,7 @@ public class SwerveModule {
         double velocity;
         velocity = driveMotor.getVelocity().getValueAsDouble();
 
-        velocity = (velocity *10) * (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+        velocity = velocity * (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
         velocity = velocity * ModuleConstants.kWheelDiameterMeters * Math.PI;
 
         return( velocity );
@@ -140,8 +156,8 @@ public class SwerveModule {
         double velocity;
         velocity = turningMotor.getVelocity().getValueAsDouble();
 
-        // convert degrees/100 milliseconds to radians per second
-        velocity = (velocity * 10) * (Math.PI / 180);
+        // convert rotations per second to radians per second
+        velocity = velocity * 2 * Math.PI;
 
         return( velocity );
     }
@@ -156,7 +172,7 @@ public class SwerveModule {
     }
 
     public double getAbsoluteEncoderDegrees() {
-        double position = absoluteEncoder.getAbsolutePosition().getValueAsDouble();
+        double position = absoluteEncoder.getAbsolutePosition().getValueAsDouble() * 360.0;
         SmartDashboard.putNumber("absoluteEncoder" + absoluteEncoder.getDeviceID() + "]", position);
         position = position - absoluteEncoderOffsetDegrees;
         return position * (absoluteEncoderReversed ? -1.0 : 1.0);
@@ -164,14 +180,27 @@ public class SwerveModule {
 
     public void resetEncoders() {
         double absPosition;
-        System.out.println("resetEncoders");
+        double talonPosition;
         // Clear the drive motor encoder position
-        driveMotor.setPosition( 0 );
+        driveMotor.setPosition( 0, 2.0 );
 
         absPosition = getAbsoluteEncoderDegrees() * 1.0;  // negative because turning motors are upside down in mk4i
-        absPosition = (absPosition/180.0) * (2048.0*Constants.ModuleConstants.SWERVE_STEERING_RATIO/2.0);
-        System.out.println("Absolute Position = " + absPosition);
-        turningMotor.setPosition( absPosition );
+        // This is sadly complicated:
+        // - CANcoder returns -0.5 to 0.5; getAbsoluteEncoderDegrees returns -180 to 180
+        // - 180, 0, and 180 are all the same (wheel is straight)
+        // - farthest you can be out of phase is 90 degrees
+        /*
+        if( absPosition <= -90 )
+            talonPosition = ((90 + absPosition) / Constants.ModuleConstants.SWERVE_STEERING_RATIO) + 4.2;
+        else if( absPosition < 90 )
+            talonPosition = -absPosition / Constants.ModuleConstants.SWERVE_STEERING_RATIO;
+        else
+            talonPosition = ((absPosition-90) / Constants.ModuleConstants.SWERVE_STEERING_RATIO) - 4.2;
+        */
+        talonPosition = (absPosition / 180.0) * (Constants.ModuleConstants.SWERVE_STEERING_RATIO / 2.0);
+
+        System.out.println("resetEncoders: motor=" + turningMotor.getDeviceID() + ", CANcoder=" + absPosition + ", talon=" + talonPosition);
+        turningMotor.setPosition( talonPosition, 2.0 );
     }
 
     public SwerveModuleState getState() {

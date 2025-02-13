@@ -19,15 +19,16 @@ public final class Constants {
 
     public static final class DriveConstants {
 
-        public static final double kTrackWidth = Units.inchesToMeters(20.75);
+        public static final double kTrackWidth = Units.inchesToMeters(22.75);
         // Distance between right and left wheels
-        public static final double kWheelBase = Units.inchesToMeters(20.75);
+        public static final double kWheelBase = Units.inchesToMeters(22.75);
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-                new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-                new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
-
+            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
+            );
+    
         // FIXME: patch these motor IDs up to match the Swervie 2022 configuration
         public static final int kFrontLeftDriveMotorPort = 13;
         public static final int kFrontRightDriveMotorPort = 18;
@@ -41,15 +42,15 @@ public final class Constants {
 
         public static final int gyroPort = 60;
 
-        public static final boolean kFrontLeftTurningEncoderReversed = true;
+        public static final boolean kFrontLeftTurningEncoderReversed = false;
         public static final boolean kFrontRightTurningEncoderReversed = false;
-        public static final boolean kBackLeftTurningEncoderReversed = true;
+        public static final boolean kBackLeftTurningEncoderReversed = false;
         public static final boolean kBackRightTurningEncoderReversed = false;
 
-        public static final boolean kFrontLeftDriveEncoderReversed = false;
-        public static final boolean kFrontRightDriveEncoderReversed = false;
-        public static final boolean kBackLeftDriveEncoderReversed = false;
-        public static final boolean kBackRightDriveEncoderReversed = false;
+        public static final boolean kFrontLeftDriveEncoderReversed = true;
+        public static final boolean kFrontRightDriveEncoderReversed = true;
+        public static final boolean kBackLeftDriveEncoderReversed = true;
+        public static final boolean kBackRightDriveEncoderReversed = true;
 
         // CANCoder IDs
         public static final int kFrontLeftDriveAbsoluteEncoderPort = 20;
@@ -133,13 +134,15 @@ public final class Constants {
         public static final double CLAW_CLIMB = 85.0;
         public static final double CLAW_REEF = 4.4;
         public static final double CLAW_BARGE = 88.2;
+        public static final double CLAW_ALGAE_LOW = 20.761;
+        public static final double CLAW_ALGAE_HIGH = 24.454;
         public static final double CLAW_PROCESSOR = 88.2;
         public static final double CLAW_MAX = 19.9;
         public static final double CLAW_ELEVATOR_CLEAR = 2; // max travel
 
         public static final double CLAW_ACCELERATION = 500;
         public static final double CLAW_VELOCITY = 250;
-        public static final double CLAW_KP = 0.2; // 0.004
+        public static final double CLAW_KP = 0.4; // 0.004
         public static final double CLAW_KI = 0.024;
         public static final double CLAW_KD = 0.000;
         //NEED TO CHANGE THE NAMES/CONSTANTS BELOW
@@ -162,8 +165,8 @@ public final class Constants {
         public static final double ELEVATOR_L3 = 22.5;
         public static final double ELEVATOR_L4 = 38;
         public static final double ELEVATOR_BARGE = -19.5;
-        public static final double ELEVATOR_ALGAE_LOW = -19.5;
-        public static final double ELEVATOR_ALGAE_HIGH = -19.5;
+        public static final double ELEVATOR_ALGAE_LOW = 16.199;
+        public static final double ELEVATOR_ALGAE_HIGH = 26.964;
         public static final double ELEVATOR_PROCESSOR = -19.5;
         public static final double ELEVATOR_CLIMB_START = -13.0;
         public static final double ELEVATOR_CLIMB_TAUT = -8.1;

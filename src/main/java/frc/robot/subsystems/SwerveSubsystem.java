@@ -76,7 +76,7 @@ public class SwerveSubsystem extends SubsystemBase {
             try {
                 Thread.sleep(1000);
                 gyro.setYaw(0, 1000);
-                zeroHeading(180);
+                zeroHeading(0);
             } catch (Exception e) {
             }
         }).start();
