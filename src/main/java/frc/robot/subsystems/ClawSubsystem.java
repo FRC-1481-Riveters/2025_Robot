@@ -110,6 +110,16 @@ public class ClawSubsystem extends SubsystemBase
         return m_atSetpoint;
     }
 
+    public boolean ClawPosition()
+    {      
+        if (m_clawMotor.getPosition().getValueAsDouble() < 4.0 ){ 
+        return true;
+        }
+        else{
+         return false;
+        }
+    }
+
     @Override
     public void periodic() 
     {
@@ -127,11 +137,11 @@ public class ClawSubsystem extends SubsystemBase
           m_output = MathUtil.clamp( pidCalculate, -0.25, 0.25);
         }
 
-        if( (m_position > ClawConstants.CLAW_MAX) ||
+        /*if( (m_position > ClawConstants.CLAW_MAX) ||
             (m_position < ClawConstants.CLAW_MIN) )
         {
             m_output = 0;
-        }
+        }*/
     
         m_clawMotor.set( m_output );
         Logger.recordOutput("Claw/Output", m_output);

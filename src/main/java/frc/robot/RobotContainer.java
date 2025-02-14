@@ -194,21 +194,22 @@ public class RobotContainer
         Trigger driverRightTrigger = driverJoystick.rightTrigger(0.7);
         driverRightTrigger
         .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
-        .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( -Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE )));
+        .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )));
 
 
         Trigger driverLeftBumper = driverJoystick.leftBumper();
         driverLeftBumper
-            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
+            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
             .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE )));
 
         Trigger driverRightBumper = driverJoystick.rightBumper();
         driverRightBumper
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
             .whileTrue(
-                Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( -Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE ))
-            .andThen( Commands.waitSeconds(6)
+                Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_IN ))
+            .andThen( Commands.waitSeconds(10)
                     .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
+            .andThen( Commands.waitSeconds(0.05))
             .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
             );
             
@@ -247,25 +248,13 @@ public class RobotContainer
                 .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF))
             ));
 
-        Trigger operatorDPadleft = operatorJoystick.povLeft();
-            operatorDPadleft
-            .onTrue( 
-                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
-                .andThen(Commands.waitSeconds(3)
-                .until( clawSubsystem::atSetpoint))
-                .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW)))
-                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE_LOW))
-            ));
-
             Trigger operatorL1Trigger = operatorJoystick.x();
             operatorL1Trigger
             .onTrue( 
-                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
-                .andThen(Commands.waitSeconds(3)
-                .until( clawSubsystem::atSetpoint))
-                .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L1)))
-                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF))
-            ));
+                Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_START))
+                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_START)))
+
+            );
 
         Trigger operatorRightJoystickAxisUp = operatorJoystick.axisGreaterThan(5, 0.7 );
         operatorRightJoystickAxisUp
@@ -287,25 +276,29 @@ public class RobotContainer
             .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
             .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.15 ), elevatorSubsystem));
 
-        Trigger operatordpadleft = operatorJoystick.axisLessThan(1, -0.7 );
-            operatorLeftJoystickAxisDown
-                .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0 ), elevatorSubsystem))
-                .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.15 ), elevatorSubsystem));
-    
-
         //Algea Low
-        Trigger operatorDPadLeft = operatorJoystick.povLeft();
-        operatorDPadLeft
-        .onTrue( 
-            //Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE))
-            /*.andThen(*/ Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))); //))));
-            
+        Trigger operatorDPadleft = operatorJoystick.povLeft();
+        operatorDPadleft
+        .onTrue(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE))
+            .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW)))
+        );
+
         //Algea High
         Trigger operatorDPadUp = operatorJoystick.povUp();
         operatorDPadUp
+        .onTrue(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE))
+            .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_HIGH)))
+        );
+
+        //Algea Store
+        Trigger operatorDPadRight = operatorJoystick.povRight();
+        operatorDPadRight
         .onTrue( 
-            Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF))
-            .andThen( Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_HIGH))));
+            Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START))
+            .andThen(Commands.waitSeconds(3)
+            .until( clawSubsystem::atSetpoint))
+            .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE_STORE))
+        ));
         
         //Algea Out
         Trigger operatorDPadDown = operatorJoystick.povDown();
@@ -330,9 +323,10 @@ public class RobotContainer
             .andThen(
                 Commands.runOnce( ()->setBling(0, 255, 0) ),
                 Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) ),
-                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) ),
-                Commands.waitSeconds(0.5 ),
-                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) )
+            )
+            .andThen(Commands.waitSeconds(0.5))
+            .andThen(Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
                 Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
                 Commands.runOnce( ()->StopControls(true) )
             )
@@ -351,7 +345,7 @@ public class RobotContainer
                     .until( elevatorSubsystem::isAtPosition)
             ) */
             .andThen( 
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L1), elevatorSubsystem)
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem)
             )
             .andThen( 
                 Commands.waitSeconds(3)
@@ -395,7 +389,7 @@ public class RobotContainer
         return Commands.runOnce( ()->System.out.println("AutonShooterCommand") )
             .andThen(Commands.runOnce(()-> swerveSubsystem.saveOdometry()))
             .andThen( 
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L1), elevatorSubsystem)
+                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem)
             )
             .andThen( 
                 Commands.waitSeconds(3)
