@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -14,24 +15,49 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.Constants.*;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 //import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
 import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
 public class RobotContainer 
 {
-    public final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem( this );
     private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     //private final ClimbSubsystem climbSubsystem = new ClimbSubsystem( elevatorSubsystem );
     private final ClawSubsystem clawSubsystem = new ClawSubsystem();
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    /* Setting up bindings for necessary control of the swerve drive platform */
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    private final Telemetry logger = new Telemetry(MaxSpeed);
+
+
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
 
     public final CommandXboxController driverJoystick = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -74,17 +100,11 @@ public class RobotContainer
         m_CANdle.configAllSettings(configAll, 100);
         m_CANdle.animate( new RainbowAnimation(1.0, 1.0, 8), 0 );
     
-        swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
-                swerveSubsystem,
-                () -> getDriverMoveFwdBack(),
-                () -> getDriverMoveLeftRight(),
-                () -> getDriverRotate(),
-                () -> !driverJoystick.getHID().getRightBumper() ));
 
         configureButtonBindings();
 
         // Register named pathplanner commands
-        NamedCommands.registerCommand("ShootCommand", AutonShooterCommand());
+        /*NamedCommands.registerCommand("ShootCommand", AutonShooterCommand());
         NamedCommands.registerCommand("ShootAgainCommand", AutonShootAgainCommand());
         NamedCommands.registerCommand("Shoot3FootCommand", AutonShooter3FootCommand());
         NamedCommands.registerCommand("SpewCommand", AutonSpewCommand());
@@ -92,7 +112,7 @@ public class RobotContainer
         NamedCommands.registerCommand("IntakeDeployCommand", IntakeDeployAutoCommand() );
         NamedCommands.registerCommand("IntakeRollersIn", IntakeRollersInCommand() );
         NamedCommands.registerCommand("IntakeRollersStop", IntakeRollersStopCommand() );
-        NamedCommands.registerCommand("Stow", AutonStowCommand());
+        NamedCommands.registerCommand("Stow", AutonStowCommand());*/
         // A chooser for autonomous commands
         // Add a button to run the example auto to SmartDashboard
         //SmartDashboard.putData("Example Auto", new PathPlannerAuto("Example Auto"));
@@ -182,9 +202,40 @@ public class RobotContainer
     
     private void configureButtonBindings() 
     {
-        Trigger aButton = driverJoystick.start();
-        aButton
-            .onTrue( Commands.runOnce( () -> swerveSubsystem.zeroHeading(0.0) ) );
+        // Note that X is defined as forward according to WPILib convention,
+        // and Y is defined as to the left according to WPILib convention.
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(-driverJoystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driverJoystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            )
+        );
+
+        driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        driverJoystick.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
+        ));
+
+        driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        );
+        driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        );
+
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        driverJoystick.back().and(driverJoystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driverJoystick.back().and(driverJoystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driverJoystick.start().and(driverJoystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driverJoystick.start().and(driverJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        // reset the field-centric heading on left bumper press
+        driverJoystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        drivetrain.registerTelemetry(logger::telemeterize);
 
         Trigger driverLeftTrigger = driverJoystick.leftTrigger( 0.7 );
         driverLeftTrigger
@@ -333,7 +384,7 @@ public class RobotContainer
         );
     }
     
-    public Command AutonShooterCommand() 
+    /*public Command AutonShooterCommand() 
     {
         return Commands.runOnce( ()->System.out.println("AutonShooterCommand") )
             .andThen(Commands.runOnce(()-> swerveSubsystem.saveOdometry()))
@@ -343,7 +394,7 @@ public class RobotContainer
             .andThen( 
                 Commands.waitSeconds(10)
                     .until( elevatorSubsystem::isAtPosition)
-            ) */
+            ) 
             .andThen( 
                 Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem)
             )
@@ -364,11 +415,6 @@ public class RobotContainer
             .andThen( IntakeRollersOutCommand())
             .andThen( Commands.waitSeconds(0.60))
             .andThen( IntakeRollersStopCommand())
-            /* .andThen( 
-                Commands.runOnce( ()-> shooterSubsystem.setShooterSpeed(ShooterConstants.SHOOTER_SPEED_3FOOT), shooterSubsystem),
-                Commands.runOnce( ()-> shooterPivotSubsystem.setClaw(ClawConstants.CLAW_3FOOT), shooterPivotSubsystem),
-                Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_3FOOT), elevatorSubsystem)
-            ) */
         ;
     }
 
