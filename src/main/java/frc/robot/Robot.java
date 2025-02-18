@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledExit() {}
 
-  @Override
+  /*@Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {}*/
 
   @Override
   public void teleopInit() {

@@ -91,8 +91,8 @@ public final class Constants {
             }
         }
 
-        public static final double DRIVE_DIVIDER_NORMAL = 2.0;
-        public static final double DRIVE_DIVIDER_TURBO = 1.0;
+        public static final double DRIVE_DIVIDER_NORMAL = 1.85;
+        public static final double DRIVE_DIVIDER_SLOW = 4.0;
     }
 
     public static final class IntakeConstants {
@@ -101,7 +101,7 @@ public final class Constants {
 
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
         public static final double INTAKE_ROLLER_SPEED_CORAL_IN = -0.3;
-        public static final double INTAKE_ROLLER_SPEED_CORAL_OUT = -0.8;
+        public static final double INTAKE_ROLLER_SPEED_CORAL_OUT = -0.9;
         public static final double INTAKE_ROLLER_SPEED_ALGAE = 1;
         public static final double INTAKE_ROLLER_SPEED_KEEP = 0.1;
 
@@ -146,8 +146,8 @@ public final class Constants {
         public static final double ELEVATOR_POSITION_TOLERANCE = .5;
         // fill out position values later
         public static final double ELEVATOR_START = 1;
-        public static final double ELEVATOR_L2 = 10.0;
-        public static final double ELEVATOR_L3 = 22.5;
+        public static final double ELEVATOR_L2 = 9.0;
+        public static final double ELEVATOR_L3 = 21.5;
         public static final double ELEVATOR_L4 = 38;
         public static final double ELEVATOR_BARGE = -19.5;
         public static final double ELEVATOR_ALGAE_LOW = 15.667;
