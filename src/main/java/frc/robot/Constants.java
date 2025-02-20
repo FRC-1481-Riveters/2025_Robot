@@ -103,7 +103,7 @@ public final class Constants {
         public static final double INTAKE_ROLLER_SPEED_CORAL_IN = -0.3;
         public static final double INTAKE_ROLLER_SPEED_CORAL_OUT = -0.9;
         public static final double INTAKE_ROLLER_SPEED_ALGAE = 1;
-        public static final double INTAKE_ROLLER_SPEED_KEEP = 0.1;
+        public static final double INTAKE_ROLLER_SPEED_KEEP = 0.15;
 
         public static final double INTAKE_CAM_ANGLE_TOLERANCE = 10;
         public static final double INTAKE_MOTOR_KP = 7;

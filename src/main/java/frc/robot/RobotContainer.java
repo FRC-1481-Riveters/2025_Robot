@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.auto.AutoBuilder;
 
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -72,11 +73,11 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     /* Path follower */
-    //private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-       /* autoChooser = AutoBuilder.buildAutoChooser("Tests");
-        SmartDashboard.putData("Auto Mode", autoChooser);*/
+       autoChooser = AutoBuilder.buildAutoChooser("Tests");
+        SmartDashboard.putData("Auto Mode", autoChooser);
 
         configureBindings();
     }
@@ -136,8 +137,8 @@ public class RobotContainer {
         .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )));
 
 
-        Trigger driverLeftBumper = driverJoystick.leftBumper();
-        driverLeftBumper
+        Trigger driverYTrigger = driverJoystick.y();
+        driverYTrigger
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
             .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE )));
 
@@ -151,11 +152,6 @@ public class RobotContainer {
             .andThen( Commands.waitSeconds(0.05))
             .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
             );
-            
-        Trigger startButton = operatorJoystick.start();
-        startButton
-            .onTrue( Commands.runOnce( () -> elevatorSubsystem.zeroEncoder() ) );
-
 
         Trigger operatorL4Trigger = operatorJoystick.y();
         operatorL4Trigger
@@ -265,8 +261,8 @@ public class RobotContainer {
                 Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) )
             )*/
             .andThen(Commands.waitSeconds(0.5))
-            .andThen(Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
-                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+            .andThen(//Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                //Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
                 Commands.runOnce( ()->StopControls(true) )
             )
         );
@@ -276,12 +272,11 @@ public class RobotContainer {
     {
         System.out.println("StopControls");
         elevatorSubsystem.setElevatorJog(0);
-        intakeSubsystem.setIntakeRoller( 0.0 );
         clawSubsystem.setClawJog(0);
     }
 
 
-    /*public Command getAutonomousCommand() {
+    public Command getAutonomousCommand() {
         return autoChooser.getSelected();
-    }*/
+    }
 }

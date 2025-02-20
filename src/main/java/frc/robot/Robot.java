@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -31,7 +33,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledExit() {}
 
-  /*@Override
+  @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -44,7 +46,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}*/
+  public void autonomousExit() {}
 
   @Override
   public void teleopInit() {
