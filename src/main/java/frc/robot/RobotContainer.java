@@ -12,7 +12,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -75,13 +74,15 @@ public class RobotContainer {
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
-    public RobotContainer() {
-       autoChooser = AutoBuilder.buildAutoChooser("Tests");
-        SmartDashboard.putData("Auto Mode", autoChooser);
-
-        NamedCommands.registerCommand("ShootCommand", ShooterCommand());
+    public RobotContainer() { 
+        
+        NamedCommands.registerCommand("ScoreL4", ScoreL4Command());
+        NamedCommands.registerCommand("Stow", StowCommand());
 
         configureBindings();
+       
+        autoChooser = AutoBuilder.buildAutoChooser("Tests");
+        SmartDashboard.putData("Auto Mode", autoChooser);
     }
 
     private void DriveDividerSet( double divider )
@@ -303,10 +304,32 @@ public class RobotContainer {
                 .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE)))
             ));
     }
-    public Command ShooterCommand() 
+    public Command ScoreL4Command() 
     {
-        return Commands.runOnce( ()->System.out.println("ShooterCommand") );
-                
+        return Commands.runOnce( ()->System.out.println("ScoreL4Command") )
+        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))) 
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
+        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)))
+        .andThen(Commands.waitSeconds(.25)
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))
+            );              
+    }
+
+    public Command StowCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("Stow Sequence") ) 
+        .andThen( 
+            Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until(elevatorSubsystem::isAtPosition))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
+        .andThen(Commands.runOnce( ()->StopControls(true) )
+        );           
     }
 
     public void StopControls( boolean stopped)
