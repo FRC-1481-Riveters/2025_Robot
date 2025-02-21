@@ -60,18 +60,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
         MotorOutputConfigs intakeMotorOutputConfigs = new MotorOutputConfigs();
         CurrentLimitsConfigs intakeMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-    
-    SupplyCurrentLimitConfiguration currentConfig = new SupplyCurrentLimitConfiguration();
-    currentConfig.currentLimit = 5;
-    currentConfig.enable = true;
 
     intakeMotorOutputConfigs
         .withNeutralMode(NeutralModeValue.Brake)
         .withInverted(intakeMotorInverted);
     intakeMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(15)
+        .withSupplyCurrentLimit(10)
         .withSupplyCurrentLimitEnable(true);
-    currentConfig.currentLimit = 10;
     // intakeMotor.configVoltageCompSaturation(12.5);
     // intakeMotor.enableVoltageCompensation(true);
     m_intakeMotor.getConfigurator().apply(new TalonFXConfiguration());

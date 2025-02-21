@@ -16,6 +16,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -64,8 +65,10 @@ public class ElevatorSubsystem extends SubsystemBase{
     elevatorMotorOutputConfigs
         .withNeutralMode(NeutralModeValue.Brake);
     elevatorMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(10)
+        .withSupplyCurrentLimit(20)
         .withSupplyCurrentLimitEnable(true);
+        //.withStatorCurrentLimit(180)
+        //.withStatorCurrentLimitEnable(true);
     // elevatorMotor.enableVoltageCompensation(true);
     m_elevatorMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);

@@ -79,6 +79,8 @@ public class RobotContainer {
        autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
+        NamedCommands.registerCommand("ShootCommand", ShooterCommand());
+
         configureBindings();
     }
 
@@ -140,8 +142,13 @@ public class RobotContainer {
         Trigger driverYTrigger = driverJoystick.y();
         driverYTrigger
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
-            .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE )));
+            .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )));
 
+        Trigger driverXTrigger = driverJoystick.x();
+        driverXTrigger
+        .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
+        .whileTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_OUT )));
+        
         Trigger driverRightBumper = driverJoystick.rightBumper();
         driverRightBumper
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
@@ -266,6 +273,40 @@ public class RobotContainer {
                 Commands.runOnce( ()->StopControls(true) )
             )
         );
+
+        Trigger operatorRightTrigger = operatorJoystick.rightTrigger(0.7);
+        operatorRightTrigger
+        .whileTrue(
+            Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem)
+            .andThen(Commands.waitSeconds(3)
+            .until( clawSubsystem::atSetpoint))
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLIMB), elevatorSubsystem))
+        );
+
+        Trigger operatorLeftTrigger = operatorJoystick.leftTrigger(0.7);
+        operatorLeftTrigger
+        .whileTrue(
+            Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem)
+            .andThen(Commands.waitSeconds(3)
+            .until( clawSubsystem::atSetpoint))
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem))
+        );
+        Trigger operatorLeftBumper = operatorJoystick.leftBumper();
+        operatorLeftBumper
+        .onTrue( 
+                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE_TRAVEL))
+                .andThen(Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint))
+                .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_BARGE))
+                .andThen(Commands.waitSeconds(3)
+                .until( elevatorSubsystem::isAtPosition))
+                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE)))
+            ));
+    }
+    public Command ShooterCommand() 
+    {
+        return Commands.runOnce( ()->System.out.println("ShooterCommand") );
+                
     }
 
     public void StopControls( boolean stopped)
