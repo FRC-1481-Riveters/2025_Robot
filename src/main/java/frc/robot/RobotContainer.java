@@ -78,6 +78,10 @@ public class RobotContainer {
         
         NamedCommands.registerCommand("ScoreL4", ScoreL4Command());
         NamedCommands.registerCommand("Stow", StowCommand());
+        NamedCommands.registerCommand("LowAlgae", LowAlgaeCommand());
+        NamedCommands.registerCommand("HighAlgae", HighAlgaeCommand());
+        NamedCommands.registerCommand("ProcessorOut", ProcessorOutCommand() );
+        NamedCommands.registerCommand("ProcessorIntake", ProcessorIntakeCommand());
 
         configureBindings();
        
@@ -312,16 +316,12 @@ public class RobotContainer {
         .until( clawSubsystem::atSetpoint))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
         .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)))
-        .andThen(Commands.waitSeconds(.25)
-        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))
-            );              
-    }
-
-    public Command StowCommand() 
-    {
-        return Commands.runOnce( ()->System.out.println("Stow Sequence") ) 
-        .andThen( 
-            Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
+        .andThen(Commands.waitSeconds(1)
+        .until(elevatorSubsystem::isAtPosition))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))              
+        .andThen(Commands.waitSeconds(.5)
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 ))))              
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.waitSeconds(3)
         .until( clawSubsystem::atSetpoint))
         .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
@@ -329,7 +329,67 @@ public class RobotContainer {
         .until(elevatorSubsystem::isAtPosition))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
         .andThen(Commands.runOnce( ()->StopControls(true) )
-        );           
+        );   
+    }
+    public Command LowAlgaeCommand(){
+
+        return Commands.runOnce( ()->System.out.println("LowAlgae") )
+        .andThen(Commands.waitSeconds(.5))
+        .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
+        .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT ))))              
+        .andThen(Commands.waitSeconds(2))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
+        .andThen(Commands.runOnce( ()->StopControls(true) )
+        );      
+    }
+    public Command HighAlgaeCommand(){
+
+        return Commands.runOnce( ()->System.out.println("HighAlgae") )
+        .andThen(Commands.waitSeconds(.5))
+        .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
+        .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_HIGH))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT ))))              
+        .andThen(Commands.waitSeconds(2))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
+        .andThen(Commands.runOnce( ()->StopControls(true) )
+        );       
+    }
+
+    public Command ProcessorOutCommand(){
+    return Commands.runOnce( ()->System.out.println("ProcessorOut") )
+    .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_PROCESSOR))
+    .andThen( Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_PROCESSOR))));
+    }
+
+    public Command ProcessorIntakeCommand(){
+        return Commands.runOnce( ()->System.out.println("ProcessorIntake") )
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))            
+        .andThen(Commands.waitSeconds(.5))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)));
+    }
+
+    public Command StowCommand(){
+        return Commands.runOnce( ()->System.out.println("Stow") )
+        .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until(elevatorSubsystem::isAtPosition))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
+        .andThen(Commands.runOnce( ()->StopControls(true))
+        );
     }
 
     public void StopControls( boolean stopped)

@@ -147,14 +147,14 @@ public final class Constants {
         public static final double ELEVATOR_POSITION_TOLERANCE = .5;
         // fill out position values later
         public static final double ELEVATOR_START = 1;
-        public static final double ELEVATOR_L2 = 10.0;
-        public static final double ELEVATOR_L3 = 22.5;
-        public static final double ELEVATOR_L4 = 38;
+        public static final double ELEVATOR_L2 = 8.0;
+        public static final double ELEVATOR_L3 = 19;
+        public static final double ELEVATOR_L4 = 37.5;
         public static final double ELEVATOR_BARGE = 39.5;
-        public static final double ELEVATOR_ALGAE_LOW = 15.667;
-        public static final double ELEVATOR_ALGAE_HIGH = 26.267;
-        public static final double ELEVATOR_PROCESSOR = 4.371;
-        public static final double ELEVATOR_CLIMB = 23.0;
+        public static final double ELEVATOR_ALGAE_LOW = 12.667;
+        public static final double ELEVATOR_ALGAE_HIGH = 25.267;
+        public static final double ELEVATOR_PROCESSOR = 2.371;
+        public static final double ELEVATOR_CLIMB = 21.0;
         public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.015;
         public static final double ELEVATOR_MOTOR_ABOVE_KI = 0.090;
         public static final double ELEVATOR_MOTOR_ABOVE_KD = 0.000;
