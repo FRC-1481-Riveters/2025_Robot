@@ -45,8 +45,10 @@ import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 
-public class RobotContainer {
 
+public class RobotContainer {
+    
+    public static double INTAKE_ROLLER_SPEED_CURRENT;
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem( this );
     private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     private final ClawSubsystem clawSubsystem = new ClawSubsystem();
@@ -164,21 +166,22 @@ public class RobotContainer {
             .andThen( Commands.waitSeconds(0.05))
             .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
             );
-
+        
+        
         Trigger operatorL4Trigger = operatorJoystick.y();
         operatorL4Trigger
-         .onTrue( 
+         .onTrue(
                 Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
                 .andThen(Commands.waitSeconds(3)
                 .until( clawSubsystem::atSetpoint))
                 .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
-                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF))
-            ));
+                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)))
+            );
+            
 
         Trigger operatorL3Trigger = operatorJoystick.b();
         operatorL3Trigger
-         .onTrue( 
-                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
+         .onTrue(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
                 .andThen(Commands.waitSeconds(3)
                 .until( clawSubsystem::atSetpoint))
                 .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L3)))
@@ -290,10 +293,12 @@ public class RobotContainer {
 
         Trigger operatorLeftTrigger = operatorJoystick.leftTrigger(0.7);
         operatorLeftTrigger
+        .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setCurrentNormal()))
         .whileTrue(
             Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem)
             .andThen(Commands.waitSeconds(3)
             .until( clawSubsystem::atSetpoint))
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb()))
             .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem))
         );
         Trigger operatorLeftBumper = operatorJoystick.leftBumper();
@@ -316,7 +321,7 @@ public class RobotContainer {
         .until( clawSubsystem::atSetpoint))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
         .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)))
-        .andThen(Commands.waitSeconds(1)
+        .andThen(Commands.waitSeconds(1.5)
         .until(elevatorSubsystem::isAtPosition))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))              
         .andThen(Commands.waitSeconds(.5)
@@ -337,9 +342,9 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(.5))
         .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))
-        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT ))))              
-        .andThen(Commands.waitSeconds(2))
-        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))))              
+        .andThen(Commands.waitSeconds(2.5))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP)))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
         .andThen(Commands.waitSeconds(3)
@@ -374,7 +379,7 @@ public class RobotContainer {
     public Command ProcessorIntakeCommand(){
         return Commands.runOnce( ()->System.out.println("ProcessorIntake") )
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))            
-        .andThen(Commands.waitSeconds(.5))
+        .andThen(Commands.waitSeconds(2))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)));
     }
 
@@ -403,4 +408,5 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
+    
 }

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClawConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -126,7 +127,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean isIntakeBeamBreakLoaded()
     {
-        if( m_CANrange.getDistance().getValueAsDouble() < 0.04 && m_CANrange.getDistance().getValueAsDouble() > 0.01 ) 
+        if( m_CANrange.getDistance().getValueAsDouble() < 0.02 && m_CANrange.getDistance().getValueAsDouble() > 0.01 ) 
             return true;
         else
             return false;
@@ -138,4 +139,17 @@ public class IntakeSubsystem extends SubsystemBase {
         Logger.recordOutput("HasCone", bHasCone );
         System.out.println("setCone "  + bHasCone);
     }
+
+    public boolean IsIntakeRunning() 
+    { 
+    if(m_rollerRpm != 0){
+        return true;}
+    
+    else{
+        return false;
+    }}
 }
+
+
+
+    

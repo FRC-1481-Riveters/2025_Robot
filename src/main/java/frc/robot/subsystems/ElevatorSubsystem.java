@@ -161,6 +161,28 @@ public class ElevatorSubsystem extends SubsystemBase{
     public double getPosition() {
         return m_position;
     }
+
+    public void setCurrentNormal(){
+      CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
+      elevatorMotorCurrentLimitsConfigs
+        .withSupplyCurrentLimit(15)
+        .withSupplyCurrentLimitEnable(true);
+        //.withStatorCurrentLimit(180)
+        //.withStatorCurrentLimitEnable(true);
+    // elevatorMotor.enableVoltageCompensation(true);
+    m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
+    }
+
+    public void setCurrentClimb(){
+      CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
+      elevatorMotorCurrentLimitsConfigs
+        .withSupplyCurrentLimit(180)
+        .withSupplyCurrentLimitEnable(true);
+        //.withStatorCurrentLimit(180)
+        //.withStatorCurrentLimitEnable(true);
+    // elevatorMotor.enableVoltageCompensation(true);
+    m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
+    }
     
     public boolean isAboveIntake()
     {

@@ -17,15 +17,54 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "A- Us Middle In"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "A- Us Middle In"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HighAlgae"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "P2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "P2"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ProcessorOut"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {

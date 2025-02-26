@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.968,
-        "y": 2.748
+        "x": 4.007,
+        "y": 2.845
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.799165858577595,
-        "y": 2.5230229121777654
+        "x": 3.838165858577595,
+        "y": 2.6200229121777654
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 2.877971548347572
       },
       "prevControl": {
-        "x": 3.711546710574737,
-        "y": 2.6018801453803384
+        "x": 3.4807500000000005,
+        "y": 2.075
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,14 +31,7 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "LowAlgae",
-      "waypointRelativePos": 0.7694244604316534,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.0,
     "maxAcceleration": 1.0,
