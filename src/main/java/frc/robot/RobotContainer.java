@@ -175,7 +175,7 @@ public class RobotContainer {
                 .andThen(Commands.waitSeconds(3)
                 .until( clawSubsystem::atSetpoint))
                 .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
-                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)))
+                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_HIGH)))
             );
             
 

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Straight Us"
+            "pathName": "Straight Them"
           }
         },
         {
@@ -17,54 +17,15 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "A- Us Inside In"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "LowAlgae"
-                }
-              }
-            ]
+            "pathName": "A- Them Inside In"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "P3"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ProcessorOut"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "P3"
           }
         },
         {
@@ -100,12 +61,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": []
                 }
               }
             ]
