@@ -151,7 +151,7 @@ public final class Constants {
         public static final double ELEVATOR_POSITION_TOLERANCE = .75;
         // fill out position values later
         public static final double ELEVATOR_START = 1;
-        public static final double ELEVATOR_L2 = 10;
+        public static final double ELEVATOR_L2 = 9.5;
         public static final double ELEVATOR_L3 = 21;
         public static final double ELEVATOR_L4 = 38;
         public static final double ELEVATOR_BARGE = 39.5;
