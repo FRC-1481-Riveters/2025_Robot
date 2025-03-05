@@ -91,7 +91,7 @@ public final class Constants {
             }
         }
 
-        public static final double DRIVE_DIVIDER_NORMAL = 2.0;
+        public static final double DRIVE_DIVIDER_NORMAL = 1.5;
         public static final double DRIVE_DIVIDER_SLOW = 4.0;
     }
 
@@ -171,11 +171,8 @@ public final class Constants {
     }
 
     public static final class ClimbConstants {
-        public static final int CLIMB_MOTOR = 24;
-        public static final int CLIMB_MOTOR_FOLLOWER = 25;
-        public static final double CLIMB_POSITION_MAX = 15.0;
-        public static final double CLIMB_ENCODER_FULLY_CLIMBED = -150;
-        public static final int CLIMB_MIN = 0; 
+        public static final int MATCH_CURRENT = 15;
+        public static final int CLIMB_CURRENT = 180; 
 
     }  
 

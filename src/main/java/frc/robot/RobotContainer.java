@@ -151,22 +151,14 @@ public class RobotContainer {
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
             .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )));
 
-        Trigger driverXTrigger = driverJoystick.x();
-        driverXTrigger
-        .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
-        .whileTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_OUT )));
         
-        Trigger driverRightBumper = driverJoystick.rightBumper();
-        driverRightBumper
-            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
-            .whileTrue(
-                Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_IN ))
-            .andThen( Commands.waitSeconds(10)
-                    .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
-            .andThen( Commands.waitSeconds(0.05))
-            .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
-            );
-        
+        Trigger driverLeftBumperTrigger = driverJoystick.leftBumper();
+        driverLeftBumperTrigger
+            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
+            .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))
+            .andThen(Commands.waitSeconds(.02))
+            .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 ))));
+   
         
         Trigger operatorL4Trigger = operatorJoystick.y();
         operatorL4Trigger
@@ -298,9 +290,15 @@ public class RobotContainer {
             Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem)
             .andThen(Commands.waitSeconds(3)
             .until( clawSubsystem::atSetpoint))
-            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb()))
             .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem))
         );
+
+        Trigger driverClimb = driverJoystick.x();
+        driverClimb
+        .whileTrue( Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.CLIMB_CURRENT)))
+        .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.MATCH_CURRENT)));
+
+
         Trigger operatorLeftBumper = operatorJoystick.leftBumper();
         operatorLeftBumper
         .onTrue( 
@@ -347,7 +345,7 @@ public class RobotContainer {
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP)))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
-        .andThen(Commands.waitSeconds(3)
+        .andThen(Commands.waitSeconds(2)
         .until( clawSubsystem::atSetpoint))
         .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
         .andThen(Commands.runOnce( ()->StopControls(true) )
@@ -363,7 +361,8 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(2))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
-        .andThen(Commands.waitSeconds(3)
+        .andThen(Commands.waitSeconds(2
+        )
         .until( clawSubsystem::atSetpoint))
         .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
         .andThen(Commands.runOnce( ()->StopControls(true) )

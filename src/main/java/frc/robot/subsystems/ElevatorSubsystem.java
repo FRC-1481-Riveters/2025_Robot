@@ -173,10 +173,10 @@ public class ElevatorSubsystem extends SubsystemBase{
     m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
     }
 
-    public void setCurrentClimb(){
+    public void setCurrentClimb(int limit){
       CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
       elevatorMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(180)
+        .withSupplyCurrentLimit(limit)
         .withSupplyCurrentLimitEnable(true);
         //.withStatorCurrentLimit(180)
         //.withStatorCurrentLimitEnable(true);
