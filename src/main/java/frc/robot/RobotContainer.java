@@ -151,11 +151,11 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        Trigger driverButtonB = driverJoystick.povDownRight();
+        Trigger driverButtonB = driverJoystick.povRight();
         driverButtonB
         .onTrue( Commands.runOnce(SignalLogger::start));
 
-        Trigger driverButtonX = driverJoystick.povDownLeft();
+        Trigger driverButtonX = driverJoystick.povLeft();
         driverButtonX
         .onTrue( Commands.runOnce(SignalLogger::stop));
 
