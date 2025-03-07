@@ -6,13 +6,16 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.SignalLogger;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,11 +24,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants.ClawConstants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.commands.AlignCommand;
+import frc.robot.commands.AlignSlide;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -33,7 +35,9 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 import frc.robot.Constants.*;
+import frc.robot.commands.AlignCommand;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
 
@@ -47,11 +51,14 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 
 
 public class RobotContainer {
+
+    private final SendableChooser<Command> autoChooser;
     
     public static double INTAKE_ROLLER_SPEED_CURRENT;
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem( this );
     private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     private final ClawSubsystem clawSubsystem = new ClawSubsystem();
+    private final VisionSubsystem m_Vision = new VisionSubsystem();
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond)*4; // 3/4 of a rotation per second max angular velocity
 
@@ -74,8 +81,6 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     /* Path follower */
-    private final SendableChooser<Command> autoChooser;
-
     public RobotContainer() { 
         
         NamedCommands.registerCommand("ScoreL4", ScoreL4Command());
@@ -86,14 +91,22 @@ public class RobotContainer {
         NamedCommands.registerCommand("ProcessorIntake", ProcessorIntakeCommand());
 
         configureBindings();
-       
-        autoChooser = AutoBuilder.buildAutoChooser("Tests");
-        SmartDashboard.putData("Auto Mode", autoChooser);
+
+        for (int port = 5800; port <= 5809; port++) {
+            PortForwarder.add(port, "limelight.local", port);
+        }
+
+        NamedCommands.registerCommand("Align", 
+        new AlignCommand(drivetrain, m_Vision).withTimeout(2));
+
+         autoChooser = AutoBuilder.buildAutoChooser("Tests");
+         SmartDashboard.putData("Auto Mode", autoChooser);
+    
     }
 
     private void DriveDividerSet( double divider )
     {
-        if (elevatorSubsystem.getPosition()>9)
+        if (elevatorSubsystem.getPosition() > 12)
         driveDivider = 4;
         else
         driveDivider = divider;
@@ -112,9 +125,12 @@ public class RobotContainer {
         );
 
         driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        driverJoystick.b().whileTrue(drivetrain.applyRequest(() ->
+        /*driverJoystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
-        ));
+        ));*/
+
+        /*driverJoystick.x().whileTrue(new AlignCommand(drivetrain, m_Vision));
+        driverJoystick.b().onTrue(new AlignSlide(drivetrain, 1, 1, 0.5));*/
 
         driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
@@ -135,15 +151,24 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
+        Trigger driverButtonB = driverJoystick.povDownRight();
+        driverButtonB
+        .onTrue( Commands.runOnce(SignalLogger::start));
+
+        Trigger driverButtonX = driverJoystick.povDownLeft();
+        driverButtonX
+        .onTrue( Commands.runOnce(SignalLogger::stop));
+
+
         Trigger driverLeftTrigger = driverJoystick.leftTrigger( 0.7 );
         driverLeftTrigger
             .onFalse(Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_NORMAL )))
             .onTrue( Commands.runOnce( ()-> DriveDividerSet( Constants.DriveConstants.DRIVE_DIVIDER_SLOW )));
 
-    Trigger driverRightTrigger = driverJoystick.rightTrigger(0.7);
-        driverRightTrigger
-        .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
-        .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )));
+        Trigger driverRightTrigger = driverJoystick.rightTrigger(0.7);
+            driverRightTrigger
+            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
+            .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )));
 
 
         Trigger driverYTrigger = driverJoystick.y();

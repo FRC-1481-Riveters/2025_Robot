@@ -4,7 +4,10 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
@@ -175,6 +178,20 @@ public final class Constants {
         public static final int CLIMB_CURRENT = 180; 
 
     }  
+
+    public static final class VisionConstants{
+    public static final String LIMELIGHT_NAME = "";
+
+    public static final double MOVE_P = 0.300000;
+    public static final double MOVE_I = 0.000000;
+    public static final double MOVE_D = 0.000600;
+
+    public static final double ROTATE_P = 0.030000;
+    public static final double ROTATE_I = 0.000000;
+    public static final double ROTATE_D = 0.000100;
+
+    public static final double TOLERANCE = 0.01;
+    }
 
     public static final class OIConstants {
         public static final int kDriverControllerPort = 0;
