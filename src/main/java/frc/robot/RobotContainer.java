@@ -89,15 +89,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("HighAlgae", HighAlgaeCommand());
         NamedCommands.registerCommand("ProcessorOut", ProcessorOutCommand() );
         NamedCommands.registerCommand("ProcessorIntake", ProcessorIntakeCommand());
+        NamedCommands.registerCommand("Align", 
+        new AlignCommand(drivetrain, m_Vision).withTimeout(2));
 
         configureBindings();
 
         for (int port = 5800; port <= 5809; port++) {
             PortForwarder.add(port, "limelight.local", port);
         }
-
-        NamedCommands.registerCommand("Align", 
-        new AlignCommand(drivetrain, m_Vision).withTimeout(2));
 
          autoChooser = AutoBuilder.buildAutoChooser("Tests");
          SmartDashboard.putData("Auto Mode", autoChooser);
@@ -129,15 +128,16 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
         ));*/
 
-        /*driverJoystick.x().whileTrue(new AlignCommand(drivetrain, m_Vision));
-        driverJoystick.b().onTrue(new AlignSlide(drivetrain, 1, 1, 0.5));*/
+        driverJoystick.povRight().whileTrue(new AlignCommand(drivetrain, m_Vision));
+        driverJoystick.povLeft().onTrue(new AlignSlide(drivetrain, 1, 1, 0.5));
 
-        driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        //creep forward and back, robot oriented
+        /*driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
         driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        );
+        );*/
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -151,13 +151,13 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        Trigger driverButtonB = driverJoystick.povRight();
+        /*Trigger driverButtonB = driverJoystick.povRight();
         driverButtonB
         .onTrue( Commands.runOnce(SignalLogger::start));
 
         Trigger driverButtonX = driverJoystick.povLeft();
         driverButtonX
-        .onTrue( Commands.runOnce(SignalLogger::stop));
+        .onTrue( Commands.runOnce(SignalLogger::stop));*/
 
 
         Trigger driverLeftTrigger = driverJoystick.leftTrigger( 0.7 );
@@ -171,10 +171,10 @@ public class RobotContainer {
             .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )));
 
 
-        Trigger driverYTrigger = driverJoystick.y();
-        driverYTrigger
-            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
-            .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )));
+        //Trigger driverYTrigger = driverJoystick.y();
+        //driverYTrigger
+          //  .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
+            //.onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )));
 
         
         Trigger driverLeftBumperTrigger = driverJoystick.leftBumper();
@@ -318,10 +318,10 @@ public class RobotContainer {
             .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem))
         );
 
-        Trigger driverClimb = driverJoystick.x();
-        driverClimb
-        .whileTrue( Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.CLIMB_CURRENT)))
-        .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.MATCH_CURRENT)));
+        //Trigger driverClimb = driverJoystick.x();
+        //driverClimb
+       // .whileTrue( Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.CLIMB_CURRENT)))
+        //.onFalse(Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.MATCH_CURRENT)));
 
 
         Trigger operatorLeftBumper = operatorJoystick.leftBumper();
