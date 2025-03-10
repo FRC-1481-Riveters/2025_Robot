@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.commands.AlignCommand;
-import frc.robot.commands.AlignSlide;
+import frc.robot.commands.DriveToCenter;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -128,8 +128,7 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
         ));*/
 
-        driverJoystick.povRight().whileTrue(new AlignCommand(drivetrain, m_Vision));
-        driverJoystick.povLeft().onTrue(new AlignSlide(drivetrain, 1, 1, 0.5));
+        driverJoystick.povRight().whileTrue(new DriveToCenter(drivetrain, m_Vision,true));
 
         //creep forward and back, robot oriented
         /*driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
@@ -183,6 +182,17 @@ public class RobotContainer {
             .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))
             .andThen(Commands.waitSeconds(.02))
             .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 ))));
+
+        Trigger driverRightBumper = driverJoystick.rightBumper();
+        driverRightBumper
+            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
+            .whileTrue(
+                Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_IN ))
+            .andThen( Commands.waitSeconds(10)
+                    .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
+            .andThen( Commands.waitSeconds(0.05))
+            .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
+            );
    
         
         Trigger operatorL4Trigger = operatorJoystick.y();

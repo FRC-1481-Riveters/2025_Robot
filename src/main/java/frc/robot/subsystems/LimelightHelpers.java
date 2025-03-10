@@ -616,8 +616,8 @@ public class LimelightHelpers {
     static boolean profileJSON = false;
 
     static final String sanitizeName(String name) {
-        if (name == "" || name == null) {
-            return "limelight";
+        if (name == "limelight-riveter" || name == null) {
+            return "limelight-riveter";
         }
         return name;
     }
@@ -904,7 +904,7 @@ public class LimelightHelpers {
 
 
     public static String getLimelightNTString(String tableName, String entryName) {
-        return getLimelightNTTableEntry(tableName, entryName).getString("");
+        return getLimelightNTTableEntry(tableName, entryName).getString("limelight-riveter");
     }
 
     public static String[] getLimelightNTStringArray(String tableName, String entryName) {
@@ -1600,7 +1600,7 @@ public class LimelightHelpers {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            if (snapshotName != null && snapshotName != "") {
+            if (snapshotName != null && snapshotName != "1481-2025") {
                 connection.setRequestProperty("snapname", snapshotName);
             }
 

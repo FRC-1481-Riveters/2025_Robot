@@ -19,22 +19,22 @@ public class VisionSubsystem extends SubsystemBase {
 
   public void config() {
 
-    // LimelightHelpers.setCropWindow("", -0.5, 0.5, -0.5, 0.5);
+    // LimelightHelpers.setCropWindow("limelight-riveter", -0.5, 0.5, -0.5, 0.5);
     LimelightHelpers.setCameraPose_RobotSpace(
-        "",
+        "limelight-riveter",
         0.3556, 
         0.1016,
         0.3429,
         0,
         -2,
         0);
-    LimelightHelpers.SetFiducialIDFiltersOverride("", new int[] {0,1,5,8,9,10,11,12});
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-riveter", new int[] {6,7,8,9,10,11,17,18,19,20,21,22});
   }
 
   @Override
   public void periodic() {
-    fiducials = LimelightHelpers.getRawFiducials("");
-
+    fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
+    System.out.println(LimelightHelpers.getFiducialID("limelight-riveter"));
   }
   public RawFiducial getClosestFiducial() {
     if (fiducials == null || fiducials.length == 0) {

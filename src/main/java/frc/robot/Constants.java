@@ -180,7 +180,7 @@ public final class Constants {
     }  
 
     public static final class VisionConstants{
-    public static final String LIMELIGHT_NAME = "";
+    public static final String LIMELIGHT_NAME = "limelight-riveter";
 
     public static final double MOVE_P = 0.400000;
     public static final double MOVE_I = 0.000000;
@@ -191,6 +191,20 @@ public final class Constants {
     public static final double ROTATE_I = 0.000000;
     public static final double ROTATE_D = 0.000100;
     //(0.03000, 0.000000, 0.001000, 0.01);
+
+    public static final double X_REEF_ALIGNMENT_P = 0.15;
+    public static final double Y_REEF_ALIGNMENT_P = 0.5;
+    public static final double ROT_REEF_ALIGNMENT_P = 0.03;
+    
+    public static final double ROT_SETPOINT_REEF_ALIGNMENT = 0;  
+    public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 0.5;
+    public static final double X_SETPOINT_REEF_ALIGNMENT = -0.5;  
+    public static final double X_TOLERANCE_REEF_ALIGNMENT = 0.005;
+    public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.4;  
+    public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.0005;
+  
+    public static final double waitTime = 1;
+    public static final double validationTime = 0.3;
 
     public static final double TOLERANCE = 0.01;
     }
