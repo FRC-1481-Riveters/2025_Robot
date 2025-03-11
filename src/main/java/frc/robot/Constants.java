@@ -187,7 +187,7 @@ public final class Constants {
     public static final double MOVE_D = 0.000600;
     //(0.300000, 0.000000, 0.000600, 0.01);
 
-    public static final double ROTATE_P = 0.050000;
+    public static final double ROTATE_P = 0.01000;
     public static final double ROTATE_I = 0.000000;
     public static final double ROTATE_D = 0.000100;
     //(0.03000, 0.000000, 0.001000, 0.01);

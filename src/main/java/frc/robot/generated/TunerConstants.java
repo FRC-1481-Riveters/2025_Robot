@@ -27,7 +27,7 @@ public class TunerConstants {
     // KP=100 too hot, KP=30 unstable with small input, KP=15 nice
     private static final Slot0Configs steerGains = new Slot0Configs()
         .withKP(15).withKI(0).withKD(0.1)
-        .withKS(0.1).withKV(0.0).withKA(0)
+        .withKS(0.047543).withKV(2.4623).withKA(0.074655)
         //.withKP(85).withKI(0).withKD(0.2)//85,0,0.2
         //withKS(0.2).withKV(2.66).withKA(0)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);

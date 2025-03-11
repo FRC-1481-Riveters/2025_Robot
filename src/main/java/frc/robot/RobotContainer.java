@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.commands.AlignCommand;
-import frc.robot.commands.DriveToCenter;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -128,15 +127,15 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
         ));*/
 
-        driverJoystick.povRight().whileTrue(new DriveToCenter(drivetrain, m_Vision,true));
+        driverJoystick.povRight().whileTrue(new AlignCommand(drivetrain, m_Vision));
 
         //creep forward and back, robot oriented
-        /*driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
         driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        );*/
+        );
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.

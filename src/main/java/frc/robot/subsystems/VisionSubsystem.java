@@ -25,16 +25,15 @@ public class VisionSubsystem extends SubsystemBase {
         0.3556, 
         0.1016,
         0.3429,
-        0,
-        -2,
-        0);
-        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-riveter", new int[] {6,7,8,9,10,11,17,18,19,20,21,22});
+        0,00
+        -2,3
+        );
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-riveter", new int[] {3,6,7,8,9,10,11,16,17,18,19,20,21,22});
   }
 
   @Override
   public void periodic() {
     fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
-    System.out.println(LimelightHelpers.getFiducialID("limelight-riveter"));
   }
   public RawFiducial getClosestFiducial() {
     if (fiducials == null || fiducials.length == 0) {
