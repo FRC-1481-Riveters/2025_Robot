@@ -79,11 +79,6 @@ public final class Constants {
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 6;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 6;
 
-        public static final PPHolonomicDriveController kDriveController = new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-        );
-
         public static RobotConfig kRobotConfig;
         static {
             try{
@@ -182,27 +177,6 @@ public final class Constants {
     public static final class VisionConstants{
     public static final String LIMELIGHT_NAME = "limelight-riveter";
 
-    public static final double MOVE_P = 0.400000;
-    public static final double MOVE_I = 0.000000;
-    public static final double MOVE_D = 0.000600;
-    //(0.300000, 0.000000, 0.000600, 0.01);
-
-    public static final double ROTATE_P = 0.01000;
-    public static final double ROTATE_I = 0.000000;
-    public static final double ROTATE_D = 0.000100;
-    //(0.03000, 0.000000, 0.001000, 0.01);
-
-    public static final double X_REEF_ALIGNMENT_P = 0.15;
-    public static final double Y_REEF_ALIGNMENT_P = 0.5;
-    public static final double ROT_REEF_ALIGNMENT_P = 0.03;
-    
-    public static final double ROT_SETPOINT_REEF_ALIGNMENT = 0;  
-    public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 0.5;
-    public static final double X_SETPOINT_REEF_ALIGNMENT = -0.5;  
-    public static final double X_TOLERANCE_REEF_ALIGNMENT = 0.005;
-    public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.4;  
-    public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.0005;
-  
     public static final double waitTime = 1;
     public static final double validationTime = 0.3;
 
@@ -214,7 +188,7 @@ public final class Constants {
       public static final double reefSpacing = 0.1651;                               // 13" = 0.3302; tag is in between, so halve that
       public static final double robotWidth = Units.inchesToMeters(35.43);    // including bumpers
       public static final double shortDistance = Units.inchesToMeters(14);    // waypoint before going straight into reef
-      public static final double coralScoreOffset = Units.inchesToMeters(0);  // how far off center the scoring mechanism is
+      public static final double coralScoreOffset = Units.inchesToMeters(0.0);  // how far off center the scoring mechanism is
     }
 
     public static final class OIConstants {
