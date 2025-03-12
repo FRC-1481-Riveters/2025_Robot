@@ -141,8 +141,8 @@ public class RobotContainer {
             )
         );
 
-        driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        /*driverJoystick.b().whileTrue(drivetrain.applyRequest(() ->
+        /*driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        driverJoystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
         ));*/
 

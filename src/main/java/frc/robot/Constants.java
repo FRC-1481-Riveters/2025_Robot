@@ -89,8 +89,8 @@ public final class Constants {
             }
         }
 
-        public static final double DRIVE_DIVIDER_NORMAL = 1.5;
-        public static final double DRIVE_DIVIDER_SLOW = 4.0;
+        public static final double DRIVE_DIVIDER_NORMAL = 1.5; //  1.5 = 66% of Max Speed
+        public static final double DRIVE_DIVIDER_SLOW = 4.0;  //  4.0 = 25% of Max Speed
     }
 
     public static final class IntakeConstants {
