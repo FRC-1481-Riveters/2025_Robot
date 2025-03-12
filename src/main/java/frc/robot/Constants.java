@@ -209,6 +209,14 @@ public final class Constants {
     public static final double TOLERANCE = 0.01;
     }
 
+    public static class reefAlignmentConstants 
+    {
+      public static final double reefSpacing = 0.1651;                               // 13" = 0.3302; tag is in between, so halve that
+      public static final double robotWidth = Units.inchesToMeters(35.43);    // including bumpers
+      public static final double shortDistance = Units.inchesToMeters(14);    // waypoint before going straight into reef
+      public static final double coralScoreOffset = Units.inchesToMeters(0);  // how far off center the scoring mechanism is
+    }
+
     public static final class OIConstants {
         public static final int kDriverControllerPort = 0;
         public static final int kOperatorControllerPort = 1;

@@ -2,13 +2,20 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.LimelightHelpers.*;
+import edu.wpi.first.math.util.Units;
+
 
 public class VisionSubsystem extends SubsystemBase {
   private RawFiducial[] fiducials;
+  private CommandSwerveDrivetrain m_commandSwerveDrivetrain;
 
-  public VisionSubsystem() {
+
+  public VisionSubsystem(CommandSwerveDrivetrain commandSwerveDrivetrain) {
+    m_commandSwerveDrivetrain = commandSwerveDrivetrain;
     config();
+    
   }
 
   public static class NoSuchTargetException extends RuntimeException {
@@ -34,7 +41,18 @@ public class VisionSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
-  }
+
+      var driveState = m_commandSwerveDrivetrain.getState();
+      double headingDeg = driveState.Pose.getRotation().getDegrees();
+      double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
+
+      LimelightHelpers.SetRobotOrientation("limelight-riveter", headingDeg, 0, 0, 0, 0, 0);
+      var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
+      if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
+        m_commandSwerveDrivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
+      
+      }
+    }
   public RawFiducial getClosestFiducial() {
     if (fiducials == null || fiducials.length == 0) {
         throw new NoSuchTargetException("No fiducials found.");
