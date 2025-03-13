@@ -150,10 +150,10 @@ public class RobotContainer {
         driverJoystick.povRight().whileTrue(CoralAlign());
 
         //creep forward and back, robot oriented
-        /*driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        driverJoystick.povUp().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(1.0).withVelocityY(0))
         );
-        driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
+        /*driverJoystick.povDown().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );*/
 
@@ -189,17 +189,17 @@ public class RobotContainer {
             .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )));
 
 
-        //Trigger driverYTrigger = driverJoystick.y();
-        //driverYTrigger
-          //  .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
-            //.onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )));
+        Trigger driverYTrigger = driverJoystick.y();
+        driverYTrigger
+            .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP )))
+            .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )));
 
         
         Trigger driverLeftBumperTrigger = driverJoystick.leftBumper();
         driverLeftBumperTrigger
             .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 )))
             .onTrue( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))
-            .andThen(Commands.waitSeconds(.02))
+            .andThen(Commands.waitSeconds(.04))
             .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0 ))));
 
         Trigger driverRightBumper = driverJoystick.rightBumper();
@@ -308,8 +308,7 @@ public class RobotContainer {
         operatorBack
         .whileTrue(
             Commands.runOnce( ()->System.out.println("Stow Sequence") ) 
-            .andThen( 
-                Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
+            .andThen( Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
             .andThen(Commands.waitSeconds(3)
             .until( clawSubsystem::atSetpoint))
             .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))

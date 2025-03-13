@@ -127,7 +127,7 @@ public final class Constants {
         public static final double CLAW_FLOOR = 26;
         public static final double CLAW_ALGAE_STORE = 13.012;
         //public static final double CLAW_MAX = 19.9;
-        public static final double CLAW_ELEVATOR_CLEAR = 5.0; // max travel
+        public static final double CLAW_ELEVATOR_CLEAR = 4.25; // max travel
 
         public static final double CLAW_ACCELERATION = 500;
         public static final double CLAW_VELOCITY = 100;
@@ -151,7 +151,7 @@ public final class Constants {
         public static final double ELEVATOR_START = 1;
         public static final double ELEVATOR_L2 = 9.5;
         public static final double ELEVATOR_L3 = 21;
-        public static final double ELEVATOR_L4 = 38;
+        public static final double ELEVATOR_L4 = 37.5;
         public static final double ELEVATOR_BARGE = 39.5;
         public static final double ELEVATOR_ALGAE_LOW = 13.5;
         public static final double ELEVATOR_ALGAE_HIGH = 24;
