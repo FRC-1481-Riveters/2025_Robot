@@ -100,7 +100,7 @@ public final class Constants {
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
         public static double INTAKE_ROLLER_SPEED_CURRENT;
         public static final double INTAKE_ROLLER_SPEED_CORAL_IN = -0.3;
-        public static final double INTAKE_ROLLER_SPEED_CORAL_OUT = -0.7;
+        public static final double INTAKE_ROLLER_SPEED_CORAL_OUT = -0.9;
         public static final double INTAKE_ROLLER_SPEED_ALGAE_IN = 1;
         public static final double INTAKE_ROLLER_SPEED_ALGAE_OUT = -10;
         public static final double INTAKE_ROLLER_SPEED_KEEP = 0.15;
@@ -119,7 +119,7 @@ public final class Constants {
         //public static final double CLAW_MIN = 0.1; -3.5
         public static final double CLAW_START = -3.3;
         public static final double CLAW_REEF = 5;
-        public static final double CLAW_HIGH = 4.0;
+        public static final double CLAW_HIGH = 4.5;
         public static final double CLAW_BARGE = 11.6; 
         public static final double CLAW_ALGAE = 20;
         public static final double CLAW_ALGAE_TRAVEL = 18.6;
@@ -151,7 +151,7 @@ public final class Constants {
         public static final double ELEVATOR_START = 1;
         public static final double ELEVATOR_L2 = 9.5;
         public static final double ELEVATOR_L3 = 21;
-        public static final double ELEVATOR_L4 = 36.5;
+        public static final double ELEVATOR_L4 = 38;
         public static final double ELEVATOR_BARGE = 39.5;
         public static final double ELEVATOR_ALGAE_LOW = 13.5;
         public static final double ELEVATOR_ALGAE_HIGH = 24;
