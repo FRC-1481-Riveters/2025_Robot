@@ -108,6 +108,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("HighAlgae", HighAlgaeCommand());
         NamedCommands.registerCommand("ProcessorOut", ProcessorOutCommand() );
         NamedCommands.registerCommand("ProcessorIntake", ProcessorIntakeCommand());
+        NamedCommands.registerCommand("Intake", IntakeCommand());
         NamedCommands.registerCommand("Align", CoralAlign());
 
         configureBindings();
@@ -435,6 +436,17 @@ public class RobotContainer {
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))            
         .andThen(Commands.waitSeconds(2))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)));
+    }
+
+    public Command IntakeCommand(){
+        return Commands.runOnce( ()->System.out.println("IntakeCommand") )
+        .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_IN ))
+        .andThen( Commands.waitSeconds(10)
+                .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
+        .andThen( Commands.waitSeconds(0.05))
+        .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
+        );
+
     }
 
     public Command StowCommand(){
