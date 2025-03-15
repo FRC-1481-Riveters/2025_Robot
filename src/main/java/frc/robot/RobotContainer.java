@@ -34,9 +34,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.commands.PositionPIDCommand;
 import edu.wpi.first.math.util.Units;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -461,32 +463,29 @@ public class RobotContainer {
         .andThen(Commands.runOnce( ()->StopControls(true))
         );
     }
-
-      public Command driveToPose(Pose2d poseStart, Pose2d poseShort, Pose2d poseFinal) 
-  {
+   
+    public Command driveToPose(Pose2d poseStart, Pose2d poseShort, Pose2d poseFinal) 
+    {
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
         2, // velocity limit
         1, // acceleration limit
         Units.degreesToRadians(360), Units.degreesToRadians(360)  // turn velocity + acceleration limits
-      );
+        );
 
-    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses( poseStart, poseShort, poseFinal );
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses( poseStart, poseShort );
 
     // Create the path using the waypoints created above
     PathPlannerPath path = new PathPlannerPath
-          (
-            waypoints,
-            constraints,
-            null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
+            ( waypoints, constraints, null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
             new GoalEndState( 0.0 /* velocity */, poseFinal.getRotation() )
-          );
+            );
 
     // Prevent the path from being flipped since the coordinates are already correct
     path.preventFlipping = true;
-
-    return AutoBuilder.followPath( path );
-  }
+    return( AutoBuilder.followPath( path )
+        .andThen( PositionPIDCommand.generateCommand( drivetrain, poseFinal, 15) ));
+    }
 
   public Pose2d closestAprilTag(Pose2d robotPose) {
     // Use the robot pose and return the closest AprilTag on a REEF
