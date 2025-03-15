@@ -478,7 +478,7 @@ public class RobotContainer {
     // Create the path using the waypoints created above
     PathPlannerPath path = new PathPlannerPath
             ( waypoints, constraints, null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
-            new GoalEndState( 0.0 /* velocity */, poseFinal.getRotation() )
+            new GoalEndState( 0.0 /* velocity */, poseShort.getRotation() )
             );
 
     // Prevent the path from being flipped since the coordinates are already correct
@@ -556,8 +556,15 @@ public class RobotContainer {
           * Math.cos(z1 + Math.PI / 2);
       translatedFinalY += ((reefAlignmentConstants.reefSpacing - reefAlignmentConstants.coralScoreOffset) * coralOffsetDirection)
           * Math.sin(z1 + Math.PI / 2);
-        
-      return driveToPose( 
+
+translatedShortX = 14.91;
+translatedShortY = 3.67;
+translatedRot = Math.PI - 0.052;
+
+translatedFinalX = 14.45;
+translatedFinalY = 3.77;
+
+            return driveToPose( 
                           (drivetrain.getState().Pose),
                           new Pose2d(translatedShortX, translatedShortY, new Rotation2d(translatedRot)),
                           new Pose2d(translatedFinalX, translatedFinalY, new Rotation2d(translatedRot))

@@ -3,10 +3,14 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+
+import java.text.DecimalFormat;
+
 import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -27,13 +31,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+
 public class PositionPIDCommand extends Command{
     
     private static CommandSwerveDrivetrain mSwerve;
     public final Pose2d goalPose;
     private PPHolonomicDriveController mDriveController = new PPHolonomicDriveController(
                     // PID constants for translation
-                   new PIDConstants(0.4, 0, 0),
+                   new PIDConstants(1.5, 0, 0),
                     // PID constants for rotation
                     new PIDConstants(1.5, 0, 0)
                 );
@@ -46,42 +51,43 @@ public class PositionPIDCommand extends Command{
     public static final Distance kPositionTolerance = Centimeter.of(1.0);
     public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
     public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
-    
-    
-    private PositionPIDCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose) {
-        this.mSwerve = mSwerve;
-        this.goalPose = goalPose;
 
-        endTrigger = new Trigger(()-> {
-            Pose2d diff = mSwerve.getState().Pose.relativeTo(goalPose);
-
-            var rotation = MathUtil.isNear(
-                0.0, 
-                diff.getRotation().getRotations(), 
-                kRotationTolerance.getRotations(), 
-                0.0, 
-                1.0
-            );
-
-            var position = diff.getTranslation().getNorm() < kPositionTolerance.in(Meters);
-
-            var speed = mSwerve.getSpeed() < kSpeedTolerance.in(MetersPerSecond);
-
-            System.out.println("end trigger conditions R: "+ rotation + "\tP: " + position + "\tS: " + speed);
             
-            return rotation && position && speed;
-        });
-
-        endTriggerDebounced = endTrigger.debounce(kEndTriggerDebounce.in(Seconds));
-    }
-
-    public static Command generateCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose, double timeout){
-        final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
-        return new PositionPIDCommand(mSwerve, goalPose).withTimeout(timeout).finallyDo( () -> {
-            mSwerve.applyRequest(() ->
-                driveRequest.withVelocityX(0)
-                     .withVelocityY(0)
-                     .withRotationalRate(0));
+            private PositionPIDCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose) {
+                this.mSwerve = mSwerve;
+                this.goalPose = goalPose;
+        
+                endTrigger = new Trigger(()-> {
+                    Pose2d diff = mSwerve.getState().Pose.relativeTo(goalPose);
+        
+                    var rotation = MathUtil.isNear(
+                        0.0, 
+                        diff.getRotation().getRotations(), 
+                        kRotationTolerance.getRotations(), 
+                        0.0, 
+                        1.0
+                    );
+        
+                    var position = diff.getTranslation().getNorm() < kPositionTolerance.in(Meters);
+        
+                    var speed = mSwerve.getSpeed() < kSpeedTolerance.in(MetersPerSecond);
+        
+                    DecimalFormat df = new DecimalFormat("#.00");
+                    System.out.println("end trigger conditions R: "+ rotation + "\tP: " + position + "\tS: " + speed  
+                        + "  x=" + df.format(mSwerve.getState().Pose.getX()) + "  targetX=" + df.format(goalPose.getX()) 
+                        + "  y=" + df.format(mSwerve.getState().Pose.getY()) + " targetY=" + df.format(goalPose.getY())
+                        + " rot=" + df.format(mSwerve.getState().Pose.getRotation().getRadians()) + " targetRot=" + df.format(goalPose.getRotation().getRadians()));
+                    
+                    return rotation && position && speed;
+                });
+        
+                endTriggerDebounced = endTrigger.debounce(kEndTriggerDebounce.in(Seconds));
+            }
+        
+            public static Command generateCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose, double timeout){
+                return new PositionPIDCommand(mSwerve, goalPose).withTimeout(timeout).finallyDo( () -> {
+                    ChassisSpeeds cs = new ChassisSpeeds();
+                    mSwerve.driveLoop(cs);
             }
         );
     }
@@ -93,19 +99,19 @@ public class PositionPIDCommand extends Command{
 
     @Override
     public void execute() {
+        ChassisSpeeds cs;
+
         PathPlannerTrajectoryState goalState = new PathPlannerTrajectoryState();
         goalState.pose = goalPose;
 
         endTriggerLogger.accept(endTrigger.getAsBoolean());
 
-        final SwerveRequest.ApplyRobotSpeeds driveRequest = new SwerveRequest.ApplyRobotSpeeds();
+        cs = mDriveController.calculateRobotRelativeSpeeds( mSwerve.getState().Pose, goalState );
 
-        mSwerve.applyRequest(()->driveRequest.withSpeeds(
-            mDriveController.calculateRobotRelativeSpeeds(
-                mSwerve.getState().Pose, goalState
-            )    
-        ));
+        DecimalFormat df = new DecimalFormat("#.00");
+        System.out.println("cs.x=" + df.format(cs.vxMetersPerSecond)+ " cs.y=" + df.format(cs.vyMetersPerSecond) + " cs.rot=" + df.format(cs.omegaRadiansPerSecond));
 
+        mSwerve.driveLoop(cs);
     }
 
     @Override

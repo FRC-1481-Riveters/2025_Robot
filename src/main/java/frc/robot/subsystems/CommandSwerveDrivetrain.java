@@ -343,4 +343,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         ChassisSpeeds fieldVelocity = getKinematics().toChassisSpeeds(getState().ModuleStates);
         return Math.sqrt(fieldVelocity.vxMetersPerSecond * fieldVelocity.vxMetersPerSecond + fieldVelocity.vyMetersPerSecond * fieldVelocity.vyMetersPerSecond);
     }
+
+    public void driveLoop( ChassisSpeeds cs )
+    {
+        setControl( m_pathApplyRobotSpeeds.withSpeeds(cs));
+    }
 }
