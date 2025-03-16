@@ -592,7 +592,7 @@ public class RobotContainer {
         return autoChooser.getSelected();
     }
  
-    public void testSomething()
+    public void testReefPositions()
     {
         int[] reefAprilTags = new int[] {6,7,8,9,10,11,17,18,19,20,21,22};
         for( int i=0; i < reefAprilTags.length; i++  )
@@ -612,8 +612,19 @@ public class RobotContainer {
                 -1 * reefAlignmentConstants.reefSpacing/2,
                 Rotation2d.kZero );
 
-            Pose2d coralLeftPose = tagPose2d.plus(coralOffsetLeft);
-            Pose2d coralLeftShortPose = tagPose2d.plus( coralOffsetLeftShort );
+            Pose2d tagReefEdgePose = tagPose2d.plus(coralOffsetLeft);
+            Pose2d tagReefShortPose = tagPose2d.plus( coralOffsetLeftShort );
+
+            // AprilTag poses are from the face of the tag (out from the reef)
+            // Convert the poses to robot poses FACING the reef
+            Pose2d robotReefEdgePose = new Pose2d( tagReefEdgePose.getX(), tagReefEdgePose.getY(), tagReefEdgePose.getRotation().plus(Rotation2d.kPi));
+            Pose2d robotReefShortPose = new Pose2d( tagReefShortPose.getX(), tagReefShortPose.getY(), tagReefShortPose.getRotation().plus(Rotation2d.kPi));
+
+            System.out.println("==== TAG " + reefAprilTags[i] + " ====");
+            DecimalFormat df = new DecimalFormat( "#.00");
+            System.out.println("reef x=" + df.format(tagPose2d.getX()) + "\treef y=" + df.format(tagPose2d.getY()) + "\treef rotate=" + df.format(tagPose2d.getRotation().getDegrees()));
+            System.out.println("left x=" + df.format(robotReefEdgePose.getX()) + "\tleft y=" + df.format(robotReefEdgePose.getY()) + "\tleft rotate=" + df.format(robotReefEdgePose.getRotation().getDegrees()));
+            System.out.println("shrt x=" + df.format(robotReefShortPose.getX()) + "\tshrt y=" + df.format(robotReefShortPose.getY()) + "\tshrt rotate=" + df.format(robotReefShortPose.getRotation().getDegrees()));
         }
     }
 }
