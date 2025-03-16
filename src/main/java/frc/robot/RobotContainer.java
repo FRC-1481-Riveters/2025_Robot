@@ -20,8 +20,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -58,7 +60,9 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.ctre.phoenix.led.*;
@@ -73,8 +77,8 @@ public class RobotContainer {
     public static double INTAKE_ROLLER_SPEED_CURRENT;
 
     private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout
-      // Per TU12, Michigan and champs are both NOT k2025ReefscapeAndyMark
-      .loadField(AprilTagFields.k2025Reefscape); 
+      // Per TU12, Michigan and champs are both welded, NOT k2025ReefscapeAndyMark
+      .loadField(AprilTagFields.k2025ReefscapeWelded); 
 
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -499,7 +503,7 @@ public class RobotContainer {
     for (int tagID : tagIDs) {
       var tagPoseOptional = aprilTagFieldLayout.getTagPose(tagID);
       var tagPose = tagPoseOptional.get();
-      Pose2d tagPose2d = new Pose2d(tagPose.getX(), tagPose.getY(), new Rotation2d(tagPose.getRotation().getZ()));
+      Pose2d tagPose2d = new Pose2d(tagPose.getX(), tagPose.getY(), tagPose.getRotation().toRotation2d());
       double distance = robotPose.getTranslation().getDistance(tagPose2d.getTranslation());
 
       // Remember the shortest distance in the list
@@ -520,55 +524,44 @@ public class RobotContainer {
     RawFiducial fiducial;
 
     Pose2d closestTagPose = closestAprilTag(drivetrain.getState().Pose);
-    // SmartDashboard.putNumber("Closest Tag X", closestTagPose.getX());
-    // SmartDashboard.putNumber("Closest Tag Y", closestTagPose.getY());
-
-    double x1 = closestTagPose.getX();
-    double y1 = closestTagPose.getY();
-    double z1 = closestTagPose.getRotation().getRadians();
-
-    // The short position has the robot bumpers a short distance away from the reef wall
-    double translatedShortX = x1 + (((reefAlignmentConstants.robotWidth / 2) + reefAlignmentConstants.shortDistance) * Math.cos(z1));
-    double translatedShortY = y1 + ((reefAlignmentConstants.robotWidth / 2) * Math.sin(z1));
-    double translatedRot = z1 - Math.PI;
-
-    // The final position has the robot bumpers flush with the reef
-    double translatedFinalX = x1 + ((reefAlignmentConstants.robotWidth / 2) * Math.cos(z1));
-    double translatedFinalY = y1 + ((reefAlignmentConstants.robotWidth / 2) * Math.sin(z1));
 
     // This function will align to the left reef post if the robot is to the left of the tag,
     // or to the right reef post if the robot is to the right of the tag.
     try
     {
-      fiducial = m_Vision.getFiducialWithId(m_Vision.getClosestFiducial().id);
-      // If limelight TX is positive, the robot is to the right of the tag
-      if( fiducial.txnc > 0 )
-        coralOffsetDirection = -1.0;
+        fiducial = m_Vision.getFiducialWithId(m_Vision.getClosestFiducial().id);
+        // If your target is on the rightmost edge of 
+        // your limelight feed, tx should return roughly 31 degrees.
+        // If the robot is aimed vaguely towards the reef, and the target is on the right, txnc will be positive
+        if( fiducial.txnc < 0 )
+            coralOffsetDirection = -1.0;
 
-      // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
-      // +X forward, +Y up
-      translatedShortX += ((reefAlignmentConstants.reefSpacing - reefAlignmentConstants.coralScoreOffset) * coralOffsetDirection)
-          * Math.cos(z1 + Math.PI / 2);
-      translatedShortY += ((reefAlignmentConstants.reefSpacing - reefAlignmentConstants.coralScoreOffset) * coralOffsetDirection)
-          * Math.sin(z1 + Math.PI / 2);
+        // Make a Transform2d to calculate the offset of the robot position 
+        // when it's up against the edge of the reef, lined up with the
+        // correct coral post.
+        // The offset includes reefSpacing (distance between coral posts)
+        // and the bumper-to-bumper width of the robot itself
+        Transform2d coralOffsetLeft = new Transform2d( 
+            reefAlignmentConstants.robotWidth / 2, 
+            coralOffsetDirection * reefAlignmentConstants.reefSpacing/2, 
+            Rotation2d.kZero );
 
-      translatedFinalX += ((reefAlignmentConstants.reefSpacing - reefAlignmentConstants.coralScoreOffset) * coralOffsetDirection)
-          * Math.cos(z1 + Math.PI / 2);
-      translatedFinalY += ((reefAlignmentConstants.reefSpacing - reefAlignmentConstants.coralScoreOffset) * coralOffsetDirection)
-          * Math.sin(z1 + Math.PI / 2);
+        // Make a Transform2d to calculate the offset of the robot position 
+        // when it's up against the edge of the reef, lined up with the
+        // correct coral post.
+        // The offset includes reefSpacing (distance between coral posts)
+        // and the bumper-to-bumper width of the robot itself, AND
+        // a short distance where PositionPIDCommand is used instead of
+        // PathPlanner, because PathPlanner is only accurate to +/- 2".
+        Transform2d coralOffsetLeftShort = new Transform2d( 
+            reefAlignmentConstants.robotWidth / 2 + reefAlignmentConstants.shortDistance, 
+            coralOffsetDirection * reefAlignmentConstants.reefSpacing/2,
+            Rotation2d.kZero );
 
-translatedShortX = 14.91;
-translatedShortY = 3.67;
-translatedRot = Math.PI - 0.052;
+        Pose2d robotReefEdgePose = closestTagPose.plus(coralOffsetLeft);
+        Pose2d robotReefShortPose = closestTagPose.plus( coralOffsetLeftShort );
 
-translatedFinalX = 14.45;
-translatedFinalY = 3.77;
-
-            return driveToPose( 
-                          (drivetrain.getState().Pose),
-                          new Pose2d(translatedShortX, translatedShortY, new Rotation2d(translatedRot)),
-                          new Pose2d(translatedFinalX, translatedFinalY, new Rotation2d(translatedRot))
-                        );
+        return driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose);
     }
     catch (VisionSubsystem.NoSuchTargetException nste)
     {
@@ -593,5 +586,29 @@ translatedFinalY = 3.77;
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
-    
+ 
+    public void testSomething()
+    {
+        int[] reefAprilTags = new int[] {6,7,8,9,10,11,17,18,19,20,21,22};
+        for( int i=0; i < reefAprilTags.length; i++  )
+        {
+            var tagPoseOptional = aprilTagFieldLayout.getTagPose(reefAprilTags[i]);
+            var tagPose = tagPoseOptional.get();
+            Pose2d tagPose2d = new Pose2d(tagPose.getX(), tagPose.getY(), tagPose.getRotation().toRotation2d());
+
+            // Make a Transform2d to calculate the offset
+            Transform2d coralOffsetLeft = new Transform2d( 
+                reefAlignmentConstants.robotWidth / 2, 
+                -1 * reefAlignmentConstants.reefSpacing/2, 
+                Rotation2d.kZero );
+
+            Transform2d coralOffsetLeftShort = new Transform2d( 
+                reefAlignmentConstants.robotWidth / 2 + reefAlignmentConstants.shortDistance, 
+                -1 * reefAlignmentConstants.reefSpacing/2,
+                Rotation2d.kZero );
+
+            Pose2d coralLeftPose = tagPose2d.plus(coralOffsetLeft);
+            Pose2d coralLeftShortPose = tagPose2d.plus( coralOffsetLeftShort );
+        }
+    }
 }

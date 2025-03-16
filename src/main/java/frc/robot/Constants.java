@@ -185,9 +185,9 @@ public final class Constants {
 
     public static class reefAlignmentConstants 
     {
-      public static final double reefSpacing = 0.1651;                               // 13" = 0.3302; tag is in between, so halve that
-      public static final double robotWidth = Units.inchesToMeters(35.43);    // including bumpers
-      public static final double shortDistance = Units.inchesToMeters(14);    // waypoint before going straight into reef
+      public static final double reefSpacing = Units.inchesToMeters(13);        // space between coral posts on the same reef face
+      public static final double robotWidth = Units.inchesToMeters(35.43);      // robot length including bumpers
+      public static final double shortDistance = Units.inchesToMeters(14);      // waypoint before going straight into reef
       public static final double coralScoreOffset = Units.inchesToMeters(0.0);  // how far off center the scoring mechanism is
     }
 
