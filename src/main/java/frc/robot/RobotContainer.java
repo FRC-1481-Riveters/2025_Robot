@@ -558,8 +558,13 @@ public class RobotContainer {
             coralOffsetDirection * reefAlignmentConstants.reefSpacing/2,
             Rotation2d.kZero );
 
-        Pose2d robotReefEdgePose = closestTagPose.plus(coralOffsetLeft);
-        Pose2d robotReefShortPose = closestTagPose.plus( coralOffsetLeftShort );
+        Pose2d tagReefEdgePose = closestTagPose.plus(coralOffsetLeft);
+        Pose2d tagReefShortPose = closestTagPose.plus( coralOffsetLeftShort );
+
+        // AprilTag poses are from the face of the tag (out from the reef)
+        // Convert the poses to robot poses FACING the reef
+        Pose2d robotReefEdgePose = new Pose2d( tagReefEdgePose.getX(), tagReefEdgePose.getY(), tagReefEdgePose.getRotation().plus(Rotation2d.kPi));
+        Pose2d robotReefShortPose = new Pose2d( tagReefShortPose.getX(), tagReefShortPose.getY(), tagReefShortPose.getRotation().plus(Rotation2d.kPi));
 
         return driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose);
     }
