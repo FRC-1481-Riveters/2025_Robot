@@ -17,7 +17,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-
+import frc.robot.subsystems.LimelightHelpers;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,7 +38,7 @@ public class PositionPIDCommand extends Command{
     public final Pose2d goalPose;
     private PPHolonomicDriveController mDriveController = new PPHolonomicDriveController(
                     // PID constants for translation
-                   new PIDConstants(1.5, 0, 0),
+                   new PIDConstants(1.7, 0, 0),
                     // PID constants for rotation
                     new PIDConstants(1.5, 0, 0)
                 );
@@ -59,7 +59,7 @@ public class PositionPIDCommand extends Command{
         
                 endTrigger = new Trigger(()-> {
                     Pose2d diff = mSwerve.getState().Pose.relativeTo(goalPose);
-        
+          
                     var rotation = MathUtil.isNear(
                         0.0, 
                         diff.getRotation().getRotations(), 
@@ -94,6 +94,8 @@ public class PositionPIDCommand extends Command{
 
     @Override
     public void initialize() {
+        mSwerve.resetPose( LimelightHelpers.getBotPose2d_wpiBlue("limelight-riveter") );
+        mSwerve.fusionDisable();
         endTriggerLogger.accept(endTrigger.getAsBoolean());
     }
 
@@ -107,15 +109,18 @@ public class PositionPIDCommand extends Command{
         endTriggerLogger.accept(endTrigger.getAsBoolean());
 
         cs = mDriveController.calculateRobotRelativeSpeeds( mSwerve.getState().Pose, goalState );
+        cs.vxMetersPerSecond /= 2;
+        cs.vyMetersPerSecond *= 2;
 
         DecimalFormat df = new DecimalFormat("#.00");
-        System.out.println("cs.x=" + df.format(cs.vxMetersPerSecond)+ " cs.y=" + df.format(cs.vyMetersPerSecond) + " cs.rot=" + df.format(cs.omegaRadiansPerSecond));
+//        System.out.println("cs.x=" + df.format(cs.vxMetersPerSecond)+ " cs.y=" + df.format(cs.vyMetersPerSecond) + " cs.rot=" + df.format(cs.omegaRadiansPerSecond));
 
         mSwerve.driveLoop(cs);
     }
 
     @Override
     public void end(boolean interrupted) {
+        mSwerve.fusionEnable();
         endTriggerLogger.accept(endTrigger.getAsBoolean());
     }
 

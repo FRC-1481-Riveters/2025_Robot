@@ -81,16 +81,16 @@ public class RobotContainer {
       // Per TU12, Michigan and champs are both welded, NOT k2025ReefscapeAndyMark
       .loadField(AprilTagFields.k2025ReefscapeWelded); 
 
-    
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond)*4; // 3/4 of a rotation per second max angular velocity  
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem( this );
     private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     private final ClawSubsystem clawSubsystem = new ClawSubsystem();
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+    private final Telemetry logger = new Telemetry(MaxSpeed, drivetrain);
     private final VisionSubsystem m_Vision = new VisionSubsystem(drivetrain);
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond)*4; // 3/4 of a rotation per second max angular velocity
-
+    
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -99,8 +99,6 @@ public class RobotContainer {
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-    private final Telemetry logger = new Telemetry(MaxSpeed);
 
     double driveDivider = Constants.DriveConstants.DRIVE_DIVIDER_NORMAL;
    
@@ -546,7 +544,7 @@ public class RobotContainer {
         // and the bumper-to-bumper width of the robot itself
         Transform2d coralOffsetLeft = new Transform2d( 
             reefAlignmentConstants.robotWidth / 2, 
-            coralOffsetDirection * reefAlignmentConstants.reefSpacing/2, 
+            coralOffsetDirection * reefAlignmentConstants.reefSpacing/2 + reefAlignmentConstants.coralScoreOffset, 
             Rotation2d.kZero );
 
         // Make a Transform2d to calculate the offset of the robot position 
@@ -558,7 +556,7 @@ public class RobotContainer {
         // PathPlanner, because PathPlanner is only accurate to +/- 2".
         Transform2d coralOffsetLeftShort = new Transform2d( 
             reefAlignmentConstants.robotWidth / 2 + reefAlignmentConstants.shortDistance, 
-            coralOffsetDirection * reefAlignmentConstants.reefSpacing/2,
+            coralOffsetDirection * reefAlignmentConstants.reefSpacing/2 + reefAlignmentConstants.coralScoreOffset,
             Rotation2d.kZero );
 
         Pose2d tagReefEdgePose = closestTagPose.plus(coralOffsetLeft);

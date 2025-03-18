@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -9,8 +10,6 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.TalonFX;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -19,15 +18,11 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -37,9 +32,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import edu.wpi.first.math.util.Units;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -49,6 +43,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    private boolean fusionEnabled = true;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -127,6 +122,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
+
+    // Locations for the swerve drive modules relative to the robot center.
+    Translation2d m_frontLeftLocation = new Translation2d(Units.inchesToMeters(11.375), Units.inchesToMeters(11.375));
+    Translation2d m_frontRightLocation = new Translation2d(Units.inchesToMeters(11.375), -Units.inchesToMeters(11.375));
+    Translation2d m_backLeftLocation = new Translation2d(-Units.inchesToMeters(11.375), Units.inchesToMeters(11.375));
+    Translation2d m_backRightLocation = new Translation2d(-Units.inchesToMeters(11.375), -Units.inchesToMeters(11.375));
+    // Creating my kinematics object using the module locations
+    SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+        m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
+    );
 
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -347,5 +352,35 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void driveLoop( ChassisSpeeds cs )
     {
         setControl( m_pathApplyRobotSpeeds.withSpeeds(cs));
+    }
+
+    public void updateOdometry(Pose2d pose, boolean valid, double ts, boolean mt2)
+    {
+        double confidence;
+
+        if( valid && fusionEnabled )
+        {
+            if( mt2 == false)
+            {
+                confidence = 0.5;
+            }
+            else
+            {
+                confidence = 0.7;
+            }
+            this.setVisionMeasurementStdDevs(VecBuilder.fill(confidence, confidence,9999999));
+            this.addVisionMeasurement(pose, ts);
+        }
+
+
+    }
+
+    public void fusionDisable()
+    {
+        fusionEnabled = false;
+    }
+    public void fusionEnable()
+    {
+        fusionEnabled = true;
     }
 }
