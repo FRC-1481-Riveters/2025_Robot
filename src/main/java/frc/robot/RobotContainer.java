@@ -51,6 +51,7 @@ import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.LimelightHelpers.RawFiducial;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -85,6 +86,7 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem( this );
     private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     private final ClawSubsystem clawSubsystem = new ClawSubsystem();
+    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final VisionSubsystem m_Vision = new VisionSubsystem(drivetrain);
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond)*4; // 3/4 of a rotation per second max angular velocity
@@ -340,17 +342,14 @@ public class RobotContainer {
             .andThen(Commands.waitSeconds(3)
             .until( clawSubsystem::atSetpoint))
             .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLIMB), elevatorSubsystem))
+            .andThen( Commands.runOnce( ()-> climbSubsystem.DeployClimb()))
         );
 
         Trigger operatorLeftTrigger = operatorJoystick.leftTrigger(0.7);
         operatorLeftTrigger
-        .onFalse(Commands.runOnce( ()-> elevatorSubsystem.setCurrentNormal()))
-        .whileTrue(
-            Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem)
-            .andThen(Commands.waitSeconds(3)
-            .until( clawSubsystem::atSetpoint))
-            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START), elevatorSubsystem))
-        );
+        .onTrue(
+            Commands.runOnce( ()-> climbSubsystem.ClimbClimb())
+            );
 
         //Trigger driverClimb = driverJoystick.x();
         //driverClimb
@@ -477,18 +476,22 @@ public class RobotContainer {
         Units.degreesToRadians(360), Units.degreesToRadians(360)  // turn velocity + acceleration limits
         );
 
-    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses( poseStart, poseShort );
+     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses( poseStart, poseShort );
 
     // Create the path using the waypoints created above
-    PathPlannerPath path = new PathPlannerPath
+    /*PathPlannerPath path = new PathPlannerPath
             ( waypoints, constraints, null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
-            new GoalEndState( 0.0 /* velocity */, poseShort.getRotation() )
+            new GoalEndState( 0.0  velocity , poseShort.getRotation() )
             );
+            
 
     // Prevent the path from being flipped since the coordinates are already correct
     path.preventFlipping = true;
     return( AutoBuilder.followPath( path )
         .andThen( PositionPIDCommand.generateCommand( drivetrain, poseFinal, 15) ));
+    }*/
+
+    return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 4));
     }
 
   public Pose2d closestAprilTag(Pose2d robotPose) {
@@ -520,7 +523,7 @@ public class RobotContainer {
 
   public Command AlignCommand()
   {
-    double coralOffsetDirection = 1.0;  // handles going for left side coral (+y) or right side coral (-y)
+    double coralOffsetDirection = -1.0;  // handles going for left side coral (+y) or right side coral (-y)
     RawFiducial fiducial;
 
     Pose2d closestTagPose = closestAprilTag(drivetrain.getState().Pose);
@@ -534,7 +537,7 @@ public class RobotContainer {
         // your limelight feed, tx should return roughly 31 degrees.
         // If the robot is aimed vaguely towards the reef, and the target is on the right, txnc will be positive
         if( fiducial.txnc < 0 )
-            coralOffsetDirection = -1.0;
+            coralOffsetDirection = 1.0;
 
         // Make a Transform2d to calculate the offset of the robot position 
         // when it's up against the edge of the reef, lined up with the

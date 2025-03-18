@@ -169,10 +169,15 @@ public final class Constants {
     }
 
     public static final class ClimbConstants {
-        public static final int MATCH_CURRENT = 15;
-        public static final int CLIMB_CURRENT = 180; 
-
-    }  
+        public static final int CLIMB_MOTOR = 52;
+        public static final int DEPLOY_MOTOR = 53;
+        public static final int CANCoder = 6;
+        public static final int CLIMB_P = 0;
+        public static final int CLIMB_I = 0;
+        public static final int CLIMB_D = 0;
+        public static final int CLIMB_STOP = 0;
+        public static final int DEPLOY_STOP = 0;
+    }
 
     public static final class VisionConstants{
     public static final String LIMELIGHT_NAME = "limelight-riveter";

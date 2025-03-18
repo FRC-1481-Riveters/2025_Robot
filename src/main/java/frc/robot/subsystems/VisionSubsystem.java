@@ -49,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
       LimelightHelpers.SetRobotOrientation("limelight-riveter", headingDeg, 0, 0, 0, 0, 0);
       var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
       if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
-        m_commandSwerveDrivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
+       // m_commandSwerveDrivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
       
       }
     }

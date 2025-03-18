@@ -29,6 +29,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Intake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Feeder To L"
@@ -50,6 +56,12 @@
           "type": "path",
           "data": {
             "pathName": "L to Feeder"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake"
           }
         }
       ]
