@@ -45,19 +45,23 @@ public class VisionSubsystem extends SubsystemBase {
     fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
 
       var driveState = m_commandSwerveDrivetrain.getState();
-      double headingDeg = driveState.Pose.getRotation().getDegrees();
+      double headingRadians = driveState.Pose.getRotation().getAngle();
       double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
 
-      LimelightHelpers.SetRobotOrientation("limelight-riveter", headingDeg, 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation("limelight-riveter", headingRadians, 0, 0, 0, 0, 0);
+
       var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
-      if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
-        //m_commandSwerveDrivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
+      if (llMeasurement != null ) {
         boolean useMegaTag2 = false; //set to false to use MegaTag1
         boolean doRejectUpdate = false;
         if(useMegaTag2 == false)
         {
           LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
           
+          if(Math.abs(omegaRps) < 2.0) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+          {
+            doRejectUpdate = true;
+          }
           if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
           {
             if(mt1.rawFiducials[0].ambiguity > .7)
@@ -78,9 +82,8 @@ public class VisionSubsystem extends SubsystemBase {
         }
         else if (useMegaTag2 == true)
         {
-          LimelightHelpers.SetRobotOrientation("limelight-riveter", driveState.Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
           LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter");
-          if(Math.abs(m_commandSwerveDrivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+          if(Math.abs(omegaRps) < 2.0) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
           {
             doRejectUpdate = true;
           }
