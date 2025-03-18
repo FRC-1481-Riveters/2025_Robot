@@ -356,19 +356,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void updateOdometry(Pose2d pose, boolean valid, double ts, boolean mt2)
     {
-        double confidence;
+        double spread;
 
         if( valid && fusionEnabled )
         {
             if( mt2 == false)
             {
-                confidence = 0.5;
+                spread = 0.6;
             }
             else
             {
-                confidence = 0.7;
+                spread = 0.4;
             }
-            this.setVisionMeasurementStdDevs(VecBuilder.fill(confidence, confidence,9999999));
+            this.setVisionMeasurementStdDevs(VecBuilder.fill(spread, spread, 9999999));
             this.addVisionMeasurement(pose, ts);
         }
 
