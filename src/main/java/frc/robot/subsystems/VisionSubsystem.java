@@ -45,19 +45,21 @@ public class VisionSubsystem extends SubsystemBase {
     fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
 
       var driveState = m_commandSwerveDrivetrain.getState();
-      double headingDeg = driveState.Pose.getRotation().getDegrees();
+      double headingDegrees = driveState.Pose.getRotation().getDegrees();
       double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
 
-      LimelightHelpers.SetRobotOrientation("limelight-riveter", headingDeg, 0, 0, 0, 0, 0);
-      var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
-      if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
-        //m_commandSwerveDrivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
-        boolean useMegaTag2 = false; //set to false to use MegaTag1
-        boolean doRejectUpdate = false;
-        if(useMegaTag2 == false)
+      LimelightHelpers.SetRobotOrientation("limelight-riveter", headingDegrees, 0, 0, 0, 0, 0);
+
+      if(Math.abs(omegaRps) > 2.0) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+        return;
+
+      boolean useMegaTag2 = false; //set to false to use MegaTag1
+      boolean doRejectUpdate = false;
+      if(useMegaTag2 == false)
+      {
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
+        if( mt1 != null )
         {
-          LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
-          
           if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
           {
             if(mt1.rawFiducials[0].ambiguity > .7)
@@ -73,22 +75,20 @@ public class VisionSubsystem extends SubsystemBase {
           {
             doRejectUpdate = true;
           }
-
-          m_commandSwerveDrivetrain.updateOdometry(mt1.pose, doRejectUpdate, mt1.timestampSeconds,false);
         }
-        else if (useMegaTag2 == true)
+        m_commandSwerveDrivetrain.updateOdometry(mt1.pose, doRejectUpdate, mt1.timestampSeconds,false);
+      }
+      else if (useMegaTag2 == true)
+      {
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter");
+        if( mt2 != null )
         {
-          LimelightHelpers.SetRobotOrientation("limelight-riveter", driveState.Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-          LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter");
-          if(Math.abs(m_commandSwerveDrivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-          {
-            doRejectUpdate = true;
-          }
           if(mt2.tagCount == 0)
           {
             doRejectUpdate = true;
           }
           m_commandSwerveDrivetrain.updateOdometry(mt2.pose, doRejectUpdate, mt2.timestampSeconds,true);
+        }
       }
     }
   }
