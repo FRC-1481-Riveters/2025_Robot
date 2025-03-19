@@ -119,7 +119,7 @@ public final class Constants {
         //public static final double CLAW_MIN = 0.1; -3.5
         public static final double CLAW_START = -3.3;
         public static final double CLAW_REEF = 5;
-        public static final double CLAW_HIGH = 5;
+        public static final double CLAW_HIGH = 6;
         public static final double CLAW_BARGE = 11.6; 
         public static final double CLAW_ALGAE = 20;
         public static final double CLAW_ALGAE_TRAVEL = 18.6;
@@ -177,6 +177,7 @@ public final class Constants {
         public static final int CLIMB_D = 0;
         public static final int CLIMB_STOP = 0;
         public static final int DEPLOY_STOP = 0;
+        public static final int CLIMB_SPEED = 2;
     }
 
     public static final class VisionConstants{

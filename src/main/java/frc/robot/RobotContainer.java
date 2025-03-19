@@ -130,7 +130,7 @@ public class RobotContainer {
 
     private void DriveDividerSet( double divider )
     {
-        if (elevatorSubsystem.getPosition() > 12)
+        if (elevatorSubsystem.getPosition() > 15)
         driveDivider = 4;
         else
         driveDivider = divider;
@@ -333,18 +333,13 @@ public class RobotContainer {
             )
         );
 
-        Trigger operatorRightTrigger = operatorJoystick.rightTrigger(0.7);
-        operatorRightTrigger
-        .whileTrue(
-            Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem)
-            .andThen(Commands.waitSeconds(3)
-            .until( clawSubsystem::atSetpoint))
-            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_CLIMB), elevatorSubsystem))
-            .andThen( Commands.runOnce( ()-> climbSubsystem.DeployClimb()))
-        );
-
         Trigger operatorLeftTrigger = operatorJoystick.leftTrigger(0.7);
         operatorLeftTrigger
+        .whileTrue(Commands.runOnce( ()-> climbSubsystem.DeployClimb())
+        );
+
+        Trigger operatorRightTrigger = operatorJoystick.rightTrigger(0.7);
+        operatorRightTrigger
         .onTrue(
             Commands.runOnce( ()-> climbSubsystem.ClimbClimb())
             );
@@ -379,7 +374,7 @@ public class RobotContainer {
         .until(elevatorSubsystem::isAtPosition))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))              
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4 + 1.25)))
-        .andThen(Commands.waitSeconds(.5)
+        .andThen(Commands.waitSeconds(.7)
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 ))))              
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.waitSeconds(3)
@@ -388,7 +383,7 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(3)
         .until(elevatorSubsystem::isAtPosition))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
-        .andThen(Commands.waitSeconds(0.02))
+        .andThen(Commands.waitSeconds(0.5))
         .andThen(Commands.runOnce( ()->StopControls(true))) 
         ;   
     }
@@ -461,6 +456,7 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(3)
         .until(elevatorSubsystem::isAtPosition))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
+        .andThen(Commands.waitSeconds(1))
         .andThen(Commands.runOnce( ()->StopControls(true))
         );
     }
@@ -489,7 +485,7 @@ public class RobotContainer {
         .andThen( PositionPIDCommand.generateCommand( drivetrain, poseFinal, 15) ));
     }*/
 
-    return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 4));
+    return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 2));
     }
 
   public Pose2d closestAprilTag(Pose2d robotPose) {

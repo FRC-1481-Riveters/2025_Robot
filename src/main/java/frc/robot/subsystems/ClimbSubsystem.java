@@ -84,6 +84,7 @@ public class ClimbSubsystem extends SubsystemBase {
     public void ClimbClimb()
     {
         System.out.println("ClimbClimb");
-        m_climb.setPosition(ClimbConstants.CLIMB_STOP);
+        m_climb.set(ClimbConstants.CLIMB_SPEED);
+        //m_climb.setPosition(ClimbConstants.CLIMB_STOP);
     }
  }
