@@ -94,9 +94,18 @@ public class PositionPIDCommand extends Command{
 
     @Override
     public void initialize() {
-        mSwerve.resetPose( LimelightHelpers.getBotPose2d_wpiBlue("limelight-riveter") );
-        mSwerve.fusionDisable();
-        endTriggerLogger.accept(endTrigger.getAsBoolean());
+        Pose2d robotPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-riveter");
+        if( robotPose.getX() == 0 && robotPose.getY() == 0 )
+        {
+            // Don't run this command if the Limelight didn't return a valid position
+            this.cancel();
+        }
+        else
+        {
+            mSwerve.resetPose( robotPose );
+            mSwerve.fusionDisable();
+            endTriggerLogger.accept(endTrigger.getAsBoolean());
+        }
     }
 
     @Override
@@ -110,7 +119,7 @@ public class PositionPIDCommand extends Command{
 
         cs = mDriveController.calculateRobotRelativeSpeeds( mSwerve.getState().Pose, goalState );
         cs.vxMetersPerSecond /= 2;
-        cs.vyMetersPerSecond *= 2;
+        cs.vyMetersPerSecond *= 1;
 
         DecimalFormat df = new DecimalFormat("#.00");
 //        System.out.println("cs.x=" + df.format(cs.vxMetersPerSecond)+ " cs.y=" + df.format(cs.vyMetersPerSecond) + " cs.rot=" + df.format(cs.omegaRadiansPerSecond));
