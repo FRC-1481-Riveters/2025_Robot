@@ -5,18 +5,24 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.Telemetry;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.LimelightHelpers.*;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 
 
 public class VisionSubsystem extends SubsystemBase {
   private RawFiducial[] fiducials;
   private CommandSwerveDrivetrain m_commandSwerveDrivetrain;
+  private AprilTagFieldLayout tagLayout;
 
 
   public VisionSubsystem(CommandSwerveDrivetrain commandSwerveDrivetrain) {
     m_commandSwerveDrivetrain = commandSwerveDrivetrain;
     config();
+    tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
   }
 
@@ -31,11 +37,11 @@ public class VisionSubsystem extends SubsystemBase {
     // LimelightHelpers.setCropWindow("limelight-riveter", -0.5, 0.5, -0.5, 0.5);
     LimelightHelpers.setCameraPose_RobotSpace(
         "limelight-riveter",
-        0.3556, 
-        0.1016,
-        0.3429,
+        0.3556,//0 
+        0.1016,//0
+        0.3429,//0
         0,00
-        -2,3
+        -2,3//0
         );
         LimelightHelpers.SetFiducialIDFiltersOverride("limelight-riveter", new int[] {3,6,7,8,9,10,11,16,17,18,19,20,21,22});
   }
@@ -54,7 +60,7 @@ public class VisionSubsystem extends SubsystemBase {
         return;
 
       boolean useMegaTag2 = false; //set to false to use MegaTag1
-      boolean doRejectUpdate = false;
+      boolean doRejectUpdate = false; 
       if(useMegaTag2 == false)
       {
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
@@ -75,6 +81,9 @@ public class VisionSubsystem extends SubsystemBase {
           {
             doRejectUpdate = true;
           }
+          if (isInsideField(m_commandSwerveDrivetrain)){
+            doRejectUpdate = false;
+          }
         }
         m_commandSwerveDrivetrain.updateOdometry(mt1.pose, doRejectUpdate, mt1.timestampSeconds,false);
       }
@@ -90,6 +99,31 @@ public class VisionSubsystem extends SubsystemBase {
           m_commandSwerveDrivetrain.updateOdometry(mt2.pose, doRejectUpdate, mt2.timestampSeconds,true);
         }
       }
+  }
+
+  public boolean isInsideField(CommandSwerveDrivetrain commandSwerveDrivetrain) {
+    m_commandSwerveDrivetrain = commandSwerveDrivetrain;
+    var driveState = m_commandSwerveDrivetrain.getState();
+    // Directions are relative to driver's perspective
+    // Blue Left: y = 0.7587x + 267.2
+    // Blue Right: y = -0.7587x - 49.95
+    // Red Left: y = 0.7587x - 474.187
+    // Red Right: y = -0.7587x + 791.337
+
+    double slope = Units.inchesToMeters(0.7587);
+    double x = driveState.Pose.getX();
+    double y = driveState.Pose.getY();
+
+    boolean isInsideBlueLeft = (y < slope*x + Units.inchesToMeters(267.2));
+    boolean isInsideBlueRight = (y > -slope*x + Units.inchesToMeters(49.95));
+    boolean isInsideRedLeft = (y > slope*x - Units.inchesToMeters(474.187));
+    boolean isInsideRedRight = (y < -slope*x + Units.inchesToMeters(791.337));
+    boolean isInsideRectangle = (x > 0 && x < tagLayout.getFieldLength() && y > 0 && y < tagLayout.getFieldWidth());
+
+    if(isInsideBlueRight && isInsideBlueLeft && isInsideRedLeft && isInsideRedRight && isInsideRectangle) {
+      return true;
+    } else {
+      return false;
     }
   }
 
