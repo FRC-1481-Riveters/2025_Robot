@@ -82,8 +82,8 @@ public class VisionSubsystem extends SubsystemBase {
           {
             doRejectUpdate = true;
           }
-          if (isInsideField(m_commandSwerveDrivetrain)){
-            doRejectUpdate = false;
+          if (!isInsideField(m_commandSwerveDrivetrain)){
+            doRejectUpdate = true;
           }
         }
         m_commandSwerveDrivetrain.updateOdometry(mt1.pose, doRejectUpdate, mt1.timestampSeconds,false);
