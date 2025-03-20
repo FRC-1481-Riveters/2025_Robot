@@ -37,9 +37,9 @@ public class VisionSubsystem extends SubsystemBase {
     // LimelightHelpers.setCropWindow("limelight-riveter", -0.5, 0.5, -0.5, 0.5);
     LimelightHelpers.setCameraPose_RobotSpace(
         "limelight-riveter",
-        0.3556,//0 
+        0.1841,//0 
         0.0,//0
-        0.3429,//0
+        0.2413,//0
         0,00
         -2,3//0
         );
