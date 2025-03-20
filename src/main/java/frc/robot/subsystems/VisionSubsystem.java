@@ -37,11 +37,12 @@ public class VisionSubsystem extends SubsystemBase {
     // LimelightHelpers.setCropWindow("limelight-riveter", -0.5, 0.5, -0.5, 0.5);
     LimelightHelpers.setCameraPose_RobotSpace(
         "limelight-riveter",
-        0.1841,//0 
-        0.0,//0
-        0.2413,//0
-        0,00
-        -2,3//0
+        0.1841,
+        0.0,
+        0.2413,
+        0,
+        0,
+        0
         );
         LimelightHelpers.SetFiducialIDFiltersOverride("limelight-riveter", new int[] {3,6,7,8,9,10,11,16,17,18,19,20,21,22});
   }
