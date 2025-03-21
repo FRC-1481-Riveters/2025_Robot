@@ -378,14 +378,14 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(.5)
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 ))))              
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
-        .andThen(Commands.waitSeconds(3)
+        /* .andThen(Commands.waitSeconds(3)
         .until( clawSubsystem::atSetpoint))
         .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
         .andThen(Commands.waitSeconds(3)
         .until(elevatorSubsystem::isAtPosition))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
         .andThen(Commands.waitSeconds(0.5))
-        .andThen(Commands.runOnce( ()->StopControls(true))) 
+        .andThen(Commands.runOnce( ()->StopControls(true))) */
         ;   
     }
 
@@ -476,7 +476,7 @@ public class RobotContainer {
 
     public Command StowCommand(){
         return Commands.runOnce( ()->System.out.println("Stow") )
-        .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
+        //.andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.waitSeconds(3)
         .until( clawSubsystem::atSetpoint))
