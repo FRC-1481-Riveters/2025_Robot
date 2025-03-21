@@ -52,9 +52,9 @@ public class VisionSubsystem extends SubsystemBase {
     fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
 
       var driveState = m_commandSwerveDrivetrain.getState();
-      double headingDegrees = driveState.Pose.getRotation().getDegrees();
       double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
 
+      double headingDegrees = driveState.Pose.getRotation().getDegrees();
       LimelightHelpers.SetRobotOrientation("limelight-riveter", headingDegrees, 0, 0, 0, 0, 0);
 
       if(Math.abs(omegaRps) > 2.0) // if our angular velocity is greater than 720 degrees per second, ignore vision updates

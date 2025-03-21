@@ -109,6 +109,7 @@ public class RobotContainer {
     public RobotContainer() { 
         
         NamedCommands.registerCommand("ScoreL4", ScoreL4Command());
+        NamedCommands.registerCommand("ScoreL2", ScoreL2Command());
         NamedCommands.registerCommand("Stow", StowCommand());
         NamedCommands.registerCommand("LowAlgae", LowAlgaeCommand());
         NamedCommands.registerCommand("HighAlgae", HighAlgaeCommand());
@@ -120,7 +121,7 @@ public class RobotContainer {
         configureBindings();
 
         for (int port = 5800; port <= 5809; port++) {
-            PortForwarder.add(port, "limelight.local", port);
+            PortForwarder.add(port, "limelight", port);
         }
 
          autoChooser = AutoBuilder.buildAutoChooser("Tests");
@@ -369,12 +370,12 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(3)
         .until( clawSubsystem::atSetpoint))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
-        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)))
+        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_HIGH)))
         .andThen(Commands.waitSeconds(1.5)
         .until(elevatorSubsystem::isAtPosition))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))              
-        .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4 + 1.25)))
-        .andThen(Commands.waitSeconds(.7)
+        //.andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4 + 1.25)))
+        .andThen(Commands.waitSeconds(.5)
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 ))))              
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.waitSeconds(3)
@@ -387,6 +388,33 @@ public class RobotContainer {
         .andThen(Commands.runOnce( ()->StopControls(true))) 
         ;   
     }
+
+    public Command ScoreL2Command() 
+    {
+        return Commands.runOnce( ()->System.out.println("ScoreL4Command") )
+        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))) 
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L2)))
+        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_REEF)))
+        .andThen(Commands.waitSeconds(1.5)
+        .until(elevatorSubsystem::isAtPosition))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))              
+        //.andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4 + 1.25)))
+        .andThen(Commands.waitSeconds(.5)
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 ))))              
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
+        .andThen(Commands.waitSeconds(3)
+        .until(elevatorSubsystem::isAtPosition))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
+        .andThen(Commands.waitSeconds(0.5))
+        .andThen(Commands.runOnce( ()->StopControls(true))) 
+        ;   
+    }
+
     public Command LowAlgaeCommand(){
 
         return Commands.runOnce( ()->System.out.println("LowAlgae") )
@@ -568,6 +596,7 @@ public class RobotContainer {
     catch (VisionSubsystem.NoSuchTargetException nste)
     {
       // if no AprilTag is visible, just don't do anything
+      System.out.println("Align: no tag is visible");
       return Commands.waitSeconds(15);
     }
   }

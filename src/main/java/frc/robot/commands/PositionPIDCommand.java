@@ -38,9 +38,9 @@ public class PositionPIDCommand extends Command{
     public final Pose2d goalPose;
     private PPHolonomicDriveController mDriveController = new PPHolonomicDriveController(
                     // PID constants for translation
-                   new PIDConstants(1.7, 0, 0),
+                   new PIDConstants(2.5, 0, 0),
                     // PID constants for rotation
-                    new PIDConstants(1.5, 0, 0)
+                    new PIDConstants(1.7, 0, 0)
                 );
 
     private final Trigger endTrigger;
@@ -94,6 +94,8 @@ public class PositionPIDCommand extends Command{
 
     @Override
     public void initialize() {
+        DecimalFormat df = new DecimalFormat("#.00");
+        System.out.println("PositionPIDCommand to x=" + df.format(goalPose.getX()) + " y=" + df.format(goalPose.getY() ));
         Pose2d robotPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-riveter");
         if( robotPose.getX() == 0 && robotPose.getY() == 0 )
         {
@@ -117,9 +119,17 @@ public class PositionPIDCommand extends Command{
 
         endTriggerLogger.accept(endTrigger.getAsBoolean());
 
+//        // Update the robot position
+//        Pose2d robotPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-riveter");
+//        if( robotPose.getX() != 0 && robotPose.getY() != 0 )
+//        {
+//            // Don't update the position if the AprilTag isn't visible
+//            mSwerve.resetPose( robotPose );
+//        }
+
         cs = mDriveController.calculateRobotRelativeSpeeds( mSwerve.getState().Pose, goalState );
-        cs.vxMetersPerSecond /= 2;
-        cs.vyMetersPerSecond *= 1;
+//        cs.vxMetersPerSecond /= 2;
+//        cs.vyMetersPerSecond *= 1.3;
 
         DecimalFormat df = new DecimalFormat("#.00");
 //        System.out.println("cs.x=" + df.format(cs.vxMetersPerSecond)+ " cs.y=" + df.format(cs.vyMetersPerSecond) + " cs.rot=" + df.format(cs.omegaRadiansPerSecond));
@@ -131,6 +141,8 @@ public class PositionPIDCommand extends Command{
     public void end(boolean interrupted) {
         mSwerve.fusionEnable();
         endTriggerLogger.accept(endTrigger.getAsBoolean());
+        DecimalFormat df = new DecimalFormat("#.00");
+        System.out.println("PositionPIDCommand to x=" + df.format(goalPose.getX()) + " y=" + df.format(goalPose.getY() ));
     }
 
     @Override

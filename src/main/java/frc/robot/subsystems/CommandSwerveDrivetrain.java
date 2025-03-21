@@ -227,7 +227,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ),
                 new PPHolonomicDriveController(
                     // PID constants for translation
-                   new PIDConstants(0.4, 0, 0),
+                   new PIDConstants(0.7, 0, 0),
                     // PID constants for rotation
                     new PIDConstants(1.5, 0, 0)
                 ),
@@ -368,8 +368,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             {
                 spread = 0.4;
             }
-            this.setVisionMeasurementStdDevs(VecBuilder.fill(spread, spread, 9999999));
-            this.addVisionMeasurement(pose, ts);
+            if( pose.getX() != 0 && pose.getY() != 0 )
+            {
+                this.setVisionMeasurementStdDevs(VecBuilder.fill(spread, spread, 9999999));
+                this.addVisionMeasurement(pose, ts);
+            }
         }
 
 
