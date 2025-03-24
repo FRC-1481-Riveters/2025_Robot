@@ -17,6 +17,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -615,9 +616,19 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        Command command;
+        command = autoChooser.getSelected();
+        String name = command.getName();
+        if( name.startsWith("right ") )
+        {
+            // if the path starts with "right ", mirror it from a left path
+            // i.e., name the left path "2 coral us", and make a dummy right path "right 2 coral us"
+            // - this will skip the dummy path and mirror the left path instead
+            command = new PathPlannerAuto( name.substring(6), true );
+        }
+        return command;
     }
- 
+
     public void testReefPositions()
     {
         int[] reefAprilTags = new int[] {6,7,8,9,10,11,17,18,19,20,21,22};
