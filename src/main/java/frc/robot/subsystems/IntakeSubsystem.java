@@ -133,6 +133,14 @@ public class IntakeSubsystem extends SubsystemBase {
             return false;
     }
 
+    public boolean isIntakeBeamBreakOut()
+    {
+        if( m_CANrange.getDistance().getValueAsDouble() < 0.04 && m_CANrange.getDistance().getValueAsDouble() > 0.025 ) 
+            return false;
+        else
+            return true;
+    }
+
     public void setCone( boolean bHasCone )
     {
         m_hasCoral = bHasCone;

@@ -27,7 +27,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.4
                       }
                     },
                     {
@@ -59,7 +59,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.75
+                        "waitTime": 0.2
                       }
                     },
                     {
@@ -83,7 +83,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Feeder To L"
+            "pathName": "Feeder To K"
           }
         },
         {
@@ -103,7 +103,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.4
                       }
                     },
                     {
@@ -119,15 +119,9 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "L to Feeder"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "Intake"
+            "name": "Stow"
           }
         }
       ]

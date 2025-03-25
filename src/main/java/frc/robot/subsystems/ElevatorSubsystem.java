@@ -65,7 +65,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     elevatorMotorOutputConfigs
         .withNeutralMode(NeutralModeValue.Brake);
     elevatorMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(17)
+        .withSupplyCurrentLimit(17)//17
         .withSupplyCurrentLimitEnable(true);
         //.withStatorCurrentLimit(180)
         //.withStatorCurrentLimitEnable(true);

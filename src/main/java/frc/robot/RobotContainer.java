@@ -234,7 +234,9 @@ public class RobotContainer {
 
         Trigger operatorL3Trigger = operatorJoystick.b();
         operatorL3Trigger
-         .onTrue(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))
+         .onTrue(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_HIGH))
+                .andThen(Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint))
                 .andThen(Commands.waitSeconds(3)
                 .until( clawSubsystem::atSetpoint))
                 .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L3)))
@@ -366,17 +368,21 @@ public class RobotContainer {
     public Command ScoreL4Command() 
     {
         return Commands.runOnce( ()->System.out.println("ScoreL4Command") )
-        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ELEVATOR_CLEAR))) 
+        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_AUTON_CLEAR))) 
         .andThen(Commands.waitSeconds(3)
         .until( clawSubsystem::atSetpoint))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
+        .andThen(Commands.waitSeconds(3)
+        .until( elevatorSubsystem::isAtPosition))
         .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_HIGH)))
         .andThen(Commands.waitSeconds(1.5)
         .until(elevatorSubsystem::isAtPosition))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))              
         //.andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4 + 1.25)))
-        .andThen(Commands.waitSeconds(.5)
-        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 ))))              
+        .andThen(Commands.waitSeconds(2)
+        .until(intakeSubsystem::isIntakeBeamBreakLoaded))
+        .andThen(Commands.waitSeconds(.65))
+        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))            
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         /* .andThen(Commands.waitSeconds(3)
         .until( clawSubsystem::atSetpoint))
@@ -597,7 +603,7 @@ public class RobotContainer {
     {
       // if no AprilTag is visible, just don't do anything
       System.out.println("Align: no tag is visible");
-      return Commands.waitSeconds(15);
+      return Commands.waitSeconds(3);
     }
   }
 
