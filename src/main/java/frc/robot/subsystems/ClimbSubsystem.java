@@ -7,6 +7,7 @@ import frc.robot.Constants.ElevatorConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -78,7 +79,9 @@ public class ClimbSubsystem extends SubsystemBase {
     public void DeployClimb()
     {
         System.out.println("DeployClimb");
-        m_deploy.setSelectedSensorPosition(ClimbConstants.DEPLOY_STOP);
+        if (m_deploy.getSelectedSensorPosition() < ClimbConstants.DEPLOY_STOP){
+            m_deploy.set(ControlMode.MotionMagic, ClimbConstants.DEPLOY_SPEED);
+        }
     }
 
     public void ClimbClimb()

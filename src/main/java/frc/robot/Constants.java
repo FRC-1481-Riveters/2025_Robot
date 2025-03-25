@@ -104,6 +104,7 @@ public final class Constants {
         public static final double INTAKE_ROLLER_SPEED_ALGAE_IN = 1;
         public static final double INTAKE_ROLLER_SPEED_ALGAE_OUT = -10;
         public static final double INTAKE_ROLLER_SPEED_KEEP = 0.15;
+        public static final double INTAKE_ROLLER_SPEED_TROUGH = -0.4;
 
         public static final double INTAKE_CAM_ANGLE_TOLERANCE = 10;
         public static final double INTAKE_MOTOR_KP = 7;
@@ -118,6 +119,7 @@ public final class Constants {
 
         //public static final double CLAW_MIN = 0.1; -3.5
         public static final double CLAW_START = -3.3;
+        public static final double CLAW_LOW = 25;
         public static final double CLAW_REEF = 5;
         public static final double CLAW_HIGH = 6;
         public static final double CLAW_BARGE = 11.6; 
@@ -150,6 +152,7 @@ public final class Constants {
         public static final double ELEVATOR_POSITION_TOLERANCE = .75;
         // fill out position values later
         public static final double ELEVATOR_START = 1;
+        public static final double ELEVATOR_L1 = 15;
         public static final double ELEVATOR_L2 = 9.5;
         public static final double ELEVATOR_L3 = 21;
         public static final double ELEVATOR_L4 = 37.5;
@@ -179,6 +182,7 @@ public final class Constants {
         public static final int CLIMB_STOP = 0;
         public static final int DEPLOY_STOP = 0;
         public static final int CLIMB_SPEED = 2;
+        public static final int DEPLOY_SPEED = 0;
     }
 
     public static final class VisionConstants{

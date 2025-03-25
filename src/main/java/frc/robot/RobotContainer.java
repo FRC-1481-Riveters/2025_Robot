@@ -220,7 +220,17 @@ public class RobotContainer {
             .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
             );
    
-        
+        Trigger troughButton = driverJoystick.b();
+        troughButton
+        .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
+        .whileTrue(
+            Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_TROUGH))
+        .andThen( Commands.waitSeconds(10)
+                .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
+        .andThen( Commands.waitSeconds(0.05))
+        .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
+        );
+
         Trigger operatorL4Trigger = operatorJoystick.y();
         operatorL4Trigger
          .onTrue(
@@ -256,10 +266,11 @@ public class RobotContainer {
             Trigger operatorL1Trigger = operatorJoystick.x();
             operatorL1Trigger
             .onTrue( 
-                Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_START))
-                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_START)))
-
-            );
+                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_LOW))
+                .andThen(Commands.waitSeconds(3)
+                .until( clawSubsystem::atSetpoint))
+                .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L1))
+            ));
 
         Trigger operatorRightJoystickAxisUp = operatorJoystick.axisGreaterThan(5, 0.7 );
         operatorRightJoystickAxisUp
@@ -351,7 +362,6 @@ public class RobotContainer {
         //driverClimb
        // .whileTrue( Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.CLIMB_CURRENT)))
         //.onFalse(Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.MATCH_CURRENT)));
-
 
         Trigger operatorLeftBumper = operatorJoystick.leftBumper();
         operatorLeftBumper
