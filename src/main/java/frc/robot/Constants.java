@@ -104,7 +104,7 @@ public final class Constants {
         public static final double INTAKE_ROLLER_SPEED_ALGAE_IN = 1;
         public static final double INTAKE_ROLLER_SPEED_ALGAE_OUT = -10;
         public static final double INTAKE_ROLLER_SPEED_KEEP = 0.15;
-        public static final double INTAKE_ROLLER_SPEED_TROUGH = -0.4;
+        public static final double INTAKE_ROLLER_SPEED_TROUGH = 0.6;
 
         public static final double INTAKE_CAM_ANGLE_TOLERANCE = 10;
         public static final double INTAKE_MOTOR_KP = 7;
@@ -119,7 +119,7 @@ public final class Constants {
 
         //public static final double CLAW_MIN = 0.1; -3.5
         public static final double CLAW_START = -3.3;
-        public static final double CLAW_LOW = 25;
+        public static final double CLAW_LOW = 20;
         public static final double CLAW_REEF = 5;
         public static final double CLAW_HIGH = 6;
         public static final double CLAW_BARGE = 11.6; 
@@ -130,11 +130,11 @@ public final class Constants {
         public static final double CLAW_ALGAE_STORE = 13.012;
         //public static final double CLAW_MAX = 19.9;
         public static final double CLAW_ELEVATOR_CLEAR = 4.25; // max travel
-        public static final double CLAW_AUTON_CLEAR = 2.5;//1.4
+        public static final double CLAW_AUTON_CLEAR = 3;//1.4
 
         public static final double CLAW_ACCELERATION = 500;
         public static final double CLAW_VELOCITY = 100;
-        public static final double CLAW_KP = 0.2; // 0.004
+        public static final double CLAW_KP = 0.1; // 0.2
         public static final double CLAW_KI = 0.024;
         public static final double CLAW_KD = 0.000;
         //NEED TO CHANGE THE NAMES/CONSTANTS BELOW
@@ -152,7 +152,7 @@ public final class Constants {
         public static final double ELEVATOR_POSITION_TOLERANCE = .75;
         // fill out position values later
         public static final double ELEVATOR_START = 1;
-        public static final double ELEVATOR_L1 = 15;
+        public static final double ELEVATOR_L1 = 12;
         public static final double ELEVATOR_L2 = 9.5;
         public static final double ELEVATOR_L3 = 21;
         public static final double ELEVATOR_L4 = 37.5;
@@ -161,7 +161,7 @@ public final class Constants {
         public static final double ELEVATOR_ALGAE_HIGH = 24;
         public static final double ELEVATOR_PROCESSOR = 2.371;
         public static final double ELEVATOR_CLIMB = 21.0;
-        public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.015;
+        public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.021;
         public static final double ELEVATOR_MOTOR_ABOVE_KI = 0.090;
         public static final double ELEVATOR_MOTOR_ABOVE_KD = 0.000;
         public static final double ELEVATOR_MOTOR_ABOVE_KF = 0;
@@ -173,16 +173,21 @@ public final class Constants {
     }
 
     public static final class ClimbConstants {
-        public static final int CLIMB_MOTOR = 52;
         public static final int DEPLOY_MOTOR = 53;
+        public static final double DEPLOY_P = 0;
+        public static final double DEPLOY_I = 0;
+        public static final double DEPLOY_D = 0;
+        public static final double DEPLOY_SPEED = 20;
+        public static final double DEPLOY_STOP = -300.0;
+        //DEPLOY_START = 0.2;
         public static final int CANCoder = 6;
-        public static final int CLIMB_P = 0;
-        public static final int CLIMB_I = 0;
-        public static final int CLIMB_D = 0;
-        public static final int CLIMB_STOP = 0;
-        public static final int DEPLOY_STOP = 0;
-        public static final int CLIMB_SPEED = 2;
-        public static final int DEPLOY_SPEED = 0;
+        public static final int CLIMB_MOTOR = 52;
+        public static final double CLIMB_P = 0;
+        public static final double CLIMB_I = 0;
+        public static final double CLIMB_D = 0;
+        public static final double CLIMB_SPEED = -0.5;
+        public static final double CLIMB_STOP = -200;
+        public static final int TALON_TIMEOUT_MS = 5000;
     }
 
     public static final class VisionConstants{

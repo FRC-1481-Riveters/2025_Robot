@@ -127,7 +127,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean isIntakeBeamBreakLoaded()
     {
-        if( m_CANrange.getDistance().getValueAsDouble() < 0.04 && m_CANrange.getDistance().getValueAsDouble() > 0.025 ) 
+        if( m_CANrange.getDistance().getValueAsDouble() < 0.06) 
             return true;
         else
             return false;
@@ -135,7 +135,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean isIntakeBeamBreakOut()
     {
-        if( m_CANrange.getDistance().getValueAsDouble() < 0.04 && m_CANrange.getDistance().getValueAsDouble() > 0.025 ) 
+        if( m_CANrange.getDistance().getValueAsDouble() < 0.06) 
             return false;
         else
             return true;

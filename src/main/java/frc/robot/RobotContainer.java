@@ -226,11 +226,7 @@ public class RobotContainer {
         .onFalse(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( 0)))
         .whileTrue(
             Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_TROUGH))
-        .andThen( Commands.waitSeconds(10)
-                .until( intakeSubsystem::isIntakeBeamBreakLoaded) )
-        .andThen( Commands.waitSeconds(0.05))
-        .andThen(Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0)))
-        );
+          );
 
         Trigger operatorL4Trigger = operatorJoystick.y();
         operatorL4Trigger
@@ -268,8 +264,6 @@ public class RobotContainer {
             operatorL1Trigger
             .onTrue( 
                 Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_LOW))
-                .andThen(Commands.waitSeconds(3)
-                .until( clawSubsystem::atSetpoint))
                 .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L1))
             ));
 
@@ -350,14 +344,32 @@ public class RobotContainer {
 
         Trigger operatorLeftTrigger = operatorJoystick.leftTrigger(0.7);
         operatorLeftTrigger
-        .whileTrue(Commands.runOnce( ()-> climbSubsystem.DeployClimb())
+        .whileTrue(
+            Commands.runOnce( ()-> climbSubsystem.DeployClimb(ClimbConstants.DEPLOY_SPEED))
+        )
+        .onFalse(
+            Commands.runOnce( ()-> climbSubsystem.DeployClimb(0)) 
         );
+
 
         Trigger operatorRightTrigger = operatorJoystick.rightTrigger(0.7);
         operatorRightTrigger
-        .onTrue(
-            Commands.runOnce( ()-> climbSubsystem.ClimbClimb())
-            );
+        .whileTrue(
+            Commands.runOnce( ()-> climbSubsystem.ClimbClimb(ClimbConstants.CLIMB_SPEED))
+        )
+        .onFalse(
+            Commands.runOnce( ()-> climbSubsystem.ClimbClimb(0)) 
+        );
+
+        Trigger DeployRest = operatorJoystick.start();
+        DeployRest
+        .whileTrue(
+            Commands.runOnce( ()-> climbSubsystem.DeployClimb(-ClimbConstants.DEPLOY_SPEED))
+        )
+        .onFalse(
+            Commands.runOnce( ()-> climbSubsystem.DeployClimb(0)) 
+        );
+
 
         //Trigger driverClimb = driverJoystick.x();
         //driverClimb
@@ -395,6 +407,7 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(.65))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))            
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
+        .andThen(Commands.waitSeconds(0.5))
         /* .andThen(Commands.waitSeconds(3)
         .until( clawSubsystem::atSetpoint))
         .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
@@ -640,7 +653,12 @@ public class RobotContainer {
             // if the path starts with "right ", mirror it from a left path
             // i.e., name the left path "2 coral us", and make a dummy right path "right 2 coral us"
             // - this will skip the dummy path and mirror the left path instead
+            System.out.println("Flipping auton path " + name.substring(6));
             command = new PathPlannerAuto( name.substring(6), true );
+        }
+        else
+        {
+            System.out.println("Using auton path " + name);
         }
         return command;
     }

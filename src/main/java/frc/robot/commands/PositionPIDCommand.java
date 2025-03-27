@@ -38,9 +38,9 @@ public class PositionPIDCommand extends Command{
     public final Pose2d goalPose;
     private PPHolonomicDriveController mDriveController = new PPHolonomicDriveController(
                     // PID constants for translation
-                   new PIDConstants(4, 0, 0),
+                   new PIDConstants(3, 0, 0),
                     // PID constants for rotation
-                    new PIDConstants(1.7, 0, 0)
+                    new PIDConstants(2.5, 0, 0)
                 );
 
     private final Trigger endTrigger;

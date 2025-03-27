@@ -22,7 +22,7 @@ public class Robot extends LoggedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    CameraServer.startAutomaticCapture();
+    //CameraServer.startAutomaticCapture();
   }
 
   @Override
