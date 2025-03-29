@@ -18,6 +18,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -31,6 +32,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     private final Follower follower = new Follower(m_elevatorMotor.getDeviceID(), false);
     //private final boolean m_CANCoderReversed;
     //private final double m_CANCoderOffsetDegrees;
+
+    private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
     
     private final PIDController elevatorPidController = new PIDController(ElevatorConstants.ELEVATOR_MOTOR_BELOW_KP, ElevatorConstants.ELEVATOR_MOTOR_BELOW_KI, ElevatorConstants.ELEVATOR_MOTOR_BELOW_KD);
 
@@ -60,6 +63,10 @@ public class ElevatorSubsystem extends SubsystemBase{
 
       MotorOutputConfigs elevatorMotorOutputConfigs = new MotorOutputConfigs();
       CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
+      var talonFXConfigs = new TalonFXConfiguration();
+      var motionMagicConfigs = talonFXConfigs.MotionMagic;
+      
+
       elevatorPidController.setIZone(0.05);
       
     elevatorMotorOutputConfigs
@@ -70,15 +77,21 @@ public class ElevatorSubsystem extends SubsystemBase{
         //.withStatorCurrentLimit(180)
         //.withStatorCurrentLimitEnable(true);
     // elevatorMotor.enableVoltageCompensation(true);
+    motionMagicConfigs.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
+    motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
+    motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
+
     m_elevatorMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
     m_elevatorMotor.getConfigurator().apply(elevatorMotorOutputConfigs);
+    m_elevatorMotor.getConfigurator().apply(talonFXConfigs);
     m_elevatorMotor.setPosition(0);
   
     // elevatorMotor.enableVoltageCompensation(true);
     m_elevatorMotorFollower.getConfigurator().apply(new TalonFXConfiguration());
     m_elevatorMotorFollower.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
     m_elevatorMotorFollower.getConfigurator().apply(elevatorMotorOutputConfigs);
+    m_elevatorMotorFollower.getConfigurator().apply(talonFXConfigs);
     m_elevatorMotorFollower.setPosition(0);
 
     m_elevatorMotorFollower.setControl(follower);
@@ -154,7 +167,8 @@ public class ElevatorSubsystem extends SubsystemBase{
       elevatorPidController.setI( ElevatorConstants.ELEVATOR_MOTOR_BELOW_KI );
       elevatorPidController.setD( ElevatorConstants.ELEVATOR_MOTOR_BELOW_KD );
       }
-        elevatorPidController.setSetpoint(position);
+        //elevatorPidController.setSetpoint(position);
+        m_elevatorMotor.setControl(m_request.withPosition(position));
         Logger.recordOutput("Elevator/Setpoint", m_setpoint);
     }
 

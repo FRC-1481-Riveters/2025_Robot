@@ -15,6 +15,7 @@ import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -33,6 +34,8 @@ public class ClawSubsystem extends SubsystemBase
     //private final double m_CANCoderOffsetDegrees;
     
     private final PIDController clawPidController = new PIDController(ClawConstants.CLAW_KP, ClawConstants.CLAW_KI, ClawConstants.CLAW_KD);
+    
+    private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     public static final double claw_kA = 0.12872;
     public static final double claw_kV = 2.3014;
@@ -55,7 +58,9 @@ public class ClawSubsystem extends SubsystemBase
        
         MotorOutputConfigs clawMotorOutputConfigs = new MotorOutputConfigs();
         CurrentLimitsConfigs clawMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-    
+        var talonFXConfigs = new TalonFXConfiguration();
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+
     SupplyCurrentLimitConfiguration currentConfig = new SupplyCurrentLimitConfiguration();
     currentConfig.currentLimit = 1;
     currentConfig.enable = true;
@@ -68,9 +73,14 @@ public class ClawSubsystem extends SubsystemBase
         .withSupplyCurrentLimitEnable(true);
     // clawMotor.configVoltageCompSaturation(12.5);
     // clawMotor.enableVoltageCompensation(true);
+    motionMagicConfigs.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
+    motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
+    motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
     m_clawMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_clawMotor.getConfigurator().apply(clawMotorCurrentLimitsConfigs);
     m_clawMotor.getConfigurator().apply(clawMotorOutputConfigs);
+    m_clawMotor.getConfigurator().apply(talonFXConfigs);
+
 
        // m_CANCoder.setPosition(m_CANCoderOffsetDegrees);
 
@@ -88,7 +98,8 @@ public class ClawSubsystem extends SubsystemBase
     {
         double sensorSetpoint;
 
-        m_Setpoint = angle;
+        //m_Setpoint = angle;
+        m_clawMotor.setControl(m_request.withPosition(angle));
         //clawPidController.reset(m_position);
         m_pid = true;
         Logger.recordOutput("Claw/Setpoint", m_Setpoint );
@@ -100,7 +111,7 @@ public class ClawSubsystem extends SubsystemBase
     {
         m_pid = false;
         m_output = speed;
-        clawPidController.setSetpoint(speed);
+        m_clawMotor.set(speed);
         m_Setpoint = 0;
         Logger.recordOutput("Claw/Setpoint", m_Setpoint );
         System.out.println("setClawJog " + m_output );

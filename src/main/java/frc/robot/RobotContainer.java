@@ -342,7 +342,7 @@ public class RobotContainer {
             )
         );
 
-        Trigger operatorLeftTrigger = operatorJoystick.leftTrigger(0.7);
+        Trigger operatorLeftTrigger = operatorJoystick.leftTrigger(0.7) .and(driverJoystick.x());
         operatorLeftTrigger
         .whileTrue(
             Commands.runOnce( ()-> climbSubsystem.DeployClimb(ClimbConstants.DEPLOY_SPEED))
@@ -352,7 +352,7 @@ public class RobotContainer {
         );
 
 
-        Trigger operatorRightTrigger = operatorJoystick.rightTrigger(0.7);
+        Trigger operatorRightTrigger = operatorJoystick.rightTrigger(0.7) .and(driverJoystick.x());
         operatorRightTrigger
         .whileTrue(
             Commands.runOnce( ()-> climbSubsystem.ClimbClimb(ClimbConstants.CLIMB_SPEED))
@@ -369,12 +369,6 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce( ()-> climbSubsystem.DeployClimb(0)) 
         );
-
-
-        //Trigger driverClimb = driverJoystick.x();
-        //driverClimb
-       // .whileTrue( Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.CLIMB_CURRENT)))
-        //.onFalse(Commands.runOnce( ()-> elevatorSubsystem.setCurrentClimb(ClimbConstants.MATCH_CURRENT)));
 
         Trigger operatorLeftBumper = operatorJoystick.leftBumper();
         operatorLeftBumper
