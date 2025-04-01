@@ -14,7 +14,6 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
 
     public static final class ModuleConstants {
-        public static final double kWheelDiameterMeters = Units.inchesToMeters(3.825);
         public static final double SWERVE_STEERING_RATIO = (150.0 / 7.0);
         public static final double kPTurning = 0.2;
 

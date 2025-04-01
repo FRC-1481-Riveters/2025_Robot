@@ -48,7 +48,6 @@ public class ClawSubsystem extends SubsystemBase
     private double m_position;
     private double m_tolerance;
     private boolean m_atSetpoint;
-    private int m_atSetpointDebounceCounter;
     private boolean m_pid;
 
 
@@ -163,18 +162,12 @@ public class ClawSubsystem extends SubsystemBase
         if( Math.abs( m_position - m_Setpoint ) > m_tolerance )
         {
             m_atSetpoint = false;
-            m_atSetpointDebounceCounter = 0;
-            Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
         }
-        else if( m_atSetpointDebounceCounter < 12 )
+        else
         {
-            m_atSetpointDebounceCounter++;
-            if( m_atSetpointDebounceCounter == 12 )
-            {
-                m_atSetpoint = true;
-                Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
-            }
+            m_atSetpoint = true;
         }
+        Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
     }
 
     public double getPosition(){
