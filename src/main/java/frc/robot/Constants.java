@@ -118,18 +118,18 @@ public final class Constants {
 
         //public static final double CLAW_MIN = 0.1; -3.5
         public static final double CLAW_START = -3.3;
-        public static final double CLAW_LOW = 20;
-        public static final double CLAW_REEF = 5;
-        public static final double CLAW_HIGH = 6;
-        public static final double CLAW_BARGE = 11.6; 
-        public static final double CLAW_ALGAE = 20;
-        public static final double CLAW_ALGAE_TRAVEL = 18.6;
-        public static final double CLAW_PROCESSOR = 25.406;
-        public static final double CLAW_FLOOR = 26;
-        public static final double CLAW_ALGAE_STORE = 13.012;
+        public static final double CLAW_LOW = 16.7;
+        public static final double CLAW_REEF = 1.7;
+        public static final double CLAW_HIGH = 2.7;
+        public static final double CLAW_BARGE = 8.3; 
+        public static final double CLAW_ALGAE = 16.7;
+        public static final double CLAW_ALGAE_TRAVEL = 15.3;
+        public static final double CLAW_PROCESSOR = 22.1;
+        public static final double CLAW_FLOOR = 22.7;
+        public static final double CLAW_ALGAE_STORE = 9.7;
         //public static final double CLAW_MAX = 19.9;
-        public static final double CLAW_ELEVATOR_CLEAR = 4.25; // max travel
-        public static final double CLAW_AUTON_CLEAR = 3;//1.4
+        public static final double CLAW_ELEVATOR_CLEAR = 1.0; //4.25; // max travel
+        public static final double CLAW_AUTON_CLEAR = 0.75;//1.4
 
         public static final double CLAW_ACCELERATION = 500;
         public static final double CLAW_VELOCITY = 100;
@@ -160,12 +160,12 @@ public final class Constants {
         public static final double ELEVATOR_ALGAE_HIGH = 24;
         public static final double ELEVATOR_PROCESSOR = 2.371;
         public static final double ELEVATOR_CLIMB = 21.0;
-        public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.021;
-        public static final double ELEVATOR_MOTOR_ABOVE_KI = 0.090;
+        public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.005; //0.021;
+        public static final double ELEVATOR_MOTOR_ABOVE_KI = 0; //0.090;
         public static final double ELEVATOR_MOTOR_ABOVE_KD = 0.000;
         public static final double ELEVATOR_MOTOR_ABOVE_KF = 0;
-        public static final double ELEVATOR_MOTOR_BELOW_KP = 0.15;
-        public static final double ELEVATOR_MOTOR_BELOW_KI = 0.090;
+        public static final double ELEVATOR_MOTOR_BELOW_KP = 0.04; //0.15;
+        public static final double ELEVATOR_MOTOR_BELOW_KI = 0; //0.090;
         public static final double ELEVATOR_MOTOR_BELOW_KD = 0.000;
         public static final double ELEVATOR_MOTOR_BELOW_KF = 0;
         public static final double ELEVATOR_MAX = 40.0;

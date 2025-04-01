@@ -1,3 +1,4 @@
+
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
@@ -15,7 +16,6 @@ import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -35,8 +35,6 @@ public class ClawSubsystem extends SubsystemBase
     
     private final PIDController clawPidController = new PIDController(ClawConstants.CLAW_KP, ClawConstants.CLAW_KI, ClawConstants.CLAW_KD);
     
-    private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-
     public static final double claw_kA = 0.12872;
     public static final double claw_kV = 2.3014;
     public static final double claw_kS = 0.55493;
@@ -48,37 +46,34 @@ public class ClawSubsystem extends SubsystemBase
     private double m_position;
     private double m_tolerance;
     private boolean m_atSetpoint;
+    private int m_atSetpointDebounceCounter;
     private boolean m_pid;
 
 
     public ClawSubsystem() 
     {
         InvertedValue clawMotorInverted =InvertedValue.CounterClockwise_Positive; //check direction for drive (is true the same as clockwise / counter-clockwise)
-       
+
+        m_clawMotor.setPosition(ClawConstants.CLAW_START);
+
         MotorOutputConfigs clawMotorOutputConfigs = new MotorOutputConfigs();
         CurrentLimitsConfigs clawMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-        var talonFXConfigs = new TalonFXConfiguration();
-        var motionMagicConfigs = talonFXConfigs.MotionMagic;
 
-    SupplyCurrentLimitConfiguration currentConfig = new SupplyCurrentLimitConfiguration();
-    currentConfig.currentLimit = 1;
-    currentConfig.enable = true;
+        SupplyCurrentLimitConfiguration currentConfig = new SupplyCurrentLimitConfiguration();
+        currentConfig.currentLimit = 1;
+        currentConfig.enable = true;
 
-    clawMotorOutputConfigs
-        .withNeutralMode(NeutralModeValue.Brake)
-        .withInverted(clawMotorInverted);
-    clawMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(3)
-        .withSupplyCurrentLimitEnable(true);
-    // clawMotor.configVoltageCompSaturation(12.5);
-    // clawMotor.enableVoltageCompensation(true);
-    motionMagicConfigs.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
-    motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
-    m_clawMotor.getConfigurator().apply(new TalonFXConfiguration());
-    m_clawMotor.getConfigurator().apply(clawMotorCurrentLimitsConfigs);
-    m_clawMotor.getConfigurator().apply(clawMotorOutputConfigs);
-    m_clawMotor.getConfigurator().apply(talonFXConfigs);
+        clawMotorOutputConfigs
+            .withNeutralMode(NeutralModeValue.Brake)
+            .withInverted(clawMotorInverted);
+        clawMotorCurrentLimitsConfigs
+            .withSupplyCurrentLimit(3)
+            .withSupplyCurrentLimitEnable(true);
+        // clawMotor.configVoltageCompSaturation(12.5);
+        // clawMotor.enableVoltageCompensation(true);
+        m_clawMotor.getConfigurator().apply(new TalonFXConfiguration());
+        m_clawMotor.getConfigurator().apply(clawMotorCurrentLimitsConfigs);
+        m_clawMotor.getConfigurator().apply(clawMotorOutputConfigs);
 
 
        // m_CANCoder.setPosition(m_CANCoderOffsetDegrees);
@@ -95,11 +90,8 @@ public class ClawSubsystem extends SubsystemBase
 
     public void setClaw( double angle )
     {
-        double sensorSetpoint;
-
-        //m_Setpoint = angle;
-        m_clawMotor.setControl(m_request.withPosition(angle));
-        //clawPidController.reset(m_position);
+        m_Setpoint = angle;
+        clawPidController.reset();
         m_pid = true;
         Logger.recordOutput("Claw/Setpoint", m_Setpoint );
 
@@ -162,12 +154,18 @@ public class ClawSubsystem extends SubsystemBase
         if( Math.abs( m_position - m_Setpoint ) > m_tolerance )
         {
             m_atSetpoint = false;
+            m_atSetpointDebounceCounter = 0;
+            Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
         }
-        else
+        else if( m_atSetpointDebounceCounter < 12 )
         {
-            m_atSetpoint = true;
+            m_atSetpointDebounceCounter++;
+            if( m_atSetpointDebounceCounter == 12 )
+            {
+                m_atSetpoint = true;
+                Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
+            }
         }
-        Logger.recordOutput("Claw/AtSetpoint", m_atSetpoint );
     }
 
     public double getPosition(){
