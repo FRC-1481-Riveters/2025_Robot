@@ -74,6 +74,7 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climb.getConfigurator().apply(new TalonFXConfiguration());
         m_climb.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
         m_climb.getConfigurator().apply(elevatorMotorOutputConfigs);
+        m_climb.setPosition(0);
 
         // Create an initial log entry so they all show up in AdvantageScope without having to enable anything
         Logger.recordOutput("Climb/Position", 0.0 );
@@ -85,8 +86,16 @@ public class ClimbSubsystem extends SubsystemBase {
     {
         // This method will be called once per scheduler run
         double pos = m_deploy.getSelectedSensorPosition();
+        double posDeploy;
         //nt_deploy_pos.setDouble( pos );
         m_climbPosition = m_climb.getPosition().getValueAsDouble();
+        if (m_climbPosition < ClimbConstants.CLIMB_STOP)
+        {
+            m_climb.set(0);
+        }
+        posDeploy = m_deploy_cancoder.getPosition().getValueAsDouble();
+        if( m_deploy.getMotorOutputPercent() > 0 && posDeploy < ClimbConstants.DEPLOY_STOP)
+            m_deploy.set(ControlMode.PercentOutput, 0);
 
         // This method will be called once per scheduler run
         Logger.recordOutput("Climb/Position", m_climbPosition );
@@ -96,17 +105,30 @@ public class ClimbSubsystem extends SubsystemBase {
 
     public void DeployClimb(double value)
     {
-        System.out.println("DeployClimb ");
-        if (m_deploy_cancoder.getPosition().getValueAsDouble() < ClimbConstants.DEPLOY_STOP){
-        m_deploy.set(ControlMode.PercentOutput, value);
-       // nt_deploy_set.setDouble( ClimbConstants.DEPLOY_SPEED );
+        double climbPos;
+        climbPos = m_deploy_cancoder.getPosition().getValueAsDouble();
+
+        System.out.println("DeployClimb, pos=" + climbPos);
+        // positive output => negative input
+        // negative output => positive input
+        if( value > 0 )
+        {
+            if ( climbPos < ClimbConstants.DEPLOY_STOP)
+            {
+                m_deploy.set(ControlMode.PercentOutput, value);
+            }
+        }
+        else
+        {
+            // manual 
+            m_deploy.set(ControlMode.PercentOutput, value);
         }
     }
 
     public void ClimbClimb(double speed)
     {
         System.out.println("ClimbClimb " + m_climbPosition);
-        if (m_climbPosition < ClimbConstants.DEPLOY_STOP)
+        if (m_climbPosition < ClimbConstants.CLIMB_STOP)
             speed = 0;
 
         m_climb.set(speed);

@@ -60,12 +60,12 @@ public class ElevatorSubsystem extends SubsystemBase{
 
       MotorOutputConfigs elevatorMotorOutputConfigs = new MotorOutputConfigs();
       CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-      elevatorPidController.setIZone(0.05);
+      elevatorPidController.setIZone(ElevatorConstants.ELEVATOR_POSITION_TOLERANCE / 2);
       
     elevatorMotorOutputConfigs
         .withNeutralMode(NeutralModeValue.Brake);
     elevatorMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(8)//15
+        .withSupplyCurrentLimit(15)
         .withSupplyCurrentLimitEnable(true);
         //.withStatorCurrentLimit(180)
         //.withStatorCurrentLimitEnable(true);

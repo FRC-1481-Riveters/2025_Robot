@@ -89,7 +89,7 @@ public final class Constants {
         }
 
         public static final double DRIVE_DIVIDER_NORMAL = 1.4; //  1.4 = 70% of Max Speed
-        public static final double DRIVE_DIVIDER_SLOW = 4.0;  //  4.0 = 25% of Max Speed
+        public static final double DRIVE_DIVIDER_SLOW = 6.0;  //  4.0 = 25% of Max Speed
     }
 
     public static final class IntakeConstants {
@@ -148,7 +148,7 @@ public final class Constants {
         public static final double ELEVATOR_ACCELERATION = 120;
         public static final int ELEVATOR_MOTOR = 42;
         public static final int ELEVATOR_MOTOR_FOLLOWER = 43;
-        public static final double ELEVATOR_POSITION_TOLERANCE = .75;
+        public static final double ELEVATOR_POSITION_TOLERANCE = 0.5; //f.75;
         // fill out position values later
         public static final double ELEVATOR_START = 1;
         public static final double ELEVATOR_L1 = 12;
@@ -160,12 +160,12 @@ public final class Constants {
         public static final double ELEVATOR_ALGAE_HIGH = 24;
         public static final double ELEVATOR_PROCESSOR = 2.371;
         public static final double ELEVATOR_CLIMB = 21.0;
-        public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.005; //0.021;
-        public static final double ELEVATOR_MOTOR_ABOVE_KI = 0; //0.090;
+        public static final double ELEVATOR_MOTOR_ABOVE_KP = 0.021;
+        public static final double ELEVATOR_MOTOR_ABOVE_KI = 0.005;
         public static final double ELEVATOR_MOTOR_ABOVE_KD = 0.000;
         public static final double ELEVATOR_MOTOR_ABOVE_KF = 0;
-        public static final double ELEVATOR_MOTOR_BELOW_KP = 0.04; //0.15;
-        public static final double ELEVATOR_MOTOR_BELOW_KI = 0; //0.090;
+        public static final double ELEVATOR_MOTOR_BELOW_KP = 0.15;
+        public static final double ELEVATOR_MOTOR_BELOW_KI = 0.04;
         public static final double ELEVATOR_MOTOR_BELOW_KD = 0.000;
         public static final double ELEVATOR_MOTOR_BELOW_KF = 0;
         public static final double ELEVATOR_MAX = 40.0;
@@ -176,8 +176,8 @@ public final class Constants {
         public static final double DEPLOY_P = 0;
         public static final double DEPLOY_I = 0;
         public static final double DEPLOY_D = 0;
-        public static final double DEPLOY_SPEED = 20;
-        public static final double DEPLOY_STOP = -300.0;
+        public static final double DEPLOY_SPEED = 1;
+        public static final double DEPLOY_STOP = -0.05;
         //DEPLOY_START = 0.2;
         public static final int CANCoder = 6;
         public static final int CLIMB_MOTOR = 52;
@@ -185,7 +185,7 @@ public final class Constants {
         public static final double CLIMB_I = 0;
         public static final double CLIMB_D = 0;
         public static final double CLIMB_SPEED = -0.5;
-        public static final double CLIMB_STOP = -200;
+        public static final double CLIMB_STOP = -163;
         public static final int TALON_TIMEOUT_MS = 5000;
     }
 
