@@ -94,7 +94,7 @@ public class ClimbSubsystem extends SubsystemBase {
             m_climb.set(0);
         }
         posDeploy = m_deploy_cancoder.getPosition().getValueAsDouble();
-        if( m_deploy.getMotorOutputPercent() > 0 && posDeploy < ClimbConstants.DEPLOY_STOP)
+        if( m_deploy.getMotorOutputPercent() > 0 && posDeploy >= ClimbConstants.DEPLOY_STOP)
             m_deploy.set(ControlMode.PercentOutput, 0);
 
         // This method will be called once per scheduler run

@@ -177,7 +177,7 @@ public final class Constants {
         public static final double DEPLOY_I = 0;
         public static final double DEPLOY_D = 0;
         public static final double DEPLOY_SPEED = 1;
-        public static final double DEPLOY_STOP = -0.05;
+        public static final double DEPLOY_STOP = -0.014;
         //DEPLOY_START = 0.2;
         public static final int CANCoder = 6;
         public static final int CLIMB_MOTOR = 52;
