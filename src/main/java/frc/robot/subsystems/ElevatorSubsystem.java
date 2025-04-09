@@ -162,32 +162,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         return m_position;
     }
 
-    public void setCurrentNormal(){
-      CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-      elevatorMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(15)
-        .withSupplyCurrentLimitEnable(true);
-        //.withStatorCurrentLimit(180)
-        //.withStatorCurrentLimitEnable(true);
-    // elevatorMotor.enableVoltageCompensation(true);
-    m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
-    }
-
-    public void setCurrentClimb(int limit){
-      CurrentLimitsConfigs elevatorMotorCurrentLimitsConfigs = new CurrentLimitsConfigs();
-      elevatorMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(limit)
-        .withSupplyCurrentLimitEnable(true);
-        //.withStatorCurrentLimit(180)
-        //.withStatorCurrentLimitEnable(true);
-    // elevatorMotor.enableVoltageCompensation(true);
-    m_elevatorMotor.getConfigurator().apply(elevatorMotorCurrentLimitsConfigs);
-    }
-    
-    public boolean isAboveIntake()
+    public boolean isAboveBar()
     {
       boolean retval;
-      if( m_position < ElevatorConstants.ELEVATOR_BARGE )
+      if( m_position < ElevatorConstants.ELEVATOR_BAR )
         retval = true;
       else
         retval = false;

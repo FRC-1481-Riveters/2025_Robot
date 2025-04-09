@@ -118,6 +118,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ProcessorIntake", ProcessorIntakeCommand());
         NamedCommands.registerCommand("Intake", IntakeCommand());
         NamedCommands.registerCommand("Align", CoralAlign());
+        NamedCommands.registerCommand("MoveL4", MoveL4Command());
 
         configureBindings();
 
@@ -288,8 +289,8 @@ public class RobotContainer {
             .onTrue(Commands.runOnce( ()-> elevatorSubsystem.setElevatorJog( 0.15 ), elevatorSubsystem));
 
         //Algea Low
-        Trigger operatorDPadleft = operatorJoystick.povLeft();
-        operatorDPadleft
+        Trigger operatorDPadDown = operatorJoystick.povDown();
+        operatorDPadDown
         .onTrue(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE))
             .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW)))
         );
@@ -302,8 +303,8 @@ public class RobotContainer {
         );
 
         //Algea Store
-        Trigger operatorDPadRight = operatorJoystick.povRight();
-        operatorDPadRight
+        Trigger operatorDPadLeft = operatorJoystick.povLeft();
+        operatorDPadLeft
         .onTrue( 
             Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START))
             .andThen(Commands.waitSeconds(3)
@@ -312,8 +313,8 @@ public class RobotContainer {
         ));
         
         //Algea Out
-        Trigger operatorDPadDown = operatorJoystick.povDown();
-        operatorDPadDown
+        Trigger operatorDPadRight = operatorJoystick.povRight();
+        operatorDPadRight
         .onTrue( 
             Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_PROCESSOR))
             .andThen( Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_PROCESSOR))));
@@ -356,6 +357,7 @@ public class RobotContainer {
         operatorRightTrigger
         .whileTrue(
             Commands.runOnce( ()-> climbSubsystem.ClimbClimb(ClimbConstants.CLIMB_SPEED))
+            .andThen( ()->clawSubsystem.setClaw(ClawConstants.CLAW_CLIMB_CLEAR))
         )
         .onFalse(
             Commands.runOnce( ()-> climbSubsystem.ClimbClimb(0)) 
@@ -370,16 +372,18 @@ public class RobotContainer {
             Commands.runOnce( ()-> climbSubsystem.DeployClimb(0)) 
         );
 
+        //barge shot
         Trigger operatorLeftBumper = operatorJoystick.leftBumper();
         operatorLeftBumper
         .onTrue( 
                 Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE_TRAVEL))
                 .andThen(Commands.waitSeconds(3)
-                .until( clawSubsystem::atSetpoint))
+                .until(clawSubsystem::atSetpoint))
                 .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_BARGE))
-                .andThen(Commands.waitSeconds(3)
-                .until( elevatorSubsystem::isAtPosition))
-                .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE)))
+                .alongWith(Commands.waitSeconds(1)
+                .until(elevatorSubsystem::isAboveBar)
+                .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE)))
+                .andThen(Commands.runOnce(()-> intakeSubsystem.setIntakeRollerSpeed(Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT))))
             ));
     }
     public Command ScoreL4Command() 
@@ -395,10 +399,10 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(1.5)
         .until(elevatorSubsystem::isAtPosition))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT )))              
+        .andThen(Commands.waitSeconds(0.5))
         //.andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4 + 1.25)))
         .andThen(Commands.waitSeconds(2)
-        .until(intakeSubsystem::isIntakeBeamBreakLoaded))
-        .andThen(Commands.waitSeconds(.65))
+        .until(intakeSubsystem::isIntakeBeamBreakOut))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))            
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.waitSeconds(0.5))
@@ -411,6 +415,18 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(0.5))
         .andThen(Commands.runOnce( ()->StopControls(true))) */
         ;   
+    }
+
+    public Command MoveL4Command() 
+    {
+        return Commands.runOnce( ()->System.out.println("MoveL4Command") )
+        .andThen(Commands.waitSeconds(0.75))
+        .andThen( Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_AUTON_CLEAR))) 
+        .andThen(Commands.waitSeconds(3)
+        .until( clawSubsystem::atSetpoint))
+        .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_L4)))
+        .andThen(Commands.waitSeconds(3)
+        .until( elevatorSubsystem::isAtPosition));
     }
 
     public Command ScoreL2Command() 

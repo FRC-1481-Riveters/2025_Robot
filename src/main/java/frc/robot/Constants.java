@@ -118,6 +118,7 @@ public final class Constants {
 
         //public static final double CLAW_MIN = 0.1; -3.5
         public static final double CLAW_START = -3.3;
+        public static final double CLAW_CLIMB_CLEAR = -2.5;
         public static final double CLAW_LOW = 16.7;
         public static final double CLAW_REEF = 1.7;
         public static final double CLAW_HIGH = 2.7;
@@ -154,7 +155,7 @@ public final class Constants {
         public static final double ELEVATOR_L1 = 12;
         public static final double ELEVATOR_L2 = 9.5;
         public static final double ELEVATOR_L3 = 21;
-        public static final double ELEVATOR_L4 = 37.5;
+        public static final double ELEVATOR_L4 = 38.6;  // 40.6 max
         public static final double ELEVATOR_BARGE = 39.5;
         public static final double ELEVATOR_ALGAE_LOW = 13.5;
         public static final double ELEVATOR_ALGAE_HIGH = 24;
@@ -169,6 +170,7 @@ public final class Constants {
         public static final double ELEVATOR_MOTOR_BELOW_KD = 0.000;
         public static final double ELEVATOR_MOTOR_BELOW_KF = 0;
         public static final double ELEVATOR_MAX = 40.0;
+        public static final double ELEVATOR_BAR = 40.0;
     }
 
     public static final class ClimbConstants {

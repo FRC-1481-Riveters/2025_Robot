@@ -141,13 +141,6 @@ public class IntakeSubsystem extends SubsystemBase {
             return true;
     }
 
-    public void setCone( boolean bHasCone )
-    {
-        m_hasCoral = bHasCone;
-        Logger.recordOutput("HasCone", bHasCone );
-        System.out.println("setCone "  + bHasCone);
-    }
-
     public boolean IsIntakeRunning() 
     { 
     if(m_rollerRpm != 0){

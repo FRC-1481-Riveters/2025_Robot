@@ -5,9 +5,28 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Straight Us"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Straight Us"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align"
           }
         },
         {
