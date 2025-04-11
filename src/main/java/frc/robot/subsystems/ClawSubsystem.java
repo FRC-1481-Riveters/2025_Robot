@@ -48,6 +48,7 @@ public class ClawSubsystem extends SubsystemBase
     private boolean m_atSetpoint;
     private int m_atSetpointDebounceCounter;
     private boolean m_pid;
+    private double m_clamp = Constants.ClawConstants.CLAW_PID_CLAMP_NORMAL;
 
 
     public ClawSubsystem() 
@@ -67,7 +68,7 @@ public class ClawSubsystem extends SubsystemBase
             .withNeutralMode(NeutralModeValue.Brake)
             .withInverted(clawMotorInverted);
         clawMotorCurrentLimitsConfigs
-            .withSupplyCurrentLimit(3)
+            .withSupplyCurrentLimit(10)
             .withSupplyCurrentLimitEnable(true);
         // clawMotor.configVoltageCompSaturation(12.5);
         // clawMotor.enableVoltageCompensation(true);
@@ -123,6 +124,23 @@ public class ClawSubsystem extends SubsystemBase
         }
     }
 
+    public boolean PastFlick( )
+    {      
+        if (m_clawMotor.getPosition().getValueAsDouble() < Constants.ClawConstants.CLAW_FLICK )
+        { 
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+    }
+
+    public void setClawPidClamp(double clampValue)
+    {
+        m_clamp = clampValue;
+    }
+    
     @Override
     public void periodic() 
     {
@@ -137,7 +155,7 @@ public class ClawSubsystem extends SubsystemBase
         if( m_pid == true )
         {
           pidCalculate = clawPidController.calculate( m_position, m_Setpoint);
-          m_output = MathUtil.clamp( pidCalculate, -0.25, 0.25);
+          m_output = MathUtil.clamp( pidCalculate, -m_clamp, m_clamp);
         }
 
         /*if( (m_position > ClawConstants.CLAW_MAX) ||

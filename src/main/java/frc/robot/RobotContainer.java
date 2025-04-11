@@ -77,6 +77,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public static double INTAKE_ROLLER_SPEED_CURRENT;
+    public static Pose2d PreviousTagPose;
 
     private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout
       // Per TU12, Michigan and champs are both welded, NOT k2025ReefscapeAndyMark
@@ -118,7 +119,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("ProcessorIntake", ProcessorIntakeCommand());
         NamedCommands.registerCommand("Intake", IntakeCommand());
         NamedCommands.registerCommand("Align", CoralAlign());
+        NamedCommands.registerCommand("Algae", AlgaeAlign());//true));
+        //NamedCommands.registerCommand("Algae", AlgaeAlign(false));
         NamedCommands.registerCommand("MoveL4", MoveL4Command());
+        NamedCommands.registerCommand("BargeShot", BargeShot());
 
         configureBindings();
 
@@ -156,7 +160,8 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
         ));*/
 
-        driverJoystick.povRight().whileTrue(CoralAlign());
+        //driverJoystick.povRight().whileTrue(AlgaeAlign());
+        //driverJoystick.povRight().whileTrue(CoralAlign());
 
         //creep forward and back, robot oriented
         driverJoystick.povUp().whileTrue(drivetrain.applyRequest(() ->
@@ -375,16 +380,29 @@ public class RobotContainer {
         //barge shot
         Trigger operatorLeftBumper = operatorJoystick.leftBumper();
         operatorLeftBumper
-        .onTrue( 
-                Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE_TRAVEL))
-                .andThen(Commands.waitSeconds(3)
-                .until(clawSubsystem::atSetpoint))
-                .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_BARGE))
-                .alongWith(Commands.waitSeconds(1)
-                .until(elevatorSubsystem::isAboveBar)
-                .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE)))
-                .andThen(Commands.runOnce(()-> intakeSubsystem.setIntakeRollerSpeed(Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT))))
-            ));
+        .onTrue( BargeShot() )
+        .onFalse(
+            Commands.runOnce(()-> intakeSubsystem.setIntakeRollerSpeed(0))
+        );
+    }
+
+    public Command BargeShot()
+    {
+        return Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE_TRAVEL-1.5))//Constants.ClawConstants.CLAW_ALGAE_STORE + 4))
+            .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_BARGE))
+            .alongWith(Commands.waitSeconds(.7))
+            .andThen(Commands.runOnce(()-> intakeSubsystem.setIntakeRollerSpeed(0))))
+            .andThen(Commands.waitSeconds(5)
+            .until(elevatorSubsystem::PastBarge))
+            .andThen(Commands.runOnce(()-> clawSubsystem.setClawPidClamp(Constants.ClawConstants.CLAW_PID_CLAMP_HIGH)))
+            .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_BARGE)))
+            .andThen(Commands.waitSeconds(5)
+            .until(clawSubsystem::PastFlick))
+            .andThen(Commands.runOnce(()-> intakeSubsystem.setIntakeRollerSpeed(Constants.IntakeConstants.INTAKE_ROLLER_SPEED_BARGE)))
+            .andThen(Commands.waitSeconds(1.0))
+            .andThen(Commands.runOnce(()-> clawSubsystem.setClawPidClamp(Constants.ClawConstants.CLAW_PID_CLAMP_NORMAL)))
+            .andThen(Commands.runOnce(()-> intakeSubsystem.setIntakeRollerSpeed(0))
+        );
     }
     public Command ScoreL4Command() 
     {
@@ -462,15 +480,15 @@ public class RobotContainer {
         .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))))              
-        .andThen(Commands.waitSeconds(2.5))
+        .andThen(Commands.waitSeconds(1.5))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP)))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
         .andThen(Commands.waitSeconds(2)
         .until( clawSubsystem::atSetpoint))
         .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
-        .andThen(Commands.runOnce( ()->StopControls(true) )
-        );      
+       // .andThen(Commands.runOnce( ()->StopControls(true) )
+        ;      
     }
     public Command HighAlgaeCommand(){
 
@@ -589,6 +607,7 @@ public class RobotContainer {
     RawFiducial fiducial;
 
     Pose2d closestTagPose = closestAprilTag(drivetrain.getState().Pose);
+    PreviousTagPose = closestTagPose;
 
     // This function will align to the left reef post if the robot is to the left of the tag,
     // or to the right reef post if the robot is to the right of the tag.
@@ -644,7 +663,74 @@ public class RobotContainer {
   public DeferredCommand CoralAlign () {
     return (new DeferredCommand(() -> AlignCommand(), Set.of(drivetrain)));
 
-}
+    }
+
+    public Command AlgaeAlignCommand()//boolean useLimeLight)
+  {
+    RawFiducial fiducial;
+    Pose2d closestTagPose;
+
+    //if(useLimeLight)
+    //{
+    closestTagPose = closestAprilTag(drivetrain.getState().Pose);
+    PreviousTagPose = closestTagPose;
+   // }
+    //else
+    //closestTagPose = PreviousTagPose;
+
+    // Make a Transform2d to calculate the offset of the robot position 
+    // when it's up against the edge of the reef, lined up with the
+    // correct coral post.
+    // The offset includes reefSpacing (distance between coral posts)
+    // and the bumper-to-bumper width of the robot itself
+    Transform2d robotOffset = new Transform2d( 
+        reefAlignmentConstants.robotWidth / 2, 
+        0,
+        Rotation2d.kZero );
+
+    // Make a Transform2d to calculate the offset of the robot position 
+    // when it's up against the edge of the reef, lined up with the
+    // correct coral post.
+    // The offset includes reefSpacing (distance between coral posts)
+    // and the bumper-to-bumper width of the robot itself, AND
+    // a short distance where PositionPIDCommand is used instead of
+    // PathPlanner, because PathPlanner is only accurate to +/- 2".
+    Transform2d robotOffsetShort = new Transform2d( 
+        reefAlignmentConstants.robotWidth / 2 + reefAlignmentConstants.shortDistance, 
+        0,
+        Rotation2d.kZero );
+
+    // This function will align to the left reef post if the robot is to the left of the tag,
+    // or to the right reef post if the robot is to the right of the tag.
+    try
+    {
+        fiducial = m_Vision.getFiducialWithId(m_Vision.getClosestFiducial().id);
+        // If your target is on the rightmost edge of 
+        // your limelight feed, tx should return roughly 31 degrees.
+        // If the robot is aimed vaguely towards the reef, and the target is on the right, txnc will be positive
+
+        Pose2d tagReefEdgePose = closestTagPose.plus(robotOffset);
+        Pose2d tagReefShortPose = closestTagPose.plus(robotOffsetShort);
+
+        // AprilTag poses are from the face of the tag (out from the reef)
+        // Convert the poses to robot poses FACING the reef
+        Pose2d robotReefEdgePose = new Pose2d( tagReefEdgePose.getX(), tagReefEdgePose.getY(), tagReefEdgePose.getRotation().plus(Rotation2d.kPi));
+        Pose2d robotReefShortPose = new Pose2d( tagReefShortPose.getX(), tagReefShortPose.getY(), tagReefShortPose.getRotation().plus(Rotation2d.kPi));
+
+        return driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose);
+    }
+    catch (VisionSubsystem.NoSuchTargetException nste)
+    {
+      // if no AprilTag is visible, just don't do anything
+      System.out.println("Align: no tag is visible");
+      return Commands.waitSeconds(3);
+    }
+  }
+
+  public DeferredCommand AlgaeAlign (){//boolean useLimeLight) {
+    return (new DeferredCommand(() -> AlgaeAlignCommand(), Set.of(drivetrain)));
+
+    }
 
     public void StopControls( boolean stopped)
     {

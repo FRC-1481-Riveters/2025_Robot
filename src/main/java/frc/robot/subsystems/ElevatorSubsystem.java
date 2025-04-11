@@ -154,6 +154,11 @@ public class ElevatorSubsystem extends SubsystemBase{
       elevatorPidController.setI( ElevatorConstants.ELEVATOR_MOTOR_BELOW_KI );
       elevatorPidController.setD( ElevatorConstants.ELEVATOR_MOTOR_BELOW_KD );
       }
+      else if (m_setpoint == ElevatorConstants.ELEVATOR_BARGE){
+      elevatorPidController.setP( ElevatorConstants.ELEVATOR_MOTOR_BARGE_KP);
+      elevatorPidController.setI( ElevatorConstants.ELEVATOR_MOTOR_BARGE_KI );
+      elevatorPidController.setD( ElevatorConstants.ELEVATOR_MOTOR_BARGE_KD ); 
+      }
         elevatorPidController.setSetpoint(position);
         Logger.recordOutput("Elevator/Setpoint", m_setpoint);
     }
@@ -170,6 +175,18 @@ public class ElevatorSubsystem extends SubsystemBase{
       else
         retval = false;
       return retval;
+    }
+
+    public boolean PastBarge( )
+    {      
+        if (m_position > ElevatorConstants.ELEVATOR_BARGE_SHOT )
+        { 
+          return true;
+        }
+        else
+        {
+          return false;
+        }
     }
 
     public boolean isAtPosition() 

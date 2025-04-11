@@ -66,7 +66,7 @@ public class IntakeSubsystem extends SubsystemBase {
         .withNeutralMode(NeutralModeValue.Brake)
         .withInverted(intakeMotorInverted);
     intakeMotorCurrentLimitsConfigs
-        .withSupplyCurrentLimit(10)
+        .withSupplyCurrentLimit(20)
         .withSupplyCurrentLimitEnable(true);
     // intakeMotor.configVoltageCompSaturation(12.5);
     // intakeMotor.enableVoltageCompensation(true);
@@ -101,11 +101,6 @@ public class IntakeSubsystem extends SubsystemBase {
        // intakePidController..setReference(rpm, ControlType.kVelocity);
         m_intakeMotor.set(rpm);
         m_rollerRpmSetpoint = rpm;
-        if( rpm > 10 )
-            intakePidControllerEnabled = true;
-        else
-            intakePidControllerEnabled = true;
-
         Logger.recordOutput("Intake/RollerSetRPM", rpm );
         System.out.println( "setIntakeRollerSpeed " + rpm );
     }
