@@ -423,15 +423,6 @@ public class RobotContainer {
         .until(intakeSubsystem::isIntakeBeamBreakOut))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))            
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
-        .andThen(Commands.waitSeconds(0.5))
-        /* .andThen(Commands.waitSeconds(3)
-        .until( clawSubsystem::atSetpoint))
-        .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
-        .andThen(Commands.waitSeconds(3)
-        .until(elevatorSubsystem::isAtPosition))
-        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
-        .andThen(Commands.waitSeconds(0.5))
-        .andThen(Commands.runOnce( ()->StopControls(true))) */
         ;   
     }
 
@@ -476,7 +467,6 @@ public class RobotContainer {
     public Command LowAlgaeCommand(){
 
         return Commands.runOnce( ()->System.out.println("LowAlgae") )
-        .andThen(Commands.waitSeconds(.5))
         .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))))              
@@ -493,11 +483,10 @@ public class RobotContainer {
     public Command HighAlgaeCommand(){
 
         return Commands.runOnce( ()->System.out.println("HighAlgae") )
-        .andThen(Commands.waitSeconds(.5))
         .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_HIGH))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_CORAL_OUT ))))              
-        .andThen(Commands.waitSeconds(2))
+        .andThen(Commands.waitSeconds(1.5))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed(0 )))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
         .andThen(Commands.waitSeconds(2
@@ -542,7 +531,6 @@ public class RobotContainer {
         .andThen(Commands.waitSeconds(3)
         .until(elevatorSubsystem::isAtPosition))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
-        .andThen(Commands.waitSeconds(1))
         .andThen(Commands.runOnce( ()->StopControls(true))
         );
     }
