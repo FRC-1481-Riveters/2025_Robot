@@ -68,26 +68,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "LowAlgae"
+                  "name": "Algae"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Algae"
-                      }
-                    }
-                  ]
+                  "name": "LowAlgae"
                 }
               }
             ]
@@ -115,56 +102,6 @@
           "type": "path",
           "data": {
             "pathName": "Barge Right"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "HighAlgae"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Algae"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Right Barge"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "BargeShot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
           }
         }
       ]

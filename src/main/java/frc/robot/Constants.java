@@ -98,7 +98,7 @@ public final class Constants {
 
         public static final double INTAKE_ROLLER_SPEED_TOLERANCE = 50;
         public static double INTAKE_ROLLER_SPEED_CURRENT;
-        public static final double INTAKE_ROLLER_SPEED_CORAL_IN = -0.3;
+        public static final double INTAKE_ROLLER_SPEED_CORAL_IN = -0.5;
         public static final double INTAKE_ROLLER_SPEED_CORAL_OUT = -0.9;
         public static final double INTAKE_ROLLER_SPEED_ALGAE_IN = 0.7;
         public static final double INTAKE_ROLLER_SPEED_ALGAE_OUT = -10;  
@@ -196,7 +196,7 @@ public final class Constants {
         public static final double CLIMB_I = 0;
         public static final double CLIMB_D = 0;
         public static final double CLIMB_SPEED = -0.5;
-        public static final double CLIMB_STOP = -163;
+        public static final double CLIMB_STOP = -155;
         public static final int TALON_TIMEOUT_MS = 5000;
     }
 

@@ -160,7 +160,7 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))
         ));*/
 
-        //driverJoystick.povRight().whileTrue(AlgaeAlign());
+        driverJoystick.povRight().whileTrue(AlgaeAlign());
         //driverJoystick.povRight().whileTrue(CoralAlign());
 
         //creep forward and back, robot oriented
