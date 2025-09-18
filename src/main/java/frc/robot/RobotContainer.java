@@ -352,7 +352,18 @@ public class RobotContainer {
         operatorLeftTrigger
         .whileTrue(
             Commands.runOnce( ()-> climbSubsystem.DeployClimb(ClimbConstants.DEPLOY_SPEED))
+            .andThen(Commands.waitSeconds(10)
+            .until(climbSubsystem::DeployDown))
+            .andThen(
+                Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 1) )
+            )
+            .andThen(Commands.waitSeconds(0.5))
+            .andThen(Commands.runOnce( ()->driverJoystick.getHID().setRumble(RumbleType.kBothRumble, 0) ),
+                Commands.runOnce( ()->operatorJoystick.getHID().setRumble(RumbleType.kBothRumble, 0))
+            )
         )
+
         .onFalse(
             Commands.runOnce( ()-> climbSubsystem.DeployClimb(0)) 
         );
@@ -470,7 +481,7 @@ public class RobotContainer {
         .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))))              
-        .andThen(Commands.waitSeconds(1.5))
+        .andThen(Commands.waitSeconds(1))//1.5
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP)))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
@@ -530,8 +541,8 @@ public class RobotContainer {
         .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_START ), elevatorSubsystem))
         .andThen(Commands.waitSeconds(3)
         .until(elevatorSubsystem::isAtPosition))
-        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem))
-        .andThen(Commands.runOnce( ()->StopControls(true))
+        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_START), clawSubsystem)
+        //.andThen(Commands.runOnce( ()->StopControls(true))
         );
     }
    
@@ -672,7 +683,7 @@ public class RobotContainer {
     // The offset includes reefSpacing (distance between coral posts)
     // and the bumper-to-bumper width of the robot itself
     Transform2d robotOffset = new Transform2d( 
-        reefAlignmentConstants.robotWidth / 2, 
+        reefAlignmentConstants.robotWidth / 2 - 0.1, 
         0,
         Rotation2d.kZero );
 

@@ -43,62 +43,6 @@
           }
         },
         {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stow"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Algae Us"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Algae"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "LowAlgae"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Center Barge"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "BargeShot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Creep"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Stow"

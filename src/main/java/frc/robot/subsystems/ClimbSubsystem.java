@@ -125,6 +125,12 @@ public class ClimbSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean DeployDown(){
+        double climbPos;
+        climbPos = m_deploy_cancoder.getPosition().getValueAsDouble();
+        return (Math.abs((climbPos + ClimbConstants.DEPLOY_STOP )) <= 0.05);
+    }
+
     public void ClimbClimb(double speed)
     {
         System.out.println("ClimbClimb " + m_climbPosition);

@@ -196,7 +196,7 @@ public final class Constants {
         public static final double CLIMB_I = 0;
         public static final double CLIMB_D = 0;
         public static final double CLIMB_SPEED = -0.5;
-        public static final double CLIMB_STOP = -155;
+        public static final double CLIMB_STOP = -150;
         public static final int TALON_TIMEOUT_MS = 5000;
     }
 

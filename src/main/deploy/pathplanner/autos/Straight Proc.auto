@@ -83,25 +83,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center Barge"
+            "pathName": "Center Proc"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "BargeShot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Creep"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
+            "name": "ProcessorOut"
           }
         }
       ]
