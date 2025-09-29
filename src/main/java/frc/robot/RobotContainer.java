@@ -119,8 +119,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ProcessorIntake", ProcessorIntakeCommand());
         NamedCommands.registerCommand("Intake", IntakeCommand());
         NamedCommands.registerCommand("Align", CoralAlign());
-        NamedCommands.registerCommand("Algae", AlgaeAlign());//true));
-        //NamedCommands.registerCommand("Algae", AlgaeAlign(false));
+        NamedCommands.registerCommand("Algae", AlgaeAlign());
         NamedCommands.registerCommand("MoveL4", MoveL4Command());
         NamedCommands.registerCommand("BargeShot", BargeShot());
 
@@ -161,7 +160,7 @@ public class RobotContainer {
         ));*/
 
         driverJoystick.povRight().whileTrue(AlgaeAlign());
-        //driverJoystick.povRight().whileTrue(CoralAlign());
+        driverJoystick.povLeft().whileTrue(CoralAlign());
 
         //creep forward and back, robot oriented
         driverJoystick.povUp().whileTrue(drivetrain.applyRequest(() ->
@@ -550,9 +549,9 @@ public class RobotContainer {
     {
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        2, // velocity limit
-        1, // acceleration limit
-        Units.degreesToRadians(360), Units.degreesToRadians(360)  // turn velocity + acceleration limits
+        0.5, // velocity limit
+        .5, // acceleration limit
+        Units.degreesToRadians(90), Units.degreesToRadians(90)  // turn velocity + acceleration limits
         );
 
      List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses( poseStart, poseShort );
@@ -716,7 +715,9 @@ public class RobotContainer {
         Pose2d robotReefEdgePose = new Pose2d( tagReefEdgePose.getX(), tagReefEdgePose.getY(), tagReefEdgePose.getRotation().plus(Rotation2d.kPi));
         Pose2d robotReefShortPose = new Pose2d( tagReefShortPose.getX(), tagReefShortPose.getY(), tagReefShortPose.getRotation().plus(Rotation2d.kPi));
 
-        return driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose);
+        return Commands.runOnce( ()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE) )
+            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW) ) )
+            .andThen( driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose) );
     }
     catch (VisionSubsystem.NoSuchTargetException nste)
     {

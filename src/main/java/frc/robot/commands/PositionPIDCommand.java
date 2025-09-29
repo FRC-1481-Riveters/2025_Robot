@@ -128,6 +128,9 @@ public class PositionPIDCommand extends Command{
 //        }
 
         cs = mDriveController.calculateRobotRelativeSpeeds( mSwerve.getState().Pose, goalState );
+        cs.vxMetersPerSecond = Math.min( cs.vxMetersPerSecond,0.75 );
+        cs.vyMetersPerSecond = Math.min( cs.vyMetersPerSecond,0.75 );
+
 //        cs.vxMetersPerSecond /= 2;
 //        cs.vyMetersPerSecond *= 1.3;
 

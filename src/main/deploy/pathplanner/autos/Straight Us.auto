@@ -62,19 +62,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "Algae"
+                  "name": "LowAlgae"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "LowAlgae"
+                  "name": "Algae"
                 }
               }
             ]
