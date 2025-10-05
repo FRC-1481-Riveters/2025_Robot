@@ -60,7 +60,7 @@ public class VisionSubsystem extends SubsystemBase {
       if(Math.abs(omegaRps) > 2.0) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
         return;
 
-      boolean useMegaTag2 = false; //set to false to use MegaTag1
+      boolean useMegaTag2 = true; //set to false to use MegaTag1
       boolean doRejectUpdate = false; 
       if(useMegaTag2 == false)
       {

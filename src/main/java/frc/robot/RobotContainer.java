@@ -39,6 +39,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.commands.PositionPIDCommand;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Time;
@@ -48,6 +50,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 import frc.robot.Constants.*;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LimelightHelpers;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.LimelightHelpers.RawFiducial;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -126,7 +129,7 @@ public class RobotContainer {
         configureBindings();
 
         for (int port = 5800; port <= 5809; port++) {
-            PortForwarder.add(port, "limelight", port);
+            PortForwarder.add(port, "limelight-riveter", port);
         }
 
          autoChooser = AutoBuilder.buildAutoChooser("Tests");
@@ -178,7 +181,7 @@ public class RobotContainer {
         driverJoystick.start().and(driverJoystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));*/
 
         // reset the field-centric heading on left bumper press
-        driverJoystick.a().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driverJoystick.a().onTrue( drivetrain.runOnce( () -> drivetrain.seedFieldCentric() ) );
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -186,7 +189,7 @@ public class RobotContainer {
         driverButtonB
         .onTrue( Commands.runOnce(SignalLogger::start));
 
-        Trigger driverButtonX = driverJoystick.povLeft();
+        Trigger driverButtonX = driverJoystick.povLeft(); )
         driverButtonX
         .onTrue( Commands.runOnce(SignalLogger::stop));*/
 
@@ -480,7 +483,7 @@ public class RobotContainer {
         .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
         .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))))              
-        .andThen(Commands.waitSeconds(1))//1.5
+        .andThen(Commands.waitSeconds(2.0))//1.5
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP)))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
@@ -547,6 +550,7 @@ public class RobotContainer {
    
     public Command driveToPose(Pose2d poseStart, Pose2d poseShort, Pose2d poseFinal) 
     {
+/*  use PositionPIDCommand instead of PathPlanner for the time being
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
         0.5, // velocity limit
@@ -567,7 +571,8 @@ public class RobotContainer {
     path.preventFlipping = true;
     return( AutoBuilder.followPath( path )
         .andThen( PositionPIDCommand.generateCommand( drivetrain, poseFinal, 15) ));
-    }*/
+    }
+*/
 
     return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 2));
     }
@@ -599,10 +604,16 @@ public class RobotContainer {
     return closestTagPose;
   }
 
-  public Command AlignCommand()
+  public Command CoralAlignCommand()
   {
     double coralOffsetDirection = -1.0;  // handles going for left side coral (+y) or right side coral (-y)
     RawFiducial fiducial;
+
+    Pose2d botPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter").pose;
+    if( botPose.getX() != 0 )
+    {
+        drivetrain.resetPose( botPose );
+    }
 
     Pose2d closestTagPose = closestAprilTag(drivetrain.getState().Pose);
     PreviousTagPose = closestTagPose;
@@ -648,25 +659,31 @@ public class RobotContainer {
         Pose2d robotReefEdgePose = new Pose2d( tagReefEdgePose.getX(), tagReefEdgePose.getY(), tagReefEdgePose.getRotation().plus(Rotation2d.kPi));
         Pose2d robotReefShortPose = new Pose2d( tagReefShortPose.getX(), tagReefShortPose.getY(), tagReefShortPose.getRotation().plus(Rotation2d.kPi));
 
-        return driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose);
+        return driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose );
     }
     catch (VisionSubsystem.NoSuchTargetException nste)
     {
-      // if no AprilTag is visible, just don't do anything
-      System.out.println("Align: no tag is visible");
-      return Commands.waitSeconds(3);
+        // if no AprilTag is visible, just don't do anything
+        System.out.println("Align: no tag is visible");
+        return Commands.waitSeconds(3);
     }
-  }
-
-  public DeferredCommand CoralAlign () {
-    return (new DeferredCommand(() -> AlignCommand(), Set.of(drivetrain)));
-
+}
+                
+    public DeferredCommand CoralAlign () {
+        return (new DeferredCommand(() -> CoralAlignCommand(), Set.of(drivetrain)));
     }
 
-    public Command AlgaeAlignCommand()//boolean useLimeLight)
+  public Command AlgaeAlignCommand()//boolean useLimeLight)
   {
     RawFiducial fiducial;
     Pose2d closestTagPose;
+
+    Pose2d botPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter").pose;
+    if( botPose.getX() != 0 )
+    {
+        drivetrain.resetPose( botPose );
+    }
+
 
     //if(useLimeLight)
     //{
@@ -715,9 +732,11 @@ public class RobotContainer {
         Pose2d robotReefEdgePose = new Pose2d( tagReefEdgePose.getX(), tagReefEdgePose.getY(), tagReefEdgePose.getRotation().plus(Rotation2d.kPi));
         Pose2d robotReefShortPose = new Pose2d( tagReefShortPose.getX(), tagReefShortPose.getY(), tagReefShortPose.getRotation().plus(Rotation2d.kPi));
 
+//        return driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose);
         return Commands.runOnce( ()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE) )
-            .andThen( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW) ) )
-            .andThen( driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose) );
+            .alongWith( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW) ) )
+            .alongWith( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )) )
+            .alongWith( driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose) );
     }
     catch (VisionSubsystem.NoSuchTargetException nste)
     {

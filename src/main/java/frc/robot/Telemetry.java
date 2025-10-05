@@ -35,6 +35,7 @@ public class Telemetry {
     public Telemetry(double maxSpeed, CommandSwerveDrivetrain drivetrain) {
         m_drivetrain = drivetrain;
         MaxSpeed = maxSpeed;
+        SignalLogger.setPath("/media/sda1/logs/");
         SignalLogger.start();
     }
 
