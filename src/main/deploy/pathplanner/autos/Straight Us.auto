@@ -93,15 +93,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Creep"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Creep"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stow"
+                }
+              }
+            ]
           }
         }
       ]

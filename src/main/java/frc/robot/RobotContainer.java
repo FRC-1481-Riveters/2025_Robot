@@ -572,7 +572,7 @@ public class RobotContainer {
     }
 */
 
-    return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 3));
+    return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 2.5));
     }
 
   public Pose2d closestAprilTag(Pose2d robotPose) {
