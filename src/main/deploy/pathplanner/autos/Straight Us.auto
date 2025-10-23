@@ -62,6 +62,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Algae"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -72,18 +78,12 @@
                 }
               },
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Algae"
+                  "pathName": "Center Barge"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Center Barge"
           }
         },
         {

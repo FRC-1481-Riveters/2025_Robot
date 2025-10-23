@@ -113,6 +113,7 @@ public class RobotContainer {
     /* Path follower */
     public RobotContainer() { 
         
+        // hey next year make these "cmdXxxx" so it's obvious in PathPlanner that they are commands not paths
         NamedCommands.registerCommand("ScoreL4", ScoreL4Command());
         NamedCommands.registerCommand("ScoreL2", ScoreL2Command());
         NamedCommands.registerCommand("Stow", StowCommand());
@@ -129,7 +130,8 @@ public class RobotContainer {
         configureBindings();
 
         for (int port = 5800; port <= 5809; port++) {
-            PortForwarder.add(port, "limelight-riveter", port);
+//            PortForwarder.add(port, "limelight-riveter.local", port);
+            PortForwarder.add(port, "10.14.81.11", port);
         }
 
          autoChooser = AutoBuilder.buildAutoChooser("Tests");
@@ -480,12 +482,8 @@ public class RobotContainer {
     public Command LowAlgaeCommand(){
 
         return Commands.runOnce( ()->System.out.println("LowAlgae") )
-        .andThen(Commands.runOnce(()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE)))
-        .andThen(Commands.runOnce(()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW))
-        .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN ))))              
-        .andThen(Commands.waitSeconds(2.0))//1.5
+        .andThen(Commands.waitSeconds(1.0))
         .andThen( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_KEEP)))
-        .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ELEVATOR_CLEAR), clawSubsystem))
         .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem))
         .andThen(Commands.waitSeconds(2)
         .until( clawSubsystem::atSetpoint))
@@ -574,7 +572,7 @@ public class RobotContainer {
     }
 */
 
-    return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 2));
+    return (PositionPIDCommand.generateCommand(drivetrain, poseFinal, 3));
     }
 
   public Pose2d closestAprilTag(Pose2d robotPose) {
@@ -736,7 +734,9 @@ public class RobotContainer {
         return Commands.runOnce( ()-> clawSubsystem.setClaw(Constants.ClawConstants.CLAW_ALGAE) )
             .alongWith( Commands.runOnce( ()-> elevatorSubsystem.setElevatorPosition(Constants.ElevatorConstants.ELEVATOR_ALGAE_LOW) ) )
             .alongWith( Commands.runOnce( ()-> intakeSubsystem.setIntakeRollerSpeed( Constants.IntakeConstants.INTAKE_ROLLER_SPEED_ALGAE_IN )) )
-            .alongWith( driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose) );
+            .alongWith( driveToPose( drivetrain.getState().Pose, robotReefShortPose, robotReefEdgePose) )
+            .andThen(Commands.runOnce( ()-> clawSubsystem.setClaw(ClawConstants.CLAW_ALGAE_STORE), clawSubsystem)
+            );
     }
     catch (VisionSubsystem.NoSuchTargetException nste)
     {

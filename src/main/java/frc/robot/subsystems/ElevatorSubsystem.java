@@ -115,7 +115,7 @@ public class ElevatorSubsystem extends SubsystemBase{
       if( m_pid == true )
       {
         pidCalculate = elevatorPidController.calculate( m_position, m_setpoint);
-        output = MathUtil.clamp( pidCalculate, -0.75, 0.75);
+        output = MathUtil.clamp( pidCalculate, -0.8, 0.8);
         m_elevatorMotor.set( output );
         Logger.recordOutput("Elevator/Output", output);
         Logger.recordOutput("Elevator/Current", m_elevatorMotor.getStatorCurrent().getValueAsDouble());

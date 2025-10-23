@@ -170,7 +170,7 @@ public final class Constants {
         public static final double ELEVATOR_MOTOR_ABOVE_KI = 0.005;
         public static final double ELEVATOR_MOTOR_ABOVE_KD = 0.000;
         public static final double ELEVATOR_MOTOR_ABOVE_KF = 0;
-        public static final double ELEVATOR_MOTOR_BELOW_KP = 0.15;
+        public static final double ELEVATOR_MOTOR_BELOW_KP = 0.16;
         public static final double ELEVATOR_MOTOR_BELOW_KI = 0.04;
         public static final double ELEVATOR_MOTOR_BELOW_KD = 0.000;
         public static final double ELEVATOR_MOTOR_BELOW_KF = 0;
