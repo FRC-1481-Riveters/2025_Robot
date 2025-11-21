@@ -49,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
+      fiducials = LimelightHelpers.getRawFiducials("limelight-riveter");
 
       var driveState = m_commandSwerveDrivetrain.getState();
       double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
@@ -60,45 +60,28 @@ public class VisionSubsystem extends SubsystemBase {
       if(Math.abs(omegaRps) > 2.0) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
         return;
 
-      boolean useMegaTag2 = true; //set to false to use MegaTag1
-      boolean doRejectUpdate = false; 
-      if(useMegaTag2 == false)
+      boolean bValid;
+      bValid = true;
+/*
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter");
+      if( mt2 != null )
       {
-        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-riveter");
-        if( mt1 != null )
+        if(mt2.tagCount == 0)
         {
-          if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
-          {
-            if(mt1.rawFiducials[0].ambiguity > .7)
-            {
-              doRejectUpdate = true;
-            }
-            if(mt1.rawFiducials[0].distToCamera > 3)
-            {
-              doRejectUpdate = true;
-            }
-          }
-          if(mt1.tagCount == 0)
-          {
-            doRejectUpdate = true;
-          }
-          if (!isInsideField(m_commandSwerveDrivetrain)){
-            doRejectUpdate = true;
-          }
+          bValid = false;
         }
-        m_commandSwerveDrivetrain.updateOdometry(mt1.pose, doRejectUpdate, mt1.timestampSeconds,false);
+        m_commandSwerveDrivetrain.updateOdometry(mt2.pose, bValid, mt2.timestampSeconds,mt2.tagCount, mt2.avgTagArea);
       }
-      else if (useMegaTag2 == true)
+*/
+      bValid = true;
+      LimelightHelpers.PoseEstimate mtCam2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-two");
+      if( mtCam2 != null )
       {
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter");
-        if( mt2 != null )
+        if(mtCam2.tagCount == 0)
         {
-          if(mt2.tagCount == 0)
-          {
-            doRejectUpdate = true;
-          }
-          m_commandSwerveDrivetrain.updateOdometry(mt2.pose, doRejectUpdate, mt2.timestampSeconds,true);
+          bValid = false;
         }
+        m_commandSwerveDrivetrain.updateOdometry(mtCam2.pose, bValid, mtCam2.timestampSeconds, mtCam2.tagCount, mtCam2.avgTagArea);
       }
   }
 

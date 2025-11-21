@@ -105,7 +105,7 @@ public class PositionPIDCommand extends Command{
         else
         {
             mSwerve.resetPose( robotPose );
-            mSwerve.fusionDisable(); // DON'T TAKE THIS OUT because auton goes nuts
+            //mSwerve.fusionDisable(); // DON'T TAKE THIS OUT because auton goes nuts
             endTriggerLogger.accept(endTrigger.getAsBoolean());
         }
     }
