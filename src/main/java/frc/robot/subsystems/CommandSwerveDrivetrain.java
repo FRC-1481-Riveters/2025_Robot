@@ -360,26 +360,29 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     {
         double xyStds, radStds;
 
-        xyStds = 0.001;     // default: image is not particularly trustworthy
-        radStds = 0.0002;
+        // WPILib SwerveDrivePoseEstimator:
+        // - The default standard deviations of the model states are 
+        //   0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading. 
+        xyStds = 0.1;     // default: Limelight pose is not particularly trustworthy
+        radStds = 0.1;
 
         if( valid && fusionEnabled )
         {
             // multiple targets detected - high confidence
             if (tagCount > 1) 
             {
-                xyStds = Math.hypot(0.014, 0.016);
-                radStds = Units.degreesToRadians(2);
+                xyStds = 0.02;
+                radStds = 0.02;
             }
             // 1 target with large area (0.01 is about 14% of image width)
             else if (tagArea > 0.01) {
-                xyStds = Math.hypot(0.015, 0.033);
-                radStds = Units.degreesToRadians(7);
+                xyStds = 0.01;
+                radStds = 0.01;
             }
             // 1 target with small area (0.002 is about 4.4% of image width)
             else if (tagArea > 0.002) {
-                xyStds = Math.hypot(0.005, 0.007);
-                radStds = Units.degreesToRadians(1);
+                xyStds = 0.05;
+                radStds = 0.05;
             }
 
             if( pose.getX() != 0 && pose.getY() != 0 )
