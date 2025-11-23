@@ -378,11 +378,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         if( valid && fusionEnabled )
         {
-            // multiple targets detected - high confidence
+            // multiple targets detected - trust is medium
             if (tagCount > 1) 
             {
-                xyStds  = 0.020;
-                radStds = 0.006;
+                xyStds  = 0.030;
+                radStds = 0.010;
             }
             // target over 4m away - trust is low
             else if (tagDistance > 4) {
@@ -391,13 +391,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
             // target over 2m away - trust is medium
             else if (tagDistance > 2) {
-                xyStds  = 0.020;
-                radStds = 0.006;
+                xyStds  = 0.030;
+                radStds = 0.010;
             }
             // target close - trust is high
             else if (tagDistance < 2) {
-                xyStds  = 0.0050;
-                radStds = 0.0016;
+                xyStds  = 0.010;
+                radStds = 0.003;
             }
 
             if( pose.getX() != 0 && pose.getY() != 0 )
