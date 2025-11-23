@@ -356,30 +356,36 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         setControl( m_pathApplyRobotSpeeds.withSpeeds(cs));
     }
 
-    public void updateOdometry(Pose2d pose, boolean valid, double ts, int tagCount, double tagArea)
+    public void updateOdometry(Pose2d pose, boolean valid, double timestamp, int tagCount, double tagArea)
     {
         double xyStds, radStds;
 
-        xyStds = 0.001;
+        xyStds = 0.001;     // default: image is not particularly trustworthy
         radStds = 0.0002;
 
         if( valid && fusionEnabled )
         {
-            // multiple targets detected
+            // multiple targets detected - high confidence
             if (tagCount > 1) 
             {
                 xyStds = Math.hypot(0.014, 0.016);
                 radStds = Units.degreesToRadians(2);
             }
-            // 1 target with large area and close to estimated roxose(??)
-            else if (tagArea > 0.14) {
+            // 1 target with large area (0.01 is about 14% of image width)
+            else if (tagArea > 0.01) {
                 xyStds = Math.hypot(0.015, 0.033);
                 radStds = Units.degreesToRadians(7);
             }
+            // 1 target with small area (0.002 is about 4.4% of image width)
+            else if (tagArea > 0.002) {
+                xyStds = Math.hypot(0.005, 0.007);
+                radStds = Units.degreesToRadians(1);
+            }
+
             if( pose.getX() != 0 && pose.getY() != 0 )
             {
                 this.setVisionMeasurementStdDevs(VecBuilder.fill(xyStds, xyStds, radStds));
-                this.addVisionMeasurement(pose, ts);
+                this.addVisionMeasurement(pose, timestamp);
             }
         }
 

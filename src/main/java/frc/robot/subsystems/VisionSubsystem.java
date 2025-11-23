@@ -66,6 +66,14 @@ public class VisionSubsystem extends SubsystemBase {
       boolean bValid;
       bValid = true;
 
+      /* Limelight tips:
+      -- Start with SENSOR GAIN = 15
+      -- Set FLICKER CORRECTION to 60 Hz
+      -- reduce exposure until tags start flickering
+      -- set DETECTOR DOWNSCALE to 2
+      -- set QUALITY THRESHOLD to 2
+      -- enable FULL 3D TARGETING
+      */
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter");
       if( mt2 != null )
       {
