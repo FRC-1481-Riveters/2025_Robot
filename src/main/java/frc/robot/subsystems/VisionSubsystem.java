@@ -45,7 +45,9 @@ public class VisionSubsystem extends SubsystemBase {
         0
         );
         LimelightHelpers.SetFiducialIDFiltersOverride("limelight-riveter", new int[] {3,6,7,8,9,10,11,16,17,18,19,20,21,22});
-  }
+
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-two", new int[] {3,6,7,8,9,10,11,16,17,18,19,20,21,22});
+    }
 
   @Override
   public void periodic() {
@@ -56,13 +58,14 @@ public class VisionSubsystem extends SubsystemBase {
 
       double headingDegrees = driveState.Pose.getRotation().getDegrees();
       LimelightHelpers.SetRobotOrientation("limelight-riveter", headingDegrees, 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation("limelight-two", headingDegrees, 0, 0, 0, 0, 0);
 
       if(Math.abs(omegaRps) > 2.0) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
         return;
 
       boolean bValid;
       bValid = true;
-/*
+
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter");
       if( mt2 != null )
       {
@@ -72,7 +75,7 @@ public class VisionSubsystem extends SubsystemBase {
         }
         m_commandSwerveDrivetrain.updateOdometry(mt2.pose, bValid, mt2.timestampSeconds,mt2.tagCount, mt2.avgTagArea);
       }
-*/
+
       bValid = true;
       LimelightHelpers.PoseEstimate mtCam2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-two");
       if( mtCam2 != null )
