@@ -81,7 +81,7 @@ public class VisionSubsystem extends SubsystemBase {
         {
           bValid = false;
         }
-        m_commandSwerveDrivetrain.updateOdometry(mt2.pose, bValid, mt2.timestampSeconds,mt2.tagCount, mt2.avgTagArea);
+        m_commandSwerveDrivetrain.updateOdometry(mt2.pose, bValid, mt2.timestampSeconds,mt2.tagCount, mt2.avgTagDist);
       }
 
       bValid = true;
@@ -92,7 +92,7 @@ public class VisionSubsystem extends SubsystemBase {
         {
           bValid = false;
         }
-        m_commandSwerveDrivetrain.updateOdometry(mtCam2.pose, bValid, mtCam2.timestampSeconds, mtCam2.tagCount, mtCam2.avgTagArea);
+        m_commandSwerveDrivetrain.updateOdometry(mtCam2.pose, bValid, mtCam2.timestampSeconds, mtCam2.tagCount, mtCam2.avgTagDist);
       }
   }
 

@@ -356,33 +356,48 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         setControl( m_pathApplyRobotSpeeds.withSpeeds(cs));
     }
 
-    public void updateOdometry(Pose2d pose, boolean valid, double timestamp, int tagCount, double tagArea)
+    public void updateOdometry(Pose2d pose, boolean valid, double timestamp, int tagCount, double tagDistance)
     {
         double xyStds, radStds;
 
         // WPILib SwerveDrivePoseEstimator:
+        // Standard deviations of the vision pose measurement 
+        // (x position in meters, y position in meters, and heading in radians).
+        // Increase these numbers to trust the vision pose measurement less.
+        //
         // - The default standard deviations of the model states are 
-        //   0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading. 
-        xyStds = 0.1;     // default: Limelight pose is not particularly trustworthy
-        radStds = 0.1;
+        //   0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+        //
+        // When incorporating AprilTag poses, 
+        //   make the vision heading standard deviation very large,
+        //   make the gyro heading standard deviation small, and 
+        //   scale the vision x and y standard deviation by distance from the tag.
+
+        xyStds  = 0.10;     // default: Limelight pose is not particularly trustworthy
+        radStds = 0.03;
 
         if( valid && fusionEnabled )
         {
             // multiple targets detected - high confidence
             if (tagCount > 1) 
             {
-                xyStds = 0.02;
-                radStds = 0.02;
+                xyStds  = 0.020;
+                radStds = 0.006;
             }
-            // 1 target with large area (0.01 is about 14% of image width)
-            else if (tagArea > 0.01) {
-                xyStds = 0.01;
-                radStds = 0.01;
+            // target over 4m away - trust is low
+            else if (tagDistance > 4) {
+                xyStds  = 0.050;
+                radStds = 0.016;
             }
-            // 1 target with small area (0.002 is about 4.4% of image width)
-            else if (tagArea > 0.002) {
-                xyStds = 0.05;
-                radStds = 0.05;
+            // target over 2m away - trust is medium
+            else if (tagDistance > 2) {
+                xyStds  = 0.020;
+                radStds = 0.006;
+            }
+            // target close - trust is high
+            else if (tagDistance < 2) {
+                xyStds  = 0.0050;
+                radStds = 0.0016;
             }
 
             if( pose.getX() != 0 && pose.getY() != 0 )
