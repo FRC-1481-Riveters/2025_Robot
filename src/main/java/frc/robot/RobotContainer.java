@@ -680,65 +680,13 @@ public class RobotContainer {
                 
 public Command PingPongCommand()
 {
-  double coralOffsetDirection = -1.0;  // handles going for left side coral (+y) or right side coral (-y)
-  RawFiducial fiducial;
+  Pose2d targetLoader = new Pose2d(1.211,7.028, Rotation2d.fromDegrees(-45));
+  Pose2d targetReef = new Pose2d(3.836, 5.194, Rotation2d.fromDegrees(-61.091));
 
-  Pose2d botPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-riveter").pose;
-  if( botPose.getX() != 0 )
-  {
-      drivetrain.resetPose( botPose );
-  }
-
-  Pose2d closestTagPose = closestAprilTag(drivetrain.getState().Pose);
-  PreviousTagPose = closestTagPose;
-
-  // This function will align to the left reef post if the robot is to the left of the tag,
-  // or to the right reef post if the robot is to the right of the tag.
-  try
-  {
-      fiducial = m_Vision.getFiducialWithId(m_Vision.getClosestFiducial().id);
-      // If your target is on the rightmost edge of 
-      // your limelight feed, tx should return roughly 31 degrees.
-      // If the robot is aimed vaguely towards the reef, and the target is on the right, txnc will be positive
-      if( fiducial.txnc < 0 )
-          coralOffsetDirection = 1.0;
-
-      // Make a Transform2d to calculate the offset of the robot position 
-      // when it's up against the edge of the reef, lined up with the
-      // correct coral post.
-      // The offset includes reefSpacing (distance between coral posts)
-      // and the bumper-to-bumper width of the robot itself
-      Transform2d coralOffsetLeft = new Transform2d( 
-          reefAlignmentConstants.robotWidth / 2, 
-          coralOffsetDirection * reefAlignmentConstants.reefSpacing/2 + reefAlignmentConstants.coralScoreOffset, 
-          Rotation2d.kZero );
-
-      // Make a Transform2d to calculate the offset of the robot position 
-      // when it's up against the edge of the reef, lined up with the
-      // correct coral post.
-      // The offset includes reefSpacing (distance between coral posts)
-      // and the bumper-to-bumper width of the robot itself, AND
-      // a short distance where PositionPIDCommand is used instead of
-      // PathPlanner, because PathPlanner is only accurate to +/- 2".
-      Transform2d coralOffsetLeftShort = new Transform2d( 
-          reefAlignmentConstants.robotWidth / 2 + reefAlignmentConstants.shortDistance, 
-          coralOffsetDirection * reefAlignmentConstants.reefSpacing/2 + reefAlignmentConstants.coralScoreOffset,
-          Rotation2d.kZero );
-
-      Pose2d targetLoader = new Pose2d(1.211,7.028, Rotation2d.fromDegrees(-45));
-      Pose2d targetReef = new Pose2d(3.836, 5.194, Rotation2d.fromDegrees(-61.091));
-
-      return driveToPose( drivetrain.getState().Pose, targetReef, targetReef )
-        .andThen( driveToPose( drivetrain.getState().Pose, targetLoader, targetLoader ) )
-        .andThen( driveToPose( drivetrain.getState().Pose, targetReef, targetReef ) )
-        .andThen( driveToPose( drivetrain.getState().Pose, targetLoader, targetLoader ) );
-  }
-  catch (VisionSubsystem.NoSuchTargetException nste)
-  {
-      // if no AprilTag is visible, just don't do anything
-      System.out.println("Align: no tag is visible");
-      return Commands.waitSeconds(3);
-  }
+  return driveToPose( drivetrain.getState().Pose, targetReef, targetReef )
+    .andThen( driveToPose( drivetrain.getState().Pose, targetLoader, targetLoader ) )
+    .andThen( driveToPose( drivetrain.getState().Pose, targetReef, targetReef ) )
+    .andThen( driveToPose( drivetrain.getState().Pose, targetLoader, targetLoader ) );
 }
 
 public DeferredCommand CoralAlign () {

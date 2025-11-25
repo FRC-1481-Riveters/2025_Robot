@@ -373,34 +373,39 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         //   make the gyro heading standard deviation small, and 
         //   scale the vision x and y standard deviation by distance from the tag.
 
-        xyStds  = 0.10;     // default: Limelight pose is not particularly trustworthy
-        radStds = 0.03;
+        xyStds  = 5.000;     // default: Limelight pose is not particularly trustworthy
+        radStds = 1.333;
 
         if( valid && fusionEnabled )
         {
+            boolean bTooFar;
+            bTooFar = false;
+
             // multiple targets detected - trust is medium
             if (tagCount > 1) 
             {
-                xyStds  = 0.030;
-                radStds = 0.010;
+                xyStds  = 0.300;
+                radStds = 0.100;
             }
             // target over 4m away - trust is low
             else if (tagDistance > 4) {
-                xyStds  = 0.050;
-                radStds = 0.016;
+                xyStds  = 1.000;
+                radStds = 0.333;
+                bTooFar = true;
             }
             // target over 2m away - trust is medium
             else if (tagDistance > 2) {
-                xyStds  = 0.030;
-                radStds = 0.010;
+                xyStds  = 0.500;
+                radStds = 0.160;
+                bTooFar = true;
             }
             // target close - trust is high
             else if (tagDistance < 2) {
-                xyStds  = 0.010;
-                radStds = 0.003;
+                xyStds  = 0.300;
+                radStds = 0.100;
             }
 
-            if( pose.getX() != 0 && pose.getY() != 0 )
+            if( pose.getX() != 0 && pose.getY() != 0 && (bTooFar == false) )
             {
                 this.setVisionMeasurementStdDevs(VecBuilder.fill(xyStds, xyStds, radStds));
                 this.addVisionMeasurement(pose, timestamp);

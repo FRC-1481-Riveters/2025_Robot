@@ -38,9 +38,9 @@ public class PositionPIDCommand extends Command{
     public final Pose2d goalPose;
     private PPHolonomicDriveController mDriveController = new PPHolonomicDriveController(
                     // PID constants for translation
-                   new PIDConstants(6, 0, 0),
+                   new PIDConstants(4, 0.000006, 0),
                     // PID constants for rotation
-                    new PIDConstants(2.6, 0, 0)
+                    new PIDConstants(2.5, 0.000003, 0)
                 );
 
     private final Trigger endTrigger;
@@ -48,8 +48,8 @@ public class PositionPIDCommand extends Command{
 
     private final BooleanPublisher endTriggerLogger = NetworkTableInstance.getDefault().getTable("logging").getBooleanTopic("PositionPIDEndTrigger").publish();
     public static final Time kEndTriggerDebounce = Seconds.of(0.1);
-    public static final Distance kPositionTolerance = Centimeter.of(1.0);
-    public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(2.0);
+    public static final Distance kPositionTolerance = Centimeter.of(2.0);
+    public static final Rotation2d kRotationTolerance = Rotation2d.fromDegrees(4.0);
     public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
 
             
@@ -85,6 +85,7 @@ public class PositionPIDCommand extends Command{
             }
         
             public static Command generateCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose, double timeout){
+                timeout = 20; //!*!*!*
                 return new PositionPIDCommand(mSwerve, goalPose).withTimeout(timeout).finallyDo( () -> {
                     ChassisSpeeds cs = new ChassisSpeeds();
                     mSwerve.driveLoop(cs);
@@ -96,18 +97,7 @@ public class PositionPIDCommand extends Command{
     public void initialize() {
         DecimalFormat df = new DecimalFormat("#.00");
         System.out.println("PositionPIDCommand to x=" + df.format(goalPose.getX()) + " y=" + df.format(goalPose.getY() ));
-        Pose2d robotPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-riveter");
-        if( robotPose.getX() == 0 && robotPose.getY() == 0 )
-        {
-            // Don't run this command if the Limelight didn't return a valid position
-            this.cancel();
-        }
-        else
-        {
-            mSwerve.resetPose( robotPose );
-            //mSwerve.fusionDisable(); // DON'T TAKE THIS OUT because auton goes nuts
-            endTriggerLogger.accept(endTrigger.getAsBoolean());
-        }
+        endTriggerLogger.accept(endTrigger.getAsBoolean());
     }
 
     @Override
@@ -128,8 +118,14 @@ public class PositionPIDCommand extends Command{
 //        }
 
         cs = mDriveController.calculateRobotRelativeSpeeds( mSwerve.getState().Pose, goalState );
-        cs.vxMetersPerSecond = Math.min( cs.vxMetersPerSecond,0.75 );
-        cs.vyMetersPerSecond = Math.min( cs.vyMetersPerSecond,0.75 );
+        if( cs.vxMetersPerSecond < 0 )
+            cs.vxMetersPerSecond = Math.max( cs.vxMetersPerSecond,-2.5 ); //!*!*!* max speed
+        else
+            cs.vxMetersPerSecond = Math.min( cs.vxMetersPerSecond,2.5 ); //!*!*!* max speed
+        if( cs.vyMetersPerSecond < 0 )
+            cs.vyMetersPerSecond = Math.max( cs.vyMetersPerSecond,-2.5 ); //!*!*!* max speed
+        else
+            cs.vyMetersPerSecond = Math.min( cs.vyMetersPerSecond,2.5 ); //!*!*!* max speed
 
 //        cs.vxMetersPerSecond /= 2;
 //        cs.vyMetersPerSecond *= 1.3;
