@@ -38,9 +38,9 @@ public class PositionPIDCommand extends Command{
     public final Pose2d goalPose;
     private PPHolonomicDriveController mDriveController = new PPHolonomicDriveController(
                     // PID constants for translation
-                   new PIDConstants(4, 0.000006, 0),
+                   new PIDConstants(3.0, 0.000006, 0, 0.3),
                     // PID constants for rotation
-                    new PIDConstants(2.5, 0.000003, 0)
+                    new PIDConstants(3.5, 0.000003, 0, 0.3)
                 );
 
     private final Trigger endTrigger;
@@ -53,42 +53,43 @@ public class PositionPIDCommand extends Command{
     public static final LinearVelocity kSpeedTolerance = InchesPerSecond.of(1);
 
             
-            private PositionPIDCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose) {
-                this.mSwerve = mSwerve;
-                this.goalPose = goalPose;
+    private PositionPIDCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose) {
+        this.mSwerve = mSwerve;
+        this.goalPose = goalPose;
+
+        endTrigger = new Trigger(()-> {
+            Pose2d diff = mSwerve.getState().Pose.relativeTo(goalPose);
+    
+            var rotation = MathUtil.isNear(
+                0.0, 
+                diff.getRotation().getRotations(), 
+                kRotationTolerance.getRotations(), 
+                0.0, 
+                1.0
+            );
+
+            var position = diff.getTranslation().getNorm() < kPositionTolerance.in(Meters);
+
+            var speed = mSwerve.getSpeed() < kSpeedTolerance.in(MetersPerSecond);
+
+            DecimalFormat df = new DecimalFormat("#.00");
+            System.out.println("end trigger conditions R: "+ rotation + "\tP: " + position + "\tS: " + speed  
+                + "  x=" + df.format(mSwerve.getState().Pose.getX()) + "  targetX=" + df.format(goalPose.getX()) 
+                + "  y=" + df.format(mSwerve.getState().Pose.getY()) + " targetY=" + df.format(goalPose.getY())
+                + " rot=" + df.format(mSwerve.getState().Pose.getRotation().getRadians()) + " targetRot=" + df.format(goalPose.getRotation().getRadians()));
+            
+            return rotation && position && speed;
+        });
+
+        endTriggerDebounced = endTrigger.debounce(kEndTriggerDebounce.in(Seconds));
+    }
         
-                endTrigger = new Trigger(()-> {
-                    Pose2d diff = mSwerve.getState().Pose.relativeTo(goalPose);
-          
-                    var rotation = MathUtil.isNear(
-                        0.0, 
-                        diff.getRotation().getRotations(), 
-                        kRotationTolerance.getRotations(), 
-                        0.0, 
-                        1.0
-                    );
-        
-                    var position = diff.getTranslation().getNorm() < kPositionTolerance.in(Meters);
-        
-                    var speed = mSwerve.getSpeed() < kSpeedTolerance.in(MetersPerSecond);
-        
-                    DecimalFormat df = new DecimalFormat("#.00");
-                    System.out.println("end trigger conditions R: "+ rotation + "\tP: " + position + "\tS: " + speed  
-                        + "  x=" + df.format(mSwerve.getState().Pose.getX()) + "  targetX=" + df.format(goalPose.getX()) 
-                        + "  y=" + df.format(mSwerve.getState().Pose.getY()) + " targetY=" + df.format(goalPose.getY())
-                        + " rot=" + df.format(mSwerve.getState().Pose.getRotation().getRadians()) + " targetRot=" + df.format(goalPose.getRotation().getRadians()));
-                    
-                    return rotation && position && speed;
-                });
-        
-                endTriggerDebounced = endTrigger.debounce(kEndTriggerDebounce.in(Seconds));
-            }
-        
-            public static Command generateCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose, double timeout){
-                timeout = 20; //!*!*!*
-                return new PositionPIDCommand(mSwerve, goalPose).withTimeout(timeout).finallyDo( () -> {
-                    ChassisSpeeds cs = new ChassisSpeeds();
-                    mSwerve.driveLoop(cs);
+    public static Command generateCommand(CommandSwerveDrivetrain mSwerve, Pose2d goalPose, double timeout){
+        timeout = 20; //!*!*!*
+        return new PositionPIDCommand(mSwerve, goalPose).withTimeout(timeout).finallyDo( () -> 
+            {
+                ChassisSpeeds cs = new ChassisSpeeds();
+                mSwerve.driveLoop(cs);
             }
         );
     }
